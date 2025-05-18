@@ -1,0 +1,96 @@
+// Colors
+$primary-color: #007bff;
+$secondary-color: #6c757d;
+$success-color: #28a745;
+$danger-color: #dc3545;
+$warning-color: #ffc107;
+$info-color: #17a2b8;
+$light-color: #f8f9fa;
+$dark-color: #343a40;
+$white: #ffffff;
+$black: #000000;
+$border-color: #dee2e6;
+
+// Theme colors
+:root {
+  // Light theme (default)
+  --color-bg: #{$light-color};
+  --color-text: #{$dark-color};
+  --color-primary: #{$primary-color};
+  --color-secondary: #{$secondary-color};
+  --color-border: #{$border-color};
+  --color-key-bg: #f0f0f0;
+  --color-key-hover: #e0e0e0;
+  --color-key-active: #d0d0d0;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-hover: rgba(0, 0, 0, 0.15);
+  --color-shadow-active: rgba(0, 0, 0, 0.2);
+}
+
+// Dark theme
+[data-theme="dark"] {
+  --color-bg: #121212;
+  --color-text: #{$light-color};
+  --color-primary: #4dabf7;
+  --color-secondary: #adb5bd;
+  --color-border: #495057;
+  --color-key-bg: #2a2a2a;
+  --color-key-hover: #3a3a3a;
+  --color-key-active: #4a4a4a;
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-hover: rgba(0, 0, 0, 0.4);
+  --color-shadow-active: rgba(0, 0, 0, 0.5);
+}
+
+// Typography
+$font-family-base: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$font-size-base: 1rem;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+$line-height-base: 1.5;
+
+// Spacing
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 3rem;
+
+// Borders
+$border-radius: 0.25rem;
+$border-width: 1px;
+
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+// Grid
+$grid-columns: 12;
+$grid-gutter-width: 1.5rem;
+
+// KeyGrid specific
+$key-size: 80px;
+$key-gap: 10px;
+$key-border-radius: 8px;
+$key-background: #f0f0f0;
+$key-hover-background: #e0e0e0;
+$key-active-background: #d0d0d0;
+
+// Battery indicator
+$battery-height: 20px;
+$battery-border-radius: 10px;
+$battery-background: #e0e0e0;
+$battery-fill-color: $success-color;
+$battery-low-color: $danger-color;
+$battery-medium-color: $warning-color;
+
+// OTA progress
+$progress-height: 24px;
+$progress-border-radius: 12px;
+$progress-background: #e0e0e0;
+$progress-fill-color: $primary-color;
+
+// Transitions
+$transition-base: all 0.2s ease-in-out;

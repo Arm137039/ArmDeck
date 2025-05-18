@@ -1,0 +1,131 @@
+@use 'variables' as *;
+
+.key-grid-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.key-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: $key-gap;
+  margin-bottom: $spacing-lg;
+}
+
+.key {
+  position: relative;
+  height: $key-size;
+  background-color: var(--color-key-bg);
+  border-radius: $key-border-radius;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  transition: $transition-base;
+  box-shadow: 0 2px 4px var(--color-shadow);
+  user-select: none;
+
+  &:hover {
+    background-color: var(--color-key-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--color-shadow-hover);
+  }
+
+  &.dragging {
+    cursor: grabbing;
+    box-shadow: 0 8px 16px var(--color-shadow-active);
+  }
+}
+
+.key-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: $spacing-sm;
+  width: 100%;
+  height: 100%;
+}
+
+.key-label {
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+  font-size: 1rem;
+}
+
+.key-action {
+  font-size: 0.8rem;
+  color: var(--color-secondary);
+}
+
+.key-grid-actions {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-md;
+  margin-top: $spacing-md;
+
+  button, label {
+    padding: $spacing-sm $spacing-md;
+    border-radius: $border-radius;
+    border: none;
+    cursor: pointer;
+    transition: $transition-base;
+    font-weight: $font-weight-bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .export-button {
+    background-color: $info-color;
+    color: $white;
+
+    &:hover {
+      background-color: color-mix(in srgb, $info-color, black 10%);
+    }
+  }
+
+  .import-button {
+    background-color: var(--color-secondary);
+    color: $white;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--color-secondary), black 10%);
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: $breakpoint-md) {
+  .key-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: $spacing-sm;
+  }
+
+  .key {
+    height: 70px;
+  }
+
+  .key-label {
+    font-size: 0.9rem;
+  }
+
+  .key-action {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .key-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+  }
+
+  .key {
+    height: 60px;
+  }
+}

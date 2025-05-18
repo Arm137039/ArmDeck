@@ -1,0 +1,82 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-pwa:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: pwa/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd pwa
+        npm ci
+    
+    - name: Build PWA
+      run: |
+        cd pwa
+        npm run build
+    
+    - name: Upload PWA artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: pwa-build
+        path: pwa/dist
+        
+  build-tauri:
+    needs: build-pwa
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: tauri/package-lock.json
+    
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+    
+    - name: Download PWA artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: pwa-build
+        path: pwa/dist
+    
+    - name: Install dependencies
+      run: |
+        cd tauri
+        npm ci
+    
+    - name: Build Tauri (Windows)
+      uses: tauri-apps/tauri-action@v0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        projectPath: tauri
+    
+    - name: Upload Windows artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-installer
+        path: tauri/src-tauri/target/release/bundle/msi/*.msi
