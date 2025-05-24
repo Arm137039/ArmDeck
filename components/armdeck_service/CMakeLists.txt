@@ -1,0 +1,7 @@
+idf_component_register(SRCS "armdeck_service.c"
+                       INCLUDE_DIRS "include"
+                       REQUIRES bt esp_hid esp_timer
+                       PRIV_REQUIRES main)
+
+# Ajouter cette option pour éviter les avertissements d'erreur de format
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-format)
