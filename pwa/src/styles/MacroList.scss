@@ -13,98 +13,74 @@
   }
 }
 
-.category-tabs {
-  display: flex;
-  gap: $spacing-sm;
-  margin-bottom: $spacing-md;
-  overflow-x: auto;
-  padding-bottom: $spacing-sm;
+// .category-tabs and .category-tab styles are now in main.scss as .c-category-tabs and .c-category-tab
 
-  .category-tab {
-    padding: $spacing-sm $spacing-md;
-    border: none;
-    border-radius: $border-radius;
-    background-color: var(--color-key-bg);
-    color: var(--color-text);
-    cursor: pointer;
-    transition: $transition-base;
-    white-space: nowrap;
-
-    &:hover {
-      background-color: var(--color-key-hover);
-    }
-
-    &.active {
-      background-color: var(--color-primary);
-      color: $white;
-    }
-  }
-}
-
-.macro-list {
-  display: grid;
+// Styling for the .macro-list container, which will also use .c-macro-items-container
+// It inherits display:grid, a base gap, and base padding from .c-macro-items-container.
+.macro-list { // Assuming HTML will be <div class="macro-list c-macro-items-container">
+  // Specific grid-template-columns for MacroList, overriding the base from .c-macro-items-container if needed.
+  // The base in .c-macro-items-container is minmax(120px, 1fr). MacroList used 150px.
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: $spacing-md;
+  
+  // Specific properties for MacroList's container
   max-height: 300px;
   overflow-y: auto;
-  padding: $spacing-sm;
-  border-radius: $border-radius;
+  border-radius: $border-radius; // Common styles did not apply border-radius to container
   background-color: var(--color-bg);
   border: $border-width solid var(--color-border);
+  // padding: $spacing-sm; // This is already in .c-macro-items-container
+  // gap: $spacing-md; // This is already in .c-macro-items-container
 }
 
-.macro-item {
-  padding: $spacing-sm;
-  border-radius: $border-radius;
-  background-color: var(--color-key-bg);
+// .macro-item, .macro-label, .macro-action styles are now in main.scss
+// as .c-macro-item, .c-macro-label, .c-macro-action.
+// Specific states like .dragging or cursor overrides can be added here if needed.
+// For example, if .macro-item in this list should specifically be 'grab':
+// .macro-item.c-macro-item { // When used within MacroList context
+//   cursor: grab; 
+//   &.dragging {
+//     cursor: grabbing;
+//     box-shadow: 0 8px 16px var(--color-shadow-active); // This shadow is more pronounced
+//   }
+// }
+// However, the common .c-macro-item already includes hover effects and basic shadow.
+// The .dragging state is specific to MacroList due to dnd context.
+.macro-item { // This will be used as <div class="macro-item c-macro-item">
+  // Override common cursor if needed
   cursor: grab;
-  transition: $transition-base;
-  box-shadow: 0 2px 4px var(--color-shadow);
-  user-select: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-
-  &:hover {
-    background-color: var(--color-key-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--color-shadow-hover);
-  }
 
   &.dragging {
     cursor: grabbing;
+    // The common .c-macro-item has a hover shadow. Dragging shadow might be different.
+    // The common one is: box-shadow: 0 4px 8px var(--color-shadow-hover);
+    // MacroList original dragging: box-shadow: 0 8px 16px var(--color-shadow-active);
+    // This is more specific and should be kept if desired.
     box-shadow: 0 8px 16px var(--color-shadow-active);
   }
 }
 
-.macro-label {
-  font-weight: $font-weight-bold;
-  margin-bottom: $spacing-xs;
-  font-size: 0.9rem;
-}
-
-.macro-action {
-  font-size: 0.7rem;
-  color: var(--color-secondary);
-}
 
 /* Responsive adjustments */
+// For .category-tabs, if any specific responsive behavior is needed for MacroList context,
+// it can be added here targeting .category-tabs.c-category-tabs { ... }
+// The common .c-category-tabs does not have flex-wrap.
+@media (max-width: $breakpoint-sm) {
+  .category-tabs { // Assuming HTML <div class="category-tabs c-category-tabs">
+    // flex-wrap: nowrap; // Common .c-category-tabs is already nowrap by default due to overflow-x: auto
+    justify-content: flex-start; // This might be a specific alignment for MacroList
+  }
+}
+
+// For .macro-list, responsive adjustments to grid and max-height
 @media (max-width: $breakpoint-md) {
-  .macro-list {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  .macro-list { // Targets .macro-list.c-macro-items-container
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); // Overrides its own 150px and common 120px
     max-height: 250px;
   }
 }
 
 @media (max-width: $breakpoint-sm) {
-  .category-tabs {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-  }
-
-  .macro-list {
+  .macro-list { // Targets .macro-list.c-macro-items-container
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     max-height: 200px;
   }

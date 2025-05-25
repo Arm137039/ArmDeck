@@ -2,69 +2,46 @@
 
 .battery-widget {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: $spacing-sm;
-  border-radius: $border-radius;
-  background-color: var(--color-key-bg);
-  box-shadow: 0 2px 4px var(--color-shadow);
-  min-width: 120px;
-  
+  flex-direction: column; // From block 1
+  align-items: center; // Common, suitable for column
+  padding: $spacing-sm; // From block 1
+  border-radius: $border-radius; // From block 1
+  background-color: var(--color-key-bg); // From block 1
+  box-shadow: 0 2px 4px var(--color-shadow); // From block 1
+  min-width: 120px; // From block 1
+  gap: 0.5rem; // From block 2 (will add gap between items in the column)
+
   .battery-icon {
-    margin-bottom: $spacing-xs;
-    
-    svg {
-      width: 32px;
-      height: 32px;
-      color: currentColor; // Use the current text color for the icon
+    width: 24px; // From block 2
+    height: 24px; // From block 2
+    margin-bottom: $spacing-xs; // From block 1 (note: gap might make this redundant or additive)
+                                // If gap is preferred, margin-bottom could be removed or adjusted.
+                                // Keeping both for now as per "merge" instruction.
+
+    svg { // From block 1, adjusted to fit container
+      width: 100%; // To fit 24x24 container
+      height: 100%; // To fit 24x24 container
+      color: currentColor; // From block 1
     }
-  }
-  
-  .battery-text {
-    font-size: 1rem;
-    font-weight: $font-weight-bold;
-  }
-  
-  // Apply red color when battery is low
-  &.battery-low {
-    color: $danger-color;
-  }
-}
-.battery-widget {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  
-  .battery-icon {
-    width: 24px;
-    height: 24px;
-    
-    img {
+
+    img { // From block 2
       width: 100%;
       height: 100%;
     }
   }
-  
-  .battery-level {
+
+  .battery-text { // From block 1
+    font-size: 1rem;
+    font-weight: $font-weight-bold;
+  }
+
+  .battery-level { // From block 2
     font-size: 0.875rem;
     font-weight: 500;
   }
-}
-// Responsive styles for right panel
-@media (min-width: $breakpoint-md) {
-  .app-content {
-    display: flex;
-    
-    .main-content {
-      flex: 1;
-    }
-    
-    .right-panel {
-      min-width: 120px;
-      padding-left: $spacing-md;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-    }
+
+  // Apply red color when battery is low
+  &.battery-low { // From block 1
+    color: $danger-color;
   }
 }

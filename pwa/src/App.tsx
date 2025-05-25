@@ -5,7 +5,7 @@ import KeyGrid from './components/KeyGrid';
 import MacroList from './components/MacroList';
 import BatteryWidget from './components/BatteryWidget';
 import DebugPanel from './components/DebugPanel';
-import useUnifiedBle from './hooks/useBle.ts';
+import useUnifiedBle from './hooks/useUnifiedBle.ts';
 
 const getInitialTheme = (): 'light' | 'dark' => {
   const savedTheme = localStorage.getItem('theme');
@@ -23,11 +23,39 @@ function App() {
     error,
     scanForDevices,
     disconnectDevice,
+    isScanning, // Added isScanning from useUnifiedBle
   } = useUnifiedBle();
 
   const [otaProgress, setOtaProgress] = useState<number | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
   const [showDebug, setShowDebug] = useState<boolean>(true);
+  const [isConnectingInProgress, setIsConnectingInProgress] = useState<boolean>(false);
+
+  useEffect(() => {
+    const webBleIntermediateStages = [
+      'Connecting to GATT...',
+      'Connected to GATT',
+      'Waiting for ESP32...',
+      'Discovering services...',
+      'Getting characteristics...',
+      // 'Scanning...' is also a key stage, especially for Tauri or initial phase of Web
+    ];
+
+    if (isScanning) {
+      setIsConnectingInProgress(true);
+    } else if (!isConnected && !error && 
+               (webBleIntermediateStages.includes(connectionStage) || connectionStage === 'Scanning...')) {
+      setIsConnectingInProgress(true);
+    } else {
+      setIsConnectingInProgress(false);
+    }
+  }, [isConnected, error, connectionStage, isScanning]);
+
+  useEffect(() => {
+    if (error) {
+      console.error("BLE Error:", error);
+    }
+  }, [error]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -94,8 +122,12 @@ function App() {
                         </button>
                       </>
                   ) : (
-                      <button className="connect-button" onClick={scanForDevices}>
-                        Connect to Device
+                      <button 
+                        className="connect-button" 
+                        onClick={scanForDevices}
+                        disabled={isConnectingInProgress}
+                      >
+                        {isScanning ? "Scanning..." : isConnectingInProgress ? "Connecting..." : "Connect to Device"}
                       </button>
                   )}
                 </div>
@@ -107,7 +139,7 @@ function App() {
                       textAlign: 'right',
                       wordBreak: 'break-word'
                     }}>
-                      ❌ {error}
+                      ❌ {error.message}
                     </div>
                 )}
               </div>

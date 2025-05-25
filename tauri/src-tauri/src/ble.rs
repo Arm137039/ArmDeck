@@ -6,14 +6,14 @@ use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use tauri::State;
 use uuid::Uuid;
-use log::{debug, error, info};
+use log::{debug, error, info, warn}; // Added warn
 
 // Define UUIDs for the BLE service and characteristics
-const SERVICE_UUID: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000000); // Replace with actual UUID
-const KEYMAP_CHARACTERISTIC_UUID: Uuid = Uuid::from_u128(0x00000001_0000_0000_0000_000000000000); // Replace with actual UUID
-const CMD_CHARACTERISTIC_UUID: Uuid = Uuid::from_u128(0x00000002_0000_0000_0000_000000000000); // Replace with actual UUID
-const FW_CHUNK_CHARACTERISTIC_UUID: Uuid = Uuid::from_u128(0x00000003_0000_0000_0000_000000000000); // Replace with actual UUID
-const BATTERY_CHARACTERISTIC_UUID: Uuid = Uuid::from_u128(0x00000004_0000_0000_0000_000000000000); // Replace with actual UUID
+const SERVICE_UUID: Uuid = Uuid::from_u128(0x7a0b1000_0000_1000_8000_00805f9b34fb);
+const KEYMAP_CHARACTERISTIC_UUID: Uuid = Uuid::from_u128(0x7a0b1001_0000_1000_8000_00805f9b34fb);
+const CMD_CHARACTERISTIC_UUID: Uuid = Uuid::from_u128(0x7a0b1002_0000_1000_8000_00805f9b34fb);
+const FW_CHUNK_CHARACTERISTIC_UUID: Uuid = Uuid::from_u128(0x7a0b1003_0000_1000_8000_00805f9b34fb);
+const BATTERY_CHARACTERISTIC_UUID: Uuid = Uuid::from_u128(0x7a0b1004_0000_1000_8000_00805f9b34fb);
 
 // Define types for our BLE device state
 pub struct BleState {
@@ -61,116 +61,165 @@ pub struct BleStatus {
 
 // Initialize the BLE adapter
 pub async fn initialize_ble() -> Result<Adapter, String> {
-    let manager = Manager::new().await.map_err(|e| format!("Failed to initialize BLE manager: {}", e))?;
-    let adapters = manager.adapters().await.map_err(|e| format!("Failed to get adapters: {}", e))?;
+    info!("Initializing BLE manager.");
+    let manager = Manager::new().await.map_err(|e| {
+        error!("Failed to initialize BLE manager: {}", e);
+        format!("Failed to initialize BLE manager: {}", e)
+    })?;
+    let adapters = manager.adapters().await.map_err(|e| {
+        error!("Failed to get adapters: {}", e);
+        format!("Failed to get adapters: {}", e)
+    })?;
     
     if adapters.is_empty() {
+        error!("No Bluetooth adapters found.");
         return Err("No Bluetooth adapters found".to_string());
     }
     
-    Ok(adapters[0].clone())
+    let adapter = adapters[0].clone();
+    info!("BLE manager initialized, adapter found: {:?}", adapter.adapter_info().await.unwrap_or_default());
+    Ok(adapter)
 }
 
 // Scan for BLE devices
 #[tauri::command]
 pub async fn scan_for_devices(state: State<'_, Arc<Mutex<BleState>>>) -> Result<Vec<DeviceInfo>, String> {
+    info!("Starting BLE scan.");
     let mut state_guard = state.lock().map_err(|_| "Failed to lock state".to_string())?;
     
     // Initialize adapter if not already done
     if state_guard.adapter.is_none() {
+        info!("Adapter not initialized. Initializing now.");
         state_guard.adapter = Some(initialize_ble().await?);
     }
     
     let adapter = state_guard.adapter.as_ref().unwrap();
     
     // Start scanning
-    adapter.start_scan(ScanFilter::default()).await.map_err(|e| format!("Failed to start scan: {}", e))?;
+    adapter.start_scan(ScanFilter::default()).await.map_err(|e| {
+        error!("Failed to start scan: {}", e);
+        format!("Failed to start scan: {}", e)
+    })?;
+    info!("BLE scan started.");
     
     // Wait for devices to be discovered
     tokio::time::sleep(Duration::from_secs(5)).await;
     
     // Get discovered devices
-    let peripherals = adapter.peripherals().await.map_err(|e| format!("Failed to get peripherals: {}", e))?;
+    let peripherals = adapter.peripherals().await.map_err(|e| {
+        error!("Failed to get peripherals: {}", e);
+        format!("Failed to get peripherals: {}", e)
+    })?;
+    debug!("Found {} peripherals during scan.", peripherals.len());
     
     // Stop scanning
-    adapter.stop_scan().await.map_err(|e| format!("Failed to stop scan: {}", e))?;
+    adapter.stop_scan().await.map_err(|e| {
+        error!("Failed to stop scan: {}", e);
+        format!("Failed to stop scan: {}", e)
+    })?;
     
     // Convert peripherals to DeviceInfo
     let mut devices = Vec::new();
     for peripheral in peripherals {
         let properties = peripheral.properties().await.map_err(|e| format!("Failed to get properties: {}", e))?;
+        let name = properties.and_then(|p| p.local_name).unwrap_or_default();
+        debug!("Discovered peripheral: ID: {}, Name: {}", peripheral.id().to_string(), name);
+
         let device_info = DeviceInfo {
             id: peripheral.id().to_string(),
-            name: properties.and_then(|p| p.local_name),
+            name: if name.is_empty() { None } else { Some(name.clone()) },
         };
         
-        // Only include devices with "StreamDeck" in the name or with our service UUID
-        if let Some(name) = &device_info.name {
-            if name.contains("StreamDeck") {
-                devices.push(device_info);
-                continue;
-            }
+        // Only include devices with "ArmDeck" (updated from StreamDeck) in the name or with our service UUID
+        if name.contains("ArmDeck") {
+            info!("Filtered peripheral for connection (name match): ID: {}, Name: {}", peripheral.id().to_string(), name);
+            devices.push(device_info);
+            continue;
         }
         
         // Check if device has our service
         if let Ok(services) = peripheral.services().await {
             if services.iter().any(|s| s.uuid == SERVICE_UUID) {
+                info!("Filtered peripheral for connection (service UUID match): ID: {}, Name: {}", peripheral.id().to_string(), name);
                 devices.push(device_info);
             }
         }
     }
-    
+    info!("Scan complete. Found {} matching devices.", devices.len());
     Ok(devices)
 }
 
 // Connect to a BLE device
 #[tauri::command]
 pub async fn connect_to_device(device_id: String, state: State<'_, Arc<Mutex<BleState>>>) -> Result<BleStatus, String> {
+    info!("Attempting to connect to device: {}.", device_id);
     let mut state_guard = state.lock().map_err(|_| "Failed to lock state".to_string())?;
     
     // Initialize adapter if not already done
     if state_guard.adapter.is_none() {
+        info!("Adapter not initialized during connect. Initializing now.");
         state_guard.adapter = Some(initialize_ble().await?);
     }
     
     let adapter = state_guard.adapter.as_ref().unwrap();
     
     // Get peripherals
-    let peripherals = adapter.peripherals().await.map_err(|e| format!("Failed to get peripherals: {}", e))?;
+    let peripherals = adapter.peripherals().await.map_err(|e| {
+        error!("Failed to get peripherals while connecting: {}", e);
+        format!("Failed to get peripherals: {}", e)
+    })?;
     
     // Find the device with the matching ID
     let device = peripherals.into_iter()
         .find(|p| p.id().to_string() == device_id)
-        .ok_or_else(|| "Device not found".to_string())?;
+        .ok_or_else(|| {
+            error!("Device not found: {}", device_id);
+            "Device not found".to_string()
+        })?;
     
     // Connect to the device
-    device.connect().await.map_err(|e| format!("Failed to connect: {}", e))?;
+    device.connect().await.map_err(|e| {
+        error!("Failed to connect to device {}: {}", device_id, e);
+        format!("Failed to connect: {}", e)
+    })?;
+    info!("Successfully connected to device: {}.", device_id);
     
     // Discover services
-    device.discover_services().await.map_err(|e| format!("Failed to discover services: {}", e))?;
+    device.discover_services().await.map_err(|e| {
+        error!("Failed to discover services for device {}: {}", device_id, e);
+        format!("Failed to discover services: {}", e)
+    })?;
+    info!("Services discovered for device: {}.", device_id);
     
     // Get the service
     let services = device.services().await.map_err(|e| format!("Failed to get services: {}", e))?;
     let service = services.iter()
         .find(|s| s.uuid == SERVICE_UUID)
-        .ok_or_else(|| "Service not found".to_string())?;
+        .ok_or_else(|| {
+            warn!("Target service UUID {} not found for device: {}.", SERVICE_UUID, device_id);
+            "Service not found".to_string()
+        })?;
     
     // Get characteristics
     let keymap_char = service.characteristics.iter()
         .find(|c| c.uuid == KEYMAP_CHARACTERISTIC_UUID)
         .cloned();
+    if keymap_char.is_some() { debug!("Keymap characteristic found."); } else { warn!("Keymap characteristic NOT found."); }
     
     let cmd_char = service.characteristics.iter()
         .find(|c| c.uuid == CMD_CHARACTERISTIC_UUID)
         .cloned();
+    if cmd_char.is_some() { debug!("Command characteristic found."); } else { warn!("Command characteristic NOT found."); }
     
     let fw_chunk_char = service.characteristics.iter()
         .find(|c| c.uuid == FW_CHUNK_CHARACTERISTIC_UUID)
         .cloned();
+    if fw_chunk_char.is_some() { debug!("Firmware Chunk characteristic found."); } else { warn!("Firmware Chunk characteristic NOT found."); }
     
     let battery_char = service.characteristics.iter()
         .find(|c| c.uuid == BATTERY_CHARACTERISTIC_UUID)
         .cloned();
+    if battery_char.is_some() { debug!("Battery characteristic found."); } else { warn!("Battery characteristic NOT found."); }
     
     // Store the device and characteristics
     state_guard.device = Some(device.clone());
@@ -178,21 +227,27 @@ pub async fn connect_to_device(device_id: String, state: State<'_, Arc<Mutex<Ble
         keymap: keymap_char,
         cmd: cmd_char,
         fw_chunk: fw_chunk_char,
-        battery: battery_char,
+        battery: battery_char.clone(), // Clone for potential use in read_battery_level
     };
     
     // Read battery level if available
-    let battery_level = if let Some(battery_char) = &state_guard.characteristics.battery {
-        if let Ok(data) = device.read(battery_char).await {
-            if !data.is_empty() {
-                let level = data[0];
-                state_guard.battery_level = level;
-                Some(level)
-            } else {
+    let battery_level_value = if let Some(char_ref) = &battery_char {
+        match device.read(char_ref).await {
+            Ok(data) => {
+                if !data.is_empty() {
+                    let level = data[0];
+                    state_guard.battery_level = level;
+                    info!("Initial battery level for {}: {}%.", device_id, level);
+                    Some(level)
+                } else {
+                    warn!("Battery characteristic read returned empty data for {}.", device_id);
+                    None
+                }
+            }
+            Err(e) => {
+                warn!("Failed to read battery level for {}: {}", device_id, e);
                 None
             }
-        } else {
-            None
         }
     } else {
         None
@@ -200,17 +255,22 @@ pub async fn connect_to_device(device_id: String, state: State<'_, Arc<Mutex<Ble
     
     Ok(BleStatus {
         is_connected: true,
-        battery_level,
+        battery_level: battery_level_value,
     })
 }
 
 // Disconnect from the BLE device
 #[tauri::command]
 pub async fn disconnect_device(state: State<'_, Arc<Mutex<BleState>>>) -> Result<BleStatus, String> {
+    info!("Attempting to disconnect from device.");
     let mut state_guard = state.lock().map_err(|_| "Failed to lock state".to_string())?;
     
     if let Some(device) = &state_guard.device {
-        device.disconnect().await.map_err(|e| format!("Failed to disconnect: {}", e))?;
+        let device_id_str = device.id().to_string(); // Capture ID before device is moved/dropped
+        match device.disconnect().await {
+            Ok(_) => info!("Disconnected from device: {}", device_id_str),
+            Err(e) => error!("Failed to disconnect from device {}: {}", device_id_str, e),
+        }
         state_guard.device = None;
         state_guard.characteristics = Characteristics {
             keymap: None,
@@ -219,6 +279,8 @@ pub async fn disconnect_device(state: State<'_, Arc<Mutex<BleState>>>) -> Result
             battery: None,
         };
         state_guard.battery_level = 0;
+    } else {
+        info!("No device was connected.");
     }
     
     Ok(BleStatus {
@@ -230,6 +292,7 @@ pub async fn disconnect_device(state: State<'_, Arc<Mutex<BleState>>>) -> Result
 // Send keymap to the device
 #[tauri::command]
 pub async fn send_keymap(keymap: String, state: State<'_, Arc<Mutex<BleState>>>) -> Result<(), String> {
+    debug!("Attempting to send keymap. Length: {}.", keymap.len());
     let state_guard = state.lock().map_err(|_| "Failed to lock state".to_string())?;
     
     let device = state_guard.device.as_ref().ok_or_else(|| "Device not connected".to_string())?;
@@ -237,14 +300,18 @@ pub async fn send_keymap(keymap: String, state: State<'_, Arc<Mutex<BleState>>>)
     
     device.write(keymap_char, keymap.as_bytes(), WriteType::WithResponse)
         .await
-        .map_err(|e| format!("Failed to send keymap: {}", e))?;
-    
+        .map_err(|e| {
+            error!("Failed to send keymap: {}", e);
+            format!("Failed to send keymap: {}", e)
+        })?;
+    debug!("Keymap sent successfully.");
     Ok(())
 }
 
 // Send command to the device
 #[tauri::command]
 pub async fn send_command(command: String, state: State<'_, Arc<Mutex<BleState>>>) -> Result<(), String> {
+    debug!("Attempting to send command: {}.", command);
     let state_guard = state.lock().map_err(|_| "Failed to lock state".to_string())?;
     
     let device = state_guard.device.as_ref().ok_or_else(|| "Device not connected".to_string())?;
@@ -252,59 +319,78 @@ pub async fn send_command(command: String, state: State<'_, Arc<Mutex<BleState>>
     
     device.write(cmd_char, command.as_bytes(), WriteType::WithResponse)
         .await
-        .map_err(|e| format!("Failed to send command: {}", e))?;
-    
+        .map_err(|e| {
+            error!("Failed to send command {}: {}", command, e);
+            format!("Failed to send command: {}", e)
+        })?;
+    debug!("Command sent successfully.");
     Ok(())
 }
 
 // Send firmware chunk to the device
 #[tauri::command]
 pub async fn send_firmware_chunk(chunk: Vec<u8>, state: State<'_, Arc<Mutex<BleState>>>, window: tauri::Window) -> Result<(), String> {
+    debug!("Attempting to send firmware chunk. Total size: {}.", chunk.len());
     let state_guard = state.lock().map_err(|_| "Failed to lock state".to_string())?;
     
     let device = state_guard.device.as_ref().ok_or_else(|| "Device not connected".to_string())?;
     let fw_chunk_char = state_guard.characteristics.fw_chunk.as_ref().ok_or_else(|| "Firmware chunk characteristic not available".to_string())?;
     
-    // Assuming we're sending chunks of 20 bytes as specified in the requirements
     const CHUNK_SIZE: usize = 20;
-    let total_chunks = (chunk.len() + CHUNK_SIZE - 1) / CHUNK_SIZE; // Ceiling division
+    let total_chunks = (chunk.len() + CHUNK_SIZE - 1) / CHUNK_SIZE;
     
     for i in 0..total_chunks {
         let start = i * CHUNK_SIZE;
         let end = std::cmp::min(start + CHUNK_SIZE, chunk.len());
         let chunk_part = &chunk[start..end];
+        debug!("Sending FW chunk part {}/{}, size: {}.", i + 1, total_chunks, chunk_part.len());
         
         device.write(fw_chunk_char, chunk_part, WriteType::WithResponse)
             .await
-            .map_err(|e| format!("Failed to send firmware chunk: {}", e))?;
+            .map_err(|e| {
+                error!("Failed to send firmware chunk part {}/{}: {}", i + 1, total_chunks, e);
+                format!("Failed to send firmware chunk: {}", e)
+            })?;
         
-        // Update progress
         let percent = ((i + 1) * 100) / total_chunks;
-        window.emit("ota-progress", percent).map_err(|e| format!("Failed to emit progress: {}", e))?;
+        window.emit("ota-progress", percent).map_err(|e| {
+            error!("Failed to emit OTA progress {}: {}", percent, e);
+            format!("Failed to emit progress: {}", e)
+        })?;
+        debug!("OTA progress emitted: {}%.", percent);
         
-        // Small delay to prevent overwhelming the device
         tokio::time::sleep(Duration::from_millis(50)).await;
     }
-    
+    info!("Firmware chunks sent successfully.");
     Ok(())
 }
 
 // Read battery level from the device
 #[tauri::command]
 pub async fn read_battery_level(state: State<'_, Arc<Mutex<BleState>>>) -> Result<Option<u8>, String> {
+    debug!("Attempting to read battery level.");
     let mut state_guard = state.lock().map_err(|_| "Failed to lock state".to_string())?;
     
     if let (Some(device), Some(battery_char)) = (&state_guard.device, &state_guard.characteristics.battery) {
-        let data = device.read(battery_char).await.map_err(|e| format!("Failed to read battery level: {}", e))?;
-        
-        if !data.is_empty() {
-            let level = data[0];
-            state_guard.battery_level = level;
-            Ok(Some(level))
-        } else {
-            Ok(None)
+        match device.read(battery_char).await {
+            Ok(data) => {
+                if !data.is_empty() {
+                    let level = data[0];
+                    state_guard.battery_level = level;
+                    debug!("Battery level read: {}%.", level);
+                    Ok(Some(level))
+                } else {
+                    warn!("Failed to read valid battery level data: characteristic read returned empty data.");
+                    Ok(None)
+                }
+            }
+            Err(e) => {
+                warn!("Failed to read valid battery level data: {}", e);
+                Err(format!("Failed to read battery level: {}", e))
+            }
         }
     } else {
+        warn!("Cannot read battery level: No device connected or battery characteristic not available.");
         Ok(None)
     }
 }
@@ -313,9 +399,11 @@ pub async fn read_battery_level(state: State<'_, Arc<Mutex<BleState>>>) -> Resul
 #[tauri::command]
 pub fn get_ble_status(state: State<'_, Arc<Mutex<BleState>>>) -> Result<BleStatus, String> {
     let state_guard = state.lock().map_err(|_| "Failed to lock state".to_string())?;
-    
+    let is_connected = state_guard.device.is_some();
+    let battery_level = if is_connected { Some(state_guard.battery_level) } else { None };
+    debug!("Fetching BLE status. Connected: {}, Battery: {}%.", is_connected, battery_level.unwrap_or_default());
     Ok(BleStatus {
-        is_connected: state_guard.device.is_some(),
-        battery_level: if state_guard.device.is_some() { Some(state_guard.battery_level) } else { None },
+        is_connected,
+        battery_level,
     })
 }

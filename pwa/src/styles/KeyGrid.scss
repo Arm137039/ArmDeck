@@ -61,43 +61,6 @@
   color: var(--color-secondary);
 }
 
-.key-grid-actions {
-  display: flex;
-  justify-content: center;
-  gap: $spacing-md;
-  margin-top: $spacing-md;
-
-  button, label {
-    padding: $spacing-sm $spacing-md;
-    border-radius: $border-radius;
-    border: none;
-    cursor: pointer;
-    transition: $transition-base;
-    font-weight: $font-weight-bold;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .export-button {
-    background-color: $info-color;
-    color: $white;
-
-    &:hover {
-      background-color: color-mix(in srgb, $info-color, black 10%);
-    }
-  }
-
-  .import-button {
-    background-color: var(--color-secondary);
-    color: $white;
-
-    &:hover {
-      background-color: color-mix(in srgb, var(--color-secondary), black 10%);
-    }
-  }
-}
-
 /* Responsive adjustments */
 @media (max-width: $breakpoint-md) {
   .key-grid {

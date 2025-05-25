@@ -59,68 +59,44 @@
   }
 }
 
-.category-tabs {
-  display: flex;
-  gap: $spacing-xs;
-  padding: $spacing-sm;
-  border-bottom: $border-width solid var(--color-border);
-  overflow-x: auto;
-
-  .category-tab {
-    padding: $spacing-xs $spacing-sm;
-    border: none;
-    border-radius: $border-radius;
-    background-color: var(--color-key-bg);
-    color: var(--color-text);
-    cursor: pointer;
-    transition: $transition-base;
-    white-space: nowrap;
-    font-size: 0.9rem;
-
-    &:hover {
-      background-color: var(--color-key-hover);
-    }
-
-    &.active {
-      background-color: var(--color-primary);
-      color: $white;
-    }
+// .category-tabs and .category-tab styles are now in main.scss as .c-category-tabs and .c-category-tab
+// Specific overrides for MacroModal context if needed:
+.category-tabs { // Assuming HTML <div class="category-tabs c-category-tabs">
+  // Override common styles if they differ significantly for the modal context
+  gap: $spacing-xs; // Modal uses a smaller gap
+  padding: $spacing-sm; // Modal has different padding for the container
+  border-bottom: $border-width solid var(--color-border); // Modal has a border
+  margin-bottom: 0; // Common has margin-bottom, modal might not need it here if header gives space
+  
+  .category-tab { // Assuming HTML <button class="category-tab c-category-tab">
+    // Override common tab padding if different for modal
+    padding: $spacing-xs $spacing-sm; // Modal uses smaller padding for tabs
+    // font-size: 0.9rem; // Already in common .c-category-tab
   }
 }
 
-.macro-grid {
-  display: grid;
+
+// Styling for the .macro-grid container, which will also use .c-macro-items-container
+// It inherits display:grid from .c-macro-items-container.
+.macro-grid { // Assuming HTML will be <div class="macro-grid c-macro-items-container">
+  // Specific grid-template-columns for MacroModal, overriding base from .c-macro-items-container
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: $spacing-sm;
-  padding: $spacing-md;
+  gap: $spacing-sm; // Override common gap
+  padding: $spacing-md; // Override common padding
+  
+  // Specific properties for MacroModal's container
   max-height: 300px;
   overflow-y: auto;
+  // Note: MacroModal's grid does not have its own background or border,
+  // it relies on the modal's background.
 }
 
-.macro-item {
-  padding: $spacing-sm;
-  border-radius: $border-radius;
-  background-color: var(--color-key-bg);
-  cursor: pointer;
-  transition: $transition-base;
-  text-align: center;
-
-  &:hover {
-    background-color: var(--color-key-hover);
-    transform: translateY(-2px);
-  }
-
-  .macro-label {
-    font-weight: $font-weight-bold;
-    margin-bottom: $spacing-xs;
-    font-size: 0.9rem;
-  }
-
-  .macro-action {
-    font-size: 0.7rem;
-    color: var(--color-secondary);
-  }
-}
+// .macro-item, .macro-label, .macro-action styles are now in main.scss
+// as .c-macro-item, .c-macro-label, .c-macro-action.
+// The .c-macro-item default cursor is 'pointer', which matches Modal's original.
+// The hover effect in .c-macro-item (translateY(-2px) and shadow) is slightly different
+// from Modal's original (no shadow specified for item hover, but common one adds it).
+// This change will make modal items also have a shadow on hover.
 
 /* Responsive adjustments */
 @media (max-width: $breakpoint-sm) {

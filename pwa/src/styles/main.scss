@@ -70,6 +70,72 @@ html, body {
   }
 }
 
+/* Action Button Group Styles */
+.actions-group {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-lg; // Default margin, can be overridden by specific contexts
+
+  button,
+  label { // Assuming labels can also be styled as buttons (e.g., for file inputs)
+    padding: $spacing-sm $spacing-md;
+    border-radius: $border-radius;
+    border: none;
+    cursor: pointer;
+    transition: $transition-base;
+    font-weight: $font-weight-bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none; // For labels styled as buttons
+    color: $white; // Default text color, overridden by specific button types
+  }
+
+  // Responsive: stack buttons vertically on smaller screens
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+  }
+}
+
+// Specific button type modifiers
+.btn-export {
+  background-color: $info-color;
+  color: $white;
+  &:hover {
+    background-color: color-mix(in srgb, $info-color, black 10%);
+  }
+}
+
+.btn-import {
+  // For <label> styled as button, ensure it looks similar
+  &, input[type="file"] + & { // Targets both button and label.btn-import
+    background-color: var(--color-secondary);
+    color: $white;
+    &:hover {
+      background-color: color-mix(in srgb, var(--color-secondary), black 10%);
+    }
+  }
+  // Hide the actual file input if label is used
+  input[type="file"].visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+}
+
+.btn-firmware {
+  background-color: $warning-color;
+  color: $black;
+  &:hover {
+    background-color: color-mix(in srgb, $warning-color, black 10%);
+  }
+}
+
 /* Connection status */
 .connection-status {
   display: flex;
@@ -166,47 +232,96 @@ main {
   }
 }
 
-/* Keymap actions */
-.keymap-actions {
+/* Common Category Tabs Styles */
+.c-category-tabs {
   display: flex;
-  gap: $spacing-md;
-  margin-top: $spacing-lg;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md; // Common margin, can be overridden
+  overflow-x: auto;
+  padding-bottom: $spacing-xs; // Minimal padding for scrollbar visibility
 
-  button {
+  .c-category-tab {
     padding: $spacing-sm $spacing-md;
-    border-radius: $border-radius;
     border: none;
+    border-radius: $border-radius;
+    background-color: var(--color-key-bg);
+    color: var(--color-text);
     cursor: pointer;
     transition: $transition-base;
-    font-weight: $font-weight-bold;
-  }
-
-  .export-button {
-    background-color: $info-color;
-    color: $white;
+    white-space: nowrap;
+    font-size: 0.9rem;
 
     &:hover {
-      background-color: color-mix(in srgb, $info-color, black 10%);
+      background-color: var(--color-key-hover);
+    }
+
+    &.active {
+      background-color: var(--color-primary);
+      color: $white;
     }
   }
+}
 
-  .import-button {
-    background-color: var(--color-secondary);
-    color: $white;
+/* Common Macro Items Container Styles */
+.c-macro-items-container {
+  display: grid;
+  // Default, can be overridden by specific component styles
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: $spacing-md;
+  padding: $spacing-sm; // Basic padding, can be augmented
 
-    &:hover {
-      background-color: color-mix(in srgb, var(--color-secondary), black 10%);
-    }
+  // Specific styles like max-height, overflow-y, background, border
+  // should be applied in the component's SCSS file if they vary.
+  // e.g., in MacroList.scss:
+  // .macro-list.c-macro-items-container {
+  //   max-height: 300px;
+  //   overflow-y: auto;
+  //   background-color: var(--color-bg);
+  //   border: $border-width solid var(--color-border);
+  // }
+}
+
+/* Common Macro Item Styles */
+.c-macro-item {
+  padding: $spacing-sm;
+  border-radius: $border-radius;
+  background-color: var(--color-key-bg);
+  cursor: pointer; // Default cursor
+  transition: $transition-base;
+  box-shadow: 0 2px 4px var(--color-shadow);
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 70px; // Ensure a minimum tap target size
+
+  &:hover {
+    background-color: var(--color-key-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--color-shadow-hover);
   }
 
-  .firmware-button {
-    background-color: $warning-color;
-    color: $black;
+  // Specific states like .dragging can be added in the component's SCSS
+  // or here if truly common. For now, keeping it separate.
+  // &.dragging {
+  //   cursor: grabbing;
+  //   box-shadow: 0 8px 16px var(--color-shadow-active);
+  // }
+}
 
-    &:hover {
-      background-color: color-mix(in srgb, $warning-color, black 10%);
-    }
-  }
+.c-macro-label {
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+  font-size: 0.9rem;
+  word-break: break-word; // Prevent overflow
+}
+
+.c-macro-action {
+  font-size: 0.7rem;
+  color: var(--color-secondary);
+  word-break: break-word; // Prevent overflow
 }
 
 /* Footer */
@@ -236,8 +351,24 @@ footer {
     width: 100%;
     justify-content: space-between;
   }
+}
 
-  .keymap-actions {
-    flex-direction: column;
+/* Layout adjustments for larger screens */
+@media (min-width: $breakpoint-md) {
+  .app-content {
+    display: flex;
+
+    .main-content {
+      flex: 1;
+    }
+
+    .right-panel {
+      min-width: 120px; // Ensure right panel has a minimum width
+      padding-left: $spacing-md; // Add some space between main and right panel
+      // Further flex properties for alignment within right-panel itself
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end; // Aligns items like BatteryWidget to the end (right)
+    }
   }
 }
