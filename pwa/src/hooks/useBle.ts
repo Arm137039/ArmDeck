@@ -1,21 +1,21 @@
 import { useState, useCallback, useEffect } from 'react';
 
-// Define UUIDs for the BLE service and characteristics
-const SERVICE_UUID = '00000000-0000-0000-0000-000000000000'; // Replace with actual UUID
-const KEYMAP_CHARACTERISTIC_UUID = '00000001-0000-0000-0000-000000000000'; // Replace with actual UUID
-const CMD_CHARACTERISTIC_UUID = '00000002-0000-0000-0000-000000000000'; // Replace with actual UUID
-const FW_CHUNK_CHARACTERISTIC_UUID = '00000003-0000-0000-0000-000000000000'; // Replace with actual UUID
-const BATTERY_CHARACTERISTIC_UUID = '00000004-0000-0000-0000-000000000000'; // Replace with actual UUID
+const ARMDECK_SERVICE_UUID = '7a0b1000-0000-1000-8000-00805f9b34fb';
+const KEYMAP_CHARACTERISTIC_UUID = '7a0b1001-0000-1000-8000-00805f9b34fb';
+const COMMAND_CHARACTERISTIC_UUID = '7a0b1002-0000-1000-8000-00805f9b34fb';
+const BATTERY_CHARACTERISTIC_UUID = '7a0b1004-0000-1000-8000-00805f9b34fb';
 
-// Define types
+// Standard Bluetooth service UUIDs
+const DEVICE_INFO_SERVICE_UUID = '0000180a-0000-1000-8000-00805f9b34fb';
+
 interface BleDevice {
   device: BluetoothDevice;
   server?: BluetoothRemoteGATTServer;
-  service?: BluetoothRemoteGATTService;
+  deviceInfoService?: BluetoothRemoteGATTService;
+  armdeckService?: BluetoothRemoteGATTService;
   characteristics: {
     keymap?: BluetoothRemoteGATTCharacteristic;
     cmd?: BluetoothRemoteGATTCharacteristic;
-    fwChunk?: BluetoothRemoteGATTCharacteristic;
     battery?: BluetoothRemoteGATTCharacteristic;
   };
 }
@@ -25,25 +25,24 @@ interface UseBleReturn {
   isConnected: boolean;
   isScanning: boolean;
   batteryLevel: number | null;
+  connectionStage: string;
   error: string | null;
   scanForDevices: () => Promise<void>;
-  connectToDevice: (device: BluetoothDevice) => Promise<void>;
   disconnectDevice: () => void;
   sendKeymap: (keymap: string) => Promise<void>;
   sendCommand: (command: string) => Promise<void>;
-  sendFirmwareChunk: (chunk: ArrayBuffer, progress: (percent: number) => void) => Promise<void>;
   readBatteryLevel: () => Promise<number>;
 }
 
-export const useBle = (): UseBleReturn => {
+const useBle = (): UseBleReturn => {
   const [isAvailable, setIsAvailable] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
+  const [connectionStage, setConnectionStage] = useState<string>('Disconnected');
   const [error, setError] = useState<string | null>(null);
   const [bleDevice, setBleDevice] = useState<BleDevice | null>(null);
 
-  // Check if Web Bluetooth is available
   useEffect(() => {
     if (navigator.bluetooth) {
       setIsAvailable(true);
@@ -53,195 +52,355 @@ export const useBle = (): UseBleReturn => {
     }
   }, []);
 
-  // Scan for BLE devices
+  const cleanupConnection = useCallback(() => {
+    if (bleDevice?.characteristics.battery) {
+      try {
+        bleDevice.characteristics.battery.stopNotifications().catch(() => {});
+      } catch {}
+    }
+    setIsConnected(false);
+    setConnectionStage('Disconnected');
+    setBatteryLevel(null);
+  }, [bleDevice]);
+
+  const handleDisconnection = useCallback((device: BluetoothDevice) => {
+    console.log(`🔌 Device disconnected: ${device.name || 'Unknown device'}`);
+    cleanupConnection();
+  }, [cleanupConnection]);
+
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const connectToServices = useCallback(async (device: BluetoothDevice) => {
+    try {
+      setError(null);
+      setConnectionStage('Connecting to GATT...');
+
+      if (!device.gatt) {
+        throw new Error('GATT not available');
+      }
+
+      const server = await device.gatt.connect();
+      console.log('✅ GATT connected');
+      setConnectionStage('Connected to GATT');
+
+      // Chrome voit les services, donc on peut être moins conservateur sur le timing
+      console.log('⏳ Waiting 5 seconds for ESP32 stability...');
+      setConnectionStage('Waiting for ESP32...');
+      await delay(5000);
+
+      // Découvrir les services directement car Chrome les voit déjà
+      console.log('🔍 Discovering services directly...');
+      setConnectionStage('Discovering services...');
+
+      const characteristics: BleDevice['characteristics'] = {};
+      let deviceInfoService: BluetoothRemoteGATTService | undefined;
+      let armdeckService: BluetoothRemoteGATTService | undefined;
+
+      // 1. Device Info service
+      try {
+        deviceInfoService = await server.getPrimaryService(DEVICE_INFO_SERVICE_UUID);
+        console.log('✅ Device Info service found');
+      } catch (e) {
+        console.warn('❌ Device Info service not found:', e);
+      }
+
+      // 2. ArmDeck service - directement car Chrome le voit
+      try {
+        console.log('🔍 Getting ArmDeck service directly...');
+        armdeckService = await server.getPrimaryService(ARMDECK_SERVICE_UUID);
+        console.log('✅ ArmDeck service found!');
+      } catch (e) {
+        console.error('❌ ArmDeck service not found:', e);
+
+        // Si ça échoue, essayer de lister tous les services pour debug
+        try {
+          console.log('🔍 Trying to list all services for debug...');
+          const allServices = await server.getPrimaryServices();
+          console.log(`📋 Found ${allServices.length} services:`);
+          allServices.forEach((service, index) => {
+            console.log(`  ${index + 1}. ${service.uuid}`);
+          });
+        } catch (enumError) {
+          console.warn('❌ Could not enumerate services:', enumError);
+        }
+      }
+
+      // 3. Si on a trouvé le service ArmDeck, récupérer ses caractéristiques
+      if (armdeckService) {
+        console.log('🔍 Getting ArmDeck characteristics...');
+        setConnectionStage('Getting characteristics...');
+
+        try {
+          // Essayer de récupérer toutes les caractéristiques directement
+          console.log('🔍 Getting Keymap characteristic...');
+          characteristics.keymap = await armdeckService.getCharacteristic(KEYMAP_CHARACTERISTIC_UUID);
+          console.log('✅ Keymap characteristic found');
+        } catch (e) {
+          console.warn('❌ Keymap characteristic not found:', e);
+        }
+
+        try {
+          console.log('🔍 Getting Command characteristic...');
+          characteristics.cmd = await armdeckService.getCharacteristic(COMMAND_CHARACTERISTIC_UUID);
+          console.log('✅ Command characteristic found');
+        } catch (e) {
+          console.warn('❌ Command characteristic not found:', e);
+        }
+
+        try {
+          console.log('🔍 Getting Battery characteristic...');
+          characteristics.battery = await armdeckService.getCharacteristic(BATTERY_CHARACTERISTIC_UUID);
+          console.log('✅ Battery characteristic found');
+        } catch (e) {
+          console.warn('❌ Battery characteristic not found:', e);
+        }
+
+        // Si certaines caractéristiques manquent, essayer l'énumération
+        const missingChars = [
+          !characteristics.keymap && 'Keymap',
+          !characteristics.cmd && 'Command',
+          !characteristics.battery && 'Battery'
+        ].filter(Boolean);
+
+        if (missingChars.length > 0) {
+          console.log(`🔍 Missing ${missingChars.join(', ')}, trying enumeration...`);
+          try {
+            const allCharacteristics = await armdeckService.getCharacteristics();
+            console.log(`📋 Found ${allCharacteristics.length} characteristics by enumeration:`);
+
+            allCharacteristics.forEach((char, index) => {
+              console.log(`  ${index + 1}. ${char.uuid}`);
+              const uuid = char.uuid.toLowerCase();
+
+              if (uuid.includes('7a0b1001') && !characteristics.keymap) {
+                console.log('    ✅ Mapped to Keymap');
+                characteristics.keymap = char;
+              } else if (uuid.includes('7a0b1002') && !characteristics.cmd) {
+                console.log('    ✅ Mapped to Command');
+                characteristics.cmd = char;
+              } else if (uuid.includes('7a0b1004') && !characteristics.battery) {
+                console.log('    ✅ Mapped to Battery');
+                characteristics.battery = char;
+              }
+            });
+          } catch (enumError) {
+            console.warn('❌ Characteristic enumeration failed:', enumError);
+          }
+        }
+      }
+
+      // 4. Sauvegarder la configuration
+      setBleDevice({
+        device,
+        server,
+        deviceInfoService,
+        armdeckService,
+        characteristics
+      });
+
+      setIsConnected(true);
+
+      // 5. Déterminer le niveau de connexion
+      const hasKeymap = !!characteristics.keymap;
+      const hasCmd = !!characteristics.cmd;
+      const hasBattery = !!characteristics.battery;
+
+      console.log('📊 Connection summary:');
+      console.log(`  Device Info service: ${!!deviceInfoService}`);
+      console.log(`  ArmDeck service: ${!!armdeckService}`);
+      console.log(`  Keymap characteristic: ${hasKeymap}`);
+      console.log(`  Command characteristic: ${hasCmd}`);
+      console.log(`  Battery characteristic: ${hasBattery}`);
+
+      if (armdeckService && hasKeymap && hasCmd && hasBattery) {
+        setConnectionStage('Fully Connected');
+        console.log('🎉 FULL FUNCTIONALITY AVAILABLE!');
+      } else if (armdeckService && (hasKeymap || hasCmd)) {
+        setConnectionStage('Partially Connected');
+        console.log('🎉 Partial functionality available');
+      } else if (deviceInfoService) {
+        setConnectionStage('Basic Connected');
+        console.log('🎉 Basic connection (Device Info only)');
+      } else {
+        setConnectionStage('Connected (Limited)');
+        console.log('⚠️ Limited connection');
+      }
+
+      // 6. Configuration batterie si disponible
+      if (characteristics.battery) {
+        try {
+          console.log('🔋 Reading initial battery level...');
+          const batteryValue = await characteristics.battery.readValue();
+          const batteryPercent = batteryValue.getUint8(0);
+          setBatteryLevel(batteryPercent);
+          console.log('🔋 Initial battery level:', batteryPercent + '%');
+
+          // Essayer d'activer les notifications
+          try {
+            await characteristics.battery.startNotifications();
+            console.log('✅ Battery notifications enabled');
+            characteristics.battery.addEventListener('characteristicvaluechanged', (event) => {
+              const value = (event.target as BluetoothRemoteGATTCharacteristic).value;
+              if (value) {
+                const level = value.getUint8(0);
+                setBatteryLevel(level);
+                console.log('🔋 Battery update:', level + '%');
+              }
+            });
+          } catch (notifyError) {
+            console.warn('❌ Battery notifications not supported:', notifyError);
+          }
+        } catch (batteryError) {
+          console.warn('❌ Battery setup failed:', batteryError);
+        }
+      }
+
+    } catch (err) {
+      console.error('❌ Connection failed:', err);
+      setIsConnected(false);
+      setConnectionStage('Connection failed');
+      setError(`Connection error: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }, []);
+
   const scanForDevices = useCallback(async () => {
     if (!navigator.bluetooth) {
-      setError('Web Bluetooth is not available');
+      setError('Web Bluetooth not available');
       return;
     }
 
     try {
       setIsScanning(true);
       setError(null);
+      setConnectionStage('Scanning...');
+
+      console.log('🔍 Looking for ArmDeck...');
 
       const device = await navigator.bluetooth.requestDevice({
         filters: [
-          { services: [SERVICE_UUID] },
-          { namePrefix: 'StreamDeck' }
+          { name: 'ArmDeck' },
+          { namePrefix: 'ArmDeck' }
         ],
-        optionalServices: [SERVICE_UUID]
+        optionalServices: [
+          DEVICE_INFO_SERVICE_UUID,
+          ARMDECK_SERVICE_UUID
+        ]
       });
 
-      device.addEventListener('gattserverdisconnected', () => {
-        setIsConnected(false);
-        setBatteryLevel(null);
-      });
+      console.log('📱 Found device:', device.name);
+      console.log('📱 Device ID:', device.id);
 
-      setBleDevice({
-        device,
-        characteristics: {}
-      });
+      device.addEventListener('gattserverdisconnected', () => handleDisconnection(device));
 
+      await connectToServices(device);
       setIsScanning(false);
+
     } catch (err) {
+      console.error('❌ Scan failed:', err);
       setIsScanning(false);
-      setError(`Error scanning for devices: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }, []);
+      setConnectionStage('Scan failed');
 
-  // Connect to a BLE device
-  const connectToDevice = useCallback(async (device: BluetoothDevice) => {
-    try {
-      setError(null);
-
-      const server = await device.gatt?.connect();
-      if (!server) {
-        throw new Error('Failed to connect to GATT server');
+      if (err instanceof Error) {
+        if (err.message.includes('cancelled')) {
+          setError('Connection cancelled by user');
+        } else if (err.message.includes('No devices found')) {
+          setError('ArmDeck not found');
+        } else {
+          setError('Scan error: ' + err.message);
+        }
       }
-
-      const service = await server.getPrimaryService(SERVICE_UUID);
-      
-      // Get all required characteristics
-      const keymapChar = await service.getCharacteristic(KEYMAP_CHARACTERISTIC_UUID);
-      const cmdChar = await service.getCharacteristic(CMD_CHARACTERISTIC_UUID);
-      const fwChunkChar = await service.getCharacteristic(FW_CHUNK_CHARACTERISTIC_UUID);
-      const batteryChar = await service.getCharacteristic(BATTERY_CHARACTERISTIC_UUID);
-
-      setBleDevice({
-        device,
-        server,
-        service,
-        characteristics: {
-          keymap: keymapChar,
-          cmd: cmdChar,
-          fwChunk: fwChunkChar,
-          battery: batteryChar
-        }
-      });
-
-      // Read initial battery level
-      const batteryValue = await batteryChar.readValue();
-      const batteryPercent = batteryValue.getUint8(0);
-      setBatteryLevel(batteryPercent);
-
-      // Set up battery level notifications
-      await batteryChar.startNotifications();
-      batteryChar.addEventListener('characteristicvaluechanged', (event) => {
-        const value = (event.target as BluetoothRemoteGATTCharacteristic).value;
-        if (value) {
-          const batteryPercent = value.getUint8(0);
-          setBatteryLevel(batteryPercent);
-        }
-      });
-
-      setIsConnected(true);
-    } catch (err) {
-      setError(`Error connecting to device: ${err instanceof Error ? err.message : String(err)}`);
     }
-  }, []);
+  }, [handleDisconnection, connectToServices]);
 
-  // Disconnect from the BLE device
   const disconnectDevice = useCallback(() => {
-    if (bleDevice?.server && bleDevice.server.connected) {
-      bleDevice.server.disconnect();
+    if (bleDevice?.server?.connected) {
+      console.log('🔌 Disconnecting...');
+      try {
+        bleDevice.server.disconnect();
+      } catch (e) {
+        console.warn('Disconnect error:', e);
+      }
     }
-    setIsConnected(false);
-    setBatteryLevel(null);
-  }, [bleDevice]);
+    cleanupConnection();
+  }, [bleDevice, cleanupConnection]);
 
-  // Send keymap to the device
   const sendKeymap = useCallback(async (keymap: string) => {
     if (!bleDevice?.characteristics.keymap) {
-      setError('Device not connected or keymap characteristic not available');
+      setError('Keymap characteristic not available');
       return;
     }
 
     try {
       const encoder = new TextEncoder();
-      const keymapData = encoder.encode(keymap);
-      await bleDevice.characteristics.keymap.writeValue(keymapData);
+      const data = encoder.encode(keymap);
+      await bleDevice.characteristics.keymap.writeValue(data);
+      console.log('✅ Keymap sent:', keymap);
+      setError(null);
     } catch (err) {
-      setError(`Error sending keymap: ${err instanceof Error ? err.message : String(err)}`);
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('❌ Keymap send error:', err);
+      setError('Keymap error: ' + msg);
     }
   }, [bleDevice]);
 
-  // Send command to the device
   const sendCommand = useCallback(async (command: string) => {
     if (!bleDevice?.characteristics.cmd) {
-      setError('Device not connected or command characteristic not available');
+      setError('Command characteristic not available');
       return;
     }
 
     try {
-      const encoder = new TextEncoder();
-      const commandData = encoder.encode(command);
-      await bleDevice.characteristics.cmd.writeValue(commandData);
-    } catch (err) {
-      setError(`Error sending command: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }, [bleDevice]);
-
-  // Send firmware chunk to the device
-  const sendFirmwareChunk = useCallback(async (chunk: ArrayBuffer, progress: (percent: number) => void) => {
-    if (!bleDevice?.characteristics.fwChunk) {
-      setError('Device not connected or firmware chunk characteristic not available');
-      return;
-    }
-
-    try {
-      // Assuming we're sending chunks of 20 bytes as specified in the requirements
-      const chunkSize = 20;
-      const totalChunks = Math.ceil(chunk.byteLength / chunkSize);
-      
-      for (let i = 0; i < totalChunks; i++) {
-        const start = i * chunkSize;
-        const end = Math.min(start + chunkSize, chunk.byteLength);
-        const chunkPart = chunk.slice(start, end);
-        
-        await bleDevice.characteristics.fwChunk.writeValue(chunkPart);
-        
-        // Update progress
-        const percent = Math.round(((i + 1) / totalChunks) * 100);
-        progress(percent);
-        
-        // Small delay to prevent overwhelming the device
-        await new Promise(resolve => setTimeout(resolve, 50));
+      let data: Uint8Array;
+      if (command.startsWith('0x')) {
+        const hex = command.replace('0x', '');
+        data = new Uint8Array([parseInt(hex, 16)]);
+      } else {
+        const encoder = new TextEncoder();
+        data = encoder.encode(command);
       }
+
+      await bleDevice.characteristics.cmd.writeValue(data);
+      console.log('✅ Command sent:', command);
+      setError(null);
     } catch (err) {
-      setError(`Error sending firmware chunk: ${err instanceof Error ? err.message : String(err)}`);
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('❌ Command send error:', err);
+      setError('Command error: ' + msg);
     }
   }, [bleDevice]);
 
-  // Read battery level from the device
-  const readBatteryLevel = useCallback(async () => {
+  const readBatteryLevel = useCallback(async (): Promise<number> => {
     if (!bleDevice?.characteristics.battery) {
-      setError('Device not connected or battery characteristic not available');
-      return 0;
+      setError('Battery characteristic not available');
+      return batteryLevel || 0;
     }
 
     try {
-      const batteryValue = await bleDevice.characteristics.battery.readValue();
-      const batteryPercent = batteryValue.getUint8(0);
-      setBatteryLevel(batteryPercent);
-      return batteryPercent;
+      const value = await bleDevice.characteristics.battery.readValue();
+      const level = value.getUint8(0);
+      setBatteryLevel(level);
+      console.log('🔋 Battery read:', level + '%');
+      setError(null);
+      return level;
     } catch (err) {
-      setError(`Error reading battery level: ${err instanceof Error ? err.message : String(err)}`);
-      return 0;
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('❌ Battery read error:', err);
+      setError('Battery read error: ' + msg);
+      return batteryLevel || 0;
     }
-  }, [bleDevice]);
+  }, [bleDevice, batteryLevel]);
 
   return {
     isAvailable,
     isConnected,
     isScanning,
     batteryLevel,
+    connectionStage,
     error,
     scanForDevices,
-    connectToDevice,
     disconnectDevice,
     sendKeymap,
     sendCommand,
-    sendFirmwareChunk,
     readBatteryLevel
   };
 };

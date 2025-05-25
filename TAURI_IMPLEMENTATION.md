@@ -21,7 +21,7 @@ The implementation uses a unified approach that automatically selects the approp
 ### React Application
 
 1. Created a Tauri-specific BLE hook (`useTauriBle.ts`)
-2. Created a unified BLE hook (`useUnifiedBle.ts`) that selects the appropriate implementation
+2. Created a unified BLE hook (`useBle.ts`) that selects the appropriate implementation
 3. Updated the main App component to use the unified BLE hook
 4. Added Tauri dependencies to `package.json`
 5. Added Tauri-specific scripts to `package.json`
