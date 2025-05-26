@@ -1,9 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
 
+// 🔥 UUIDs CORRIGÉS - Ceux que Chrome voit réellement
 const ARMDECK_SERVICE_UUID = '7a0b1000-0000-1000-8000-00805f9b34fb';
-const KEYMAP_CHARACTERISTIC_UUID = '7a0b1001-0000-1000-8000-00805f9b34fb';
-const COMMAND_CHARACTERISTIC_UUID = '7a0b1002-0000-1000-8000-00805f9b34fb';
-const BATTERY_CHARACTERISTIC_UUID = '7a0b1004-0000-1000-8000-00805f9b34fb';
+const KEYMAP_CHARACTERISTIC_UUID = 'fb349b5f-8000-0080-0010-000001100b7a';
+const COMMAND_CHARACTERISTIC_UUID = 'fb349b5f-8000-0080-0010-000002100b7a';
+const BATTERY_CHARACTERISTIC_UUID = 'fb349b5f-8000-0080-0010-000004100b7a';
 
 // Standard Bluetooth service UUIDs
 const DEVICE_INFO_SERVICE_UUID = '0000180a-0000-1000-8000-00805f9b34fb';
@@ -83,38 +84,38 @@ const useBle = (): UseBleReturn => {
       console.log('✅ GATT connected');
       setConnectionStage('Connected to GATT');
 
-      // Chrome voit les services, donc on peut être moins conservateur sur le timing
-      console.log('⏳ Waiting 5 seconds for ESP32 stability...');
+      // Attendre la stabilisation de l'ESP32
+      console.log('⏳ Waiting 3 seconds for ESP32 stability...');
       setConnectionStage('Waiting for ESP32...');
-      await delay(5000);
+      await delay(3000);
 
-      // Découvrir les services directement car Chrome les voit déjà
-      console.log('🔍 Discovering services directly...');
+      console.log('🔍 Discovering services...');
       setConnectionStage('Discovering services...');
 
       const characteristics: BleDevice['characteristics'] = {};
       let deviceInfoService: BluetoothRemoteGATTService | undefined;
       let armdeckService: BluetoothRemoteGATTService | undefined;
 
-      // 1. Device Info service
+      // 1. Service Device Info (standard)
       try {
+        console.log('🔍 Getting Device Information service...');
         deviceInfoService = await server.getPrimaryService(DEVICE_INFO_SERVICE_UUID);
         console.log('✅ Device Info service found');
       } catch (e) {
         console.warn('❌ Device Info service not found:', e);
       }
 
-      // 2. ArmDeck service - directement car Chrome le voit
+      // 2. Service ArmDeck (custom)
       try {
-        console.log('🔍 Getting ArmDeck service directly...');
+        console.log('🔍 Getting ArmDeck service...');
         armdeckService = await server.getPrimaryService(ARMDECK_SERVICE_UUID);
         console.log('✅ ArmDeck service found!');
       } catch (e) {
         console.error('❌ ArmDeck service not found:', e);
 
-        // Si ça échoue, essayer de lister tous les services pour debug
+        // Debug: lister tous les services
         try {
-          console.log('🔍 Trying to list all services for debug...');
+          console.log('🔍 Listing all available services for debug...');
           const allServices = await server.getPrimaryServices();
           console.log(`📋 Found ${allServices.length} services:`);
           allServices.forEach((service, index) => {
@@ -125,37 +126,41 @@ const useBle = (): UseBleReturn => {
         }
       }
 
-      // 3. Si on a trouvé le service ArmDeck, récupérer ses caractéristiques
+      // 3. Récupérer les caractéristiques du service ArmDeck
       if (armdeckService) {
         console.log('🔍 Getting ArmDeck characteristics...');
         setConnectionStage('Getting characteristics...');
 
-        try {
-          // Essayer de récupérer toutes les caractéristiques directement
-          console.log('🔍 Getting Keymap characteristic...');
-          characteristics.keymap = await armdeckService.getCharacteristic(KEYMAP_CHARACTERISTIC_UUID);
-          console.log('✅ Keymap characteristic found');
-        } catch (e) {
-          console.warn('❌ Keymap characteristic not found:', e);
-        }
+        // Essayer de récupérer chaque caractéristique
+        const characteristicPromises = [
+          // Keymap
+          armdeckService.getCharacteristic(KEYMAP_CHARACTERISTIC_UUID)
+              .then(char => {
+                characteristics.keymap = char;
+                console.log('✅ Keymap characteristic found');
+              })
+              .catch(e => console.warn('❌ Keymap characteristic not found:', e)),
 
-        try {
-          console.log('🔍 Getting Command characteristic...');
-          characteristics.cmd = await armdeckService.getCharacteristic(COMMAND_CHARACTERISTIC_UUID);
-          console.log('✅ Command characteristic found');
-        } catch (e) {
-          console.warn('❌ Command characteristic not found:', e);
-        }
+          // Command
+          armdeckService.getCharacteristic(COMMAND_CHARACTERISTIC_UUID)
+              .then(char => {
+                characteristics.cmd = char;
+                console.log('✅ Command characteristic found');
+              })
+              .catch(e => console.warn('❌ Command characteristic not found:', e)),
 
-        try {
-          console.log('🔍 Getting Battery characteristic...');
-          characteristics.battery = await armdeckService.getCharacteristic(BATTERY_CHARACTERISTIC_UUID);
-          console.log('✅ Battery characteristic found');
-        } catch (e) {
-          console.warn('❌ Battery characteristic not found:', e);
-        }
+          // Battery
+          armdeckService.getCharacteristic(BATTERY_CHARACTERISTIC_UUID)
+              .then(char => {
+                characteristics.battery = char;
+                console.log('✅ Battery characteristic found');
+              })
+              .catch(e => console.warn('❌ Battery characteristic not found:', e))
+        ];
 
-        // Si certaines caractéristiques manquent, essayer l'énumération
+        await Promise.all(characteristicPromises);
+
+        // Si des caractéristiques manquent, essayer l'énumération
         const missingChars = [
           !characteristics.keymap && 'Keymap',
           !characteristics.cmd && 'Command',
@@ -172,13 +177,14 @@ const useBle = (): UseBleReturn => {
               console.log(`  ${index + 1}. ${char.uuid}`);
               const uuid = char.uuid.toLowerCase();
 
-              if (uuid.includes('7a0b1001') && !characteristics.keymap) {
+              // Mapping par UUID - utiliser les UUIDs que Chrome voit réellement
+              if (uuid.includes('fb349b5f-8000-0080-0010-000001100b7a') && !characteristics.keymap) {
                 console.log('    ✅ Mapped to Keymap');
                 characteristics.keymap = char;
-              } else if (uuid.includes('7a0b1002') && !characteristics.cmd) {
+              } else if (uuid.includes('fb349b5f-8000-0080-0010-000002100b7a') && !characteristics.cmd) {
                 console.log('    ✅ Mapped to Command');
                 characteristics.cmd = char;
-              } else if (uuid.includes('7a0b1004') && !characteristics.battery) {
+              } else if (uuid.includes('fb349b5f-8000-0080-0010-000004100b7a') && !characteristics.battery) {
                 console.log('    ✅ Mapped to Battery');
                 characteristics.battery = char;
               }
@@ -235,7 +241,7 @@ const useBle = (): UseBleReturn => {
           setBatteryLevel(batteryPercent);
           console.log('🔋 Initial battery level:', batteryPercent + '%');
 
-          // Essayer d'activer les notifications
+          // Notifications batterie
           try {
             await characteristics.battery.startNotifications();
             console.log('✅ Battery notifications enabled');
@@ -274,16 +280,21 @@ const useBle = (): UseBleReturn => {
       setError(null);
       setConnectionStage('Scanning...');
 
-      console.log('🔍 Looking for ArmDeck...');
+      console.log('🔍 Looking for ArmDeck devices...');
 
       const device = await navigator.bluetooth.requestDevice({
         filters: [
           { name: 'ArmDeck' },
-          { namePrefix: 'ArmDeck' }
+          { namePrefix: 'ArmDeck' },
+          // 🔥 NOUVEAU: Filtre par service Device Info que l'ESP32 advertise
+          { services: [DEVICE_INFO_SERVICE_UUID] }
         ],
         optionalServices: [
           DEVICE_INFO_SERVICE_UUID,
-          ARMDECK_SERVICE_UUID
+          ARMDECK_SERVICE_UUID,
+          // 🔥 AJOUT: Services standard HID que Chrome reconnaît
+          '00001812-0000-1000-8000-00805f9b34fb', // HID Service
+          '0000180f-0000-1000-8000-00805f9b34fb'  // Battery Service
         ]
       });
 
@@ -304,7 +315,7 @@ const useBle = (): UseBleReturn => {
         if (err.message.includes('cancelled')) {
           setError('Connection cancelled by user');
         } else if (err.message.includes('No devices found')) {
-          setError('ArmDeck not found');
+          setError('ArmDeck not found. Make sure the device is powered on and advertising. Check chrome://bluetooth-internals for debugging.');
         } else {
           setError('Scan error: ' + err.message);
         }
