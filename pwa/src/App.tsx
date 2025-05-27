@@ -1,30 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import KeyGrid from './components/KeyGrid';
 import MacroList from './components/MacroList';
 import ConnectionStatusPanel from './components/ConnectionStatusPanel';
 import useUnifiedBle from './hooks/useBle';
+import useTheme from './hooks/useTheme';
 import './styles/main.scss';
-
-const getInitialTheme = (): 'light' | 'dark' => {
-  const savedTheme = localStorage.getItem('theme');
-  return (savedTheme as 'light' | 'dark') || 'dark';
-};
 
 function App() {
   const { isConnected, error } = useUnifiedBle();
-  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
     document.body.className = `theme-${theme}`;
   }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-  };
 
   return (
       <DndProvider backend={HTML5Backend}>
