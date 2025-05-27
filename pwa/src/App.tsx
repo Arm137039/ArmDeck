@@ -1,10 +1,10 @@
+// App.tsx - Interface responsive avec thèmes corrigés
 import { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import KeyGrid from './components/KeyGrid';
 import MacroList from './components/MacroList';
-import BatteryWidget from './components/BatteryWidget';
-import DebugPanel from './components/DebugPanel';
+import ConnectionStatusPanel from './components/ConnectionStatusPanel';
 import useUnifiedBle from './hooks/useBle.ts';
 
 const getInitialTheme = (): 'light' | 'dark' => {
@@ -12,165 +12,247 @@ const getInitialTheme = (): 'light' | 'dark' => {
   if (savedTheme === 'dark' || savedTheme === 'light') {
     return savedTheme as 'light' | 'dark';
   }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return 'dark'; // Default to dark for professional look
 };
 
 function App() {
   const {
     isConnected,
-    batteryLevel,
     connectionStage,
     error,
-    scanForDevices,
-    disconnectDevice,
   } = useUnifiedBle();
 
-  const [otaProgress, setOtaProgress] = useState<number | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
-  const [showDebug, setShowDebug] = useState<boolean>(true);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
+
+    // Apply theme globally
+    document.body.style.backgroundColor = theme === 'dark' ? '#0a0a0a' : '#f8f9fa';
+    document.body.style.color = theme === 'dark' ? '#ffffff' : '#333333';
+    document.body.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
   }, [theme]);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) {
-        setTheme(e.matches ? 'dark' : 'light');
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
 
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
   };
 
-  const toggleDebug = () => {
-    setShowDebug(!showDebug);
-  };
+  // Dynamic styles based on theme
+  const getThemedStyle = () => ({
+    background: theme === 'dark' ? '#0a0a0a' : '#f8f9fa',
+    color: theme === 'dark' ? '#ffffff' : '#333333',
+    headerBg: theme === 'dark' ? '#0f0f0f' : '#ffffff',
+    border: theme === 'dark' ? '#222222' : '#e0e0e0',
+    cardBg: theme === 'dark' ? '#1a1a1a' : '#ffffff',
+    textPrimary: theme === 'dark' ? '#ffffff' : '#333333',
+    textSecondary: theme === 'dark' ? '#999999' : '#666666',
+    textMuted: theme === 'dark' ? '#666666' : '#999999'
+  });
+
+  const themedStyle = getThemedStyle();
 
   return (
       <DndProvider backend={HTML5Backend}>
-        <div className="app-container">
-          <header className="app-header">
-            <div className="header-left">
-              <h1>ArmDeck</h1>
-              <button
-                  className="theme-toggle-button"
-                  onClick={toggleTheme}
-                  aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-              >
-                {theme === 'light' ? '🌙' : '☀️'}
-              </button>
-              <button
-                  className="debug-toggle-button"
-                  onClick={toggleDebug}
-                  style={{
-                    marginLeft: '10px',
-                    padding: '8px 12px',
-                    borderRadius: '4px',
-                    border: '1px solid #ccc',
-                    backgroundColor: showDebug ? '#007bff' : '#f8f9fa',
-                    color: showDebug ? 'white' : 'black',
-                    cursor: 'pointer'
-                  }}
-              >
-                🔧 Debug
-              </button>
-            </div>
-            <div className="connection-status">
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                <div style={{ marginBottom: '4px' }}>
-                  {isConnected ? (
-                      <>
-                        <span className="status-connected">✅ {connectionStage}</span>
-                        <button className="disconnect-button" onClick={disconnectDevice}>
-                          Disconnect
-                        </button>
-                      </>
-                  ) : (
-                      <button className="connect-button" onClick={scanForDevices}>
-                        Connect to Device
-                      </button>
-                  )}
+        <div style={{
+          minHeight: '100vh',
+          backgroundColor: themedStyle.background,
+          color: themedStyle.textPrimary,
+          transition: 'all 0.3s ease'
+        }}>
+          {/* Header responsive */}
+          <header style={{
+            padding: '16px 24px',
+            backgroundColor: themedStyle.headerBg,
+            borderBottom: `1px solid ${themedStyle.border}`,
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+            backdropFilter: 'blur(8px)'
+          }}>
+            <div style={{
+              maxWidth: '1400px', // Augmenté pour plus d'espace
+              margin: '0 auto',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              {/* Logo/Title */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <h1 style={{
+                  margin: 0,
+                  fontSize: '20px',
+                  fontWeight: '600',
+                  letterSpacing: '-0.025em',
+                  color: themedStyle.textPrimary
+                }}>
+                  ArmDeck
+                </h1>
+                <div style={{
+                  padding: '4px 8px',
+                  backgroundColor: themedStyle.cardBg,
+                  border: `1px solid ${themedStyle.border}`,
+                  borderRadius: '4px',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  color: themedStyle.textSecondary
+                }}>
+                  Configuration Tool
                 </div>
-                {error && (
-                    <div style={{
-                      fontSize: '12px',
-                      color: 'red',
-                      maxWidth: '300px',
-                      textAlign: 'right',
-                      wordBreak: 'break-word'
-                    }}>
-                      ❌ {error}
-                    </div>
-                )}
+              </div>
+
+              {/* Status et contrôles */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px'
+              }}>
+                {/* Connection status - CORRIGÉ */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '6px 12px',
+                  backgroundColor: isConnected ?
+                      (theme === 'dark' ? '#0f1419' : '#f0f9ff') :
+                      (theme === 'dark' ? '#2d1617' : '#fef2f2'),
+                  border: `1px solid ${isConnected ? '#4ade80' : '#ff6b35'}`,
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: isConnected ? '#4ade80' : '#ff6b35'
+                }}>
+                  <div style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: isConnected ? '#4ade80' : '#ff6b35'
+                  }} />
+                  {isConnected ? 'Connected' : 'Disconnected'}
+                </div>
+
+                {/* Theme toggle */}
+                <button
+                    onClick={toggleTheme}
+                    style={{
+                      padding: '8px',
+                      borderRadius: '6px',
+                      border: `1px solid ${themedStyle.border}`,
+                      backgroundColor: 'transparent',
+                      color: themedStyle.textPrimary,
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = themedStyle.cardBg;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                    title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                >
+                  {theme === 'light' ? '🌙' : '☀️'}
+                </button>
               </div>
             </div>
           </header>
 
-          <div className="app-content">
-            <div className="main-content">
-              {showDebug && <DebugPanel />}
+          {/* Main content - Layout responsive amélioré */}
+          <main style={{
+            maxWidth: '1400px', // Augmenté pour plus d'espace
+            margin: '0 auto'
+          }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(800px, 1fr) 320px', // Min-width pour éviter l'écrasement
+              gap: '24px',
+              alignItems: 'start',
+              padding: '24px'
+            }}>
+              {/* Zone principale */}
+              <div style={{ minWidth: 0 }}> {/* Permet au contenu de se rétrécir */}
+                {/* Connection panel */}
+                <ConnectionStatusPanel />
 
-              <KeyGrid />
+                {/* Key Grid principal */}
+                <KeyGrid />
+              </div>
 
-              {otaProgress !== null && (
-                  <div className="ota-progress">
-                    <h3>Firmware Update</h3>
-                    <div className="progress-bar">
-                      <div className="progress" style={{ width: `${otaProgress}%` }}></div>
+              {/* Sidebar fixe */}
+              <div style={{
+                position: 'sticky',
+                top: '100px',
+                minWidth: '320px' // Largeur fixe pour la sidebar
+              }}>
+                {/* Macro List */}
+                <MacroList />
+
+                {/* Quick Guide */}
+                <div style={{
+                  marginTop: '24px',
+                  padding: '16px',
+                  backgroundColor: themedStyle.cardBg,
+                  border: `1px solid ${themedStyle.border}`,
+                  borderRadius: '8px'
+                }}>
+                  <h3 style={{
+                    margin: '0 0 12px 0',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: themedStyle.textPrimary
+                  }}>
+                    Quick Guide
+                  </h3>
+                  <div style={{
+                    fontSize: '12px',
+                    lineHeight: '1.5',
+                    color: themedStyle.textSecondary
+                  }}>
+                    <div style={{ marginBottom: '6px' }}>
+                      <strong style={{ color: themedStyle.textPrimary }}>Connect:</strong> Pair with your ArmDeck device
                     </div>
-                    <span>{otaProgress}%</span>
+                    <div style={{ marginBottom: '6px' }}>
+                      <strong style={{ color: themedStyle.textPrimary }}>Configure:</strong> Click buttons to assign actions
+                    </div>
+                    <div style={{ marginBottom: '6px' }}>
+                      <strong style={{ color: themedStyle.textPrimary }}>Drag:</strong> Drop macros onto buttons
+                    </div>
+                    <div>
+                      <strong style={{ color: themedStyle.textPrimary }}>Auto-save:</strong> Changes sync automatically
+                    </div>
                   </div>
-              )}
-
-              <MacroList />
-            </div>
-
-            <div className="right-panel">
-              <BatteryWidget alwaysShow={true} />
-
-              <div style={{
-                marginTop: '20px',
-                padding: '15px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                backgroundColor: theme === 'dark' ? '#2a2a2a' : '#f9f9f9'
-              }}>
-                <h4 style={{ margin: '0 0 10px 0' }}>📡 Connection Status</h4>
-                <div style={{ fontSize: '14px' }}>
-                  <p><strong>Status:</strong> {connectionStage}</p>
-                  <p><strong>Connected:</strong> {isConnected ? '✅ Yes' : '❌ No'}</p>
-                  <p><strong>Battery:</strong> {batteryLevel !== null ? `${batteryLevel}%` : 'N/A'}</p>
                 </div>
-              </div>
 
-              <div style={{
-                marginTop: '20px',
-                padding: '15px',
-                border: '1px solid #007bff',
-                borderRadius: '8px',
-                backgroundColor: theme === 'dark' ? '#1a1a2e' : '#e7f3ff'
-              }}>
-                <h4 style={{ margin: '0 0 10px 0', color: '#007bff' }}>🧪 Test Instructions</h4>
-                <div style={{ fontSize: '12px', lineHeight: '1.4' }}>
-                  <p>1. Click "Connect to Device"</p>
-                  <p>2. Wait for "Fully Connected" status</p>
-                  <p>3. Use Debug Panel to test commands</p>
-                  <p>4. Check browser console for logs</p>
-                </div>
+                {/* Error display in sidebar */}
+                {error && (
+                    <div style={{
+                      marginTop: '16px',
+                      padding: '12px',
+                      backgroundColor: theme === 'dark' ? '#2d1617' : '#fef2f2',
+                      border: '1px solid #ff6b35',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      color: '#ff6b35'
+                    }}>
+                      <strong>Connection Error:</strong><br />
+                      {error.length > 60 ? `${error.substring(0, 60)}...` : error}
+                    </div>
+                )}
               </div>
             </div>
-          </div>
+          </main>
 
-          <footer>
-            <p>ArmDeck Configuration Tool - Debug Mode {showDebug ? 'ON' : 'OFF'}</p>
+          {/* Footer minimal */}
+          <footer style={{
+            padding: '24px',
+            textAlign: 'center',
+            fontSize: '11px',
+            color: themedStyle.textMuted,
+            borderTop: `1px solid ${themedStyle.border}`,
+            marginTop: '48px'
+          }}>
+            ArmDeck Configuration Tool • Built with React + ESP32
           </footer>
         </div>
       </DndProvider>

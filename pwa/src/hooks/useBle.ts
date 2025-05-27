@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
 
-// 🔥 UUIDs CORRIGÉS - Ceux que Chrome voit réellement
+// 🔥 UUIDs CORRIGÉS - Ceux que Chrome voit réellement (sans batterie)
 const ARMDECK_SERVICE_UUID = '7a0b1000-0000-1000-8000-00805f9b34fb';
 const KEYMAP_CHARACTERISTIC_UUID = 'fb349b5f-8000-0080-0010-000001100b7a';
 const COMMAND_CHARACTERISTIC_UUID = 'fb349b5f-8000-0080-0010-000002100b7a';
-const BATTERY_CHARACTERISTIC_UUID = 'fb349b5f-8000-0080-0010-000004100b7a';
+// 🔥 SUPPRIMÉ: BATTERY_CHARACTERISTIC_UUID
 
 // Standard Bluetooth service UUIDs
 const DEVICE_INFO_SERVICE_UUID = '0000180a-0000-1000-8000-00805f9b34fb';
@@ -147,15 +147,9 @@ const useBle = (): UseBleReturn => {
                 characteristics.cmd = char;
                 console.log('✅ Command characteristic found');
               })
-              .catch(e => console.warn('❌ Command characteristic not found:', e)),
+              .catch(e => console.warn('❌ Command characteristic not found:', e))
 
-          // Battery
-          armdeckService.getCharacteristic(BATTERY_CHARACTERISTIC_UUID)
-              .then(char => {
-                characteristics.battery = char;
-                console.log('✅ Battery characteristic found');
-              })
-              .catch(e => console.warn('❌ Battery characteristic not found:', e))
+          // 🔥 SUPPRIMÉ: Battery characteristic - plus besoin
         ];
 
         await Promise.all(characteristicPromises);
@@ -163,8 +157,8 @@ const useBle = (): UseBleReturn => {
         // Si des caractéristiques manquent, essayer l'énumération
         const missingChars = [
           !characteristics.keymap && 'Keymap',
-          !characteristics.cmd && 'Command',
-          !characteristics.battery && 'Battery'
+          !characteristics.cmd && 'Command'
+          // 🔥 SUPPRIMÉ: Battery check
         ].filter(Boolean);
 
         if (missingChars.length > 0) {
@@ -209,57 +203,34 @@ const useBle = (): UseBleReturn => {
       // 5. Déterminer le niveau de connexion
       const hasKeymap = !!characteristics.keymap;
       const hasCmd = !!characteristics.cmd;
-      const hasBattery = !!characteristics.battery;
+      // 🔥 SUPPRIMÉ: Battery check pour déterminer la connexion complète
 
       console.log('📊 Connection summary:');
       console.log(`  Device Info service: ${!!deviceInfoService}`);
       console.log(`  ArmDeck service: ${!!armdeckService}`);
       console.log(`  Keymap characteristic: ${hasKeymap}`);
       console.log(`  Command characteristic: ${hasCmd}`);
-      console.log(`  Battery characteristic: ${hasBattery}`);
 
-      if (armdeckService && hasKeymap && hasCmd && hasBattery) {
+      // 🔥 NOUVEAU: Keymap + Command = Fully Connected (sans batterie)
+      if (armdeckService && hasKeymap && hasCmd) {
         setConnectionStage('Fully Connected');
-        console.log('🎉 FULL FUNCTIONALITY AVAILABLE!');
+        setIsConnected(true); // 🔥 IMPORTANT: Marquer comme connecté!
+        console.log('🎉 FULL FUNCTIONALITY AVAILABLE! (Battery service removed)');
       } else if (armdeckService && (hasKeymap || hasCmd)) {
         setConnectionStage('Partially Connected');
+        setIsConnected(false); // Partial = pas fully connected
         console.log('🎉 Partial functionality available');
       } else if (deviceInfoService) {
         setConnectionStage('Basic Connected');
+        setIsConnected(false);
         console.log('🎉 Basic connection (Device Info only)');
       } else {
         setConnectionStage('Connected (Limited)');
+        setIsConnected(false);
         console.log('⚠️ Limited connection');
       }
 
-      // 6. Configuration batterie si disponible
-      if (characteristics.battery) {
-        try {
-          console.log('🔋 Reading initial battery level...');
-          const batteryValue = await characteristics.battery.readValue();
-          const batteryPercent = batteryValue.getUint8(0);
-          setBatteryLevel(batteryPercent);
-          console.log('🔋 Initial battery level:', batteryPercent + '%');
-
-          // Notifications batterie
-          try {
-            await characteristics.battery.startNotifications();
-            console.log('✅ Battery notifications enabled');
-            characteristics.battery.addEventListener('characteristicvaluechanged', (event) => {
-              const value = (event.target as BluetoothRemoteGATTCharacteristic).value;
-              if (value) {
-                const level = value.getUint8(0);
-                setBatteryLevel(level);
-                console.log('🔋 Battery update:', level + '%');
-              }
-            });
-          } catch (notifyError) {
-            console.warn('❌ Battery notifications not supported:', notifyError);
-          }
-        } catch (batteryError) {
-          console.warn('❌ Battery setup failed:', batteryError);
-        }
-      }
+      // 6. PAS de configuration batterie car service supprimé
 
     } catch (err) {
       console.error('❌ Connection failed:', err);
@@ -381,25 +352,10 @@ const useBle = (): UseBleReturn => {
   }, [bleDevice]);
 
   const readBatteryLevel = useCallback(async (): Promise<number> => {
-    if (!bleDevice?.characteristics.battery) {
-      setError('Battery characteristic not available');
-      return batteryLevel || 0;
-    }
-
-    try {
-      const value = await bleDevice.characteristics.battery.readValue();
-      const level = value.getUint8(0);
-      setBatteryLevel(level);
-      console.log('🔋 Battery read:', level + '%');
-      setError(null);
-      return level;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error('❌ Battery read error:', err);
-      setError('Battery read error: ' + msg);
-      return batteryLevel || 0;
-    }
-  }, [bleDevice, batteryLevel]);
+    // 🔥 SUPPRIMÉ: Plus de service batterie
+    setError('Battery service not implemented');
+    return 0;
+  }, []);
 
   return {
     isAvailable,
