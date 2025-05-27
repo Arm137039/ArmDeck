@@ -4,12 +4,12 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import KeyGrid from './components/KeyGrid';
 import MacroList from './components/MacroList';
 import ConnectionStatusPanel from './components/ConnectionStatusPanel';
-import useUnifiedBle from './hooks/useBle';
+import useBle from './hooks/useBle';
 import useTheme from './hooks/useTheme';
 import './styles/main.scss';
 
 function App() {
-  const { isConnected, error } = useUnifiedBle();
+  const { isConnected, error } = useBle();
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {

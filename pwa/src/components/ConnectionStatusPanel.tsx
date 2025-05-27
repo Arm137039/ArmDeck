@@ -1,5 +1,5 @@
 import React from 'react';
-import useUnifiedBle from '../hooks/useBle';
+import useBle from '../hooks/useBle';
 import useDeviceConfig from '../hooks/useDeviceConfig';
 
 const ConnectionStatusPanel: React.FC = () => {
@@ -9,7 +9,7 @@ const ConnectionStatusPanel: React.FC = () => {
         error,
         scanForDevices,
         disconnectDevice,
-    } = useUnifiedBle();
+    } = useBle();
 
     const {
         deviceInfo,

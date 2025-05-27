@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import useUnifiedBle from './useBle';
+import useBle from './useBle';
 
 export interface ButtonConfig {
     id: number;
@@ -58,7 +58,7 @@ const DEFAULT_BUTTONS: ButtonConfig[] = [
 ];
 
 const useDeviceConfig = (): UseDeviceConfigReturn => {
-    const { isConnected, sendCommand } = useUnifiedBle();
+    const { isConnected, sendCommand } = useBle();
 
     const [buttons, setButtons] = useState<ButtonConfig[]>(DEFAULT_BUTTONS);
     const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
