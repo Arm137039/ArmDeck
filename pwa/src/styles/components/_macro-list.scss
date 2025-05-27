@@ -1,0 +1,162 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.macro-list {
+  @include card;
+  padding: spacing(xxl);
+
+  &__title {
+    margin: 0 0 spacing(xl) 0;
+    font-size: font-size(xl);
+    font-weight: font-weight(semibold);
+    color: var(--text-primary);
+  }
+
+  &__tabs {
+    display: flex;
+    gap: spacing(xs);
+    margin-bottom: spacing(xl);
+    flex-wrap: wrap;
+  }
+
+  &__tab {
+    @include button(transparent, var(--text-secondary));
+    padding: spacing(sm) spacing(lg);
+    font-size: font-size(sm);
+
+    &--active {
+      background-color: var(--text-primary);
+      color: var(--bg-primary);
+    }
+
+    &:hover:not(&--active) {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+  }
+
+  &__content {
+    max-height: 300px;
+    overflow-y: auto;
+    @include custom-scrollbar;
+  }
+
+  &__empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: spacing(xxl);
+    font-size: font-size(base);
+  }
+}
+
+.draggable-macro {
+  padding: spacing(md) spacing(lg);
+  margin: spacing(xs) 0;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: border-radius(lg);
+  cursor: grab;
+  transition: transition(normal);
+
+  @include hover-effect(var(--bg-primary), var(--border-dark));
+
+  &--dragging {
+    opacity: 0.5;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &__label {
+    font-size: font-size(base);
+    font-weight: font-weight(medium);
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+
+  &__action {
+    font-size: font-size(xs);
+    color: var(--text-secondary);
+    font-family: monospace;
+  }
+}.macro-list {
+   @include card;
+   padding: spacing(xxl);
+
+   &__title {
+     margin: 0 0 spacing(xl) 0;
+     font-size: font-size(xl);
+     font-weight: font-weight(semibold);
+     color: var(--text-primary);
+   }
+
+   &__tabs {
+     display: flex;
+     gap: spacing(xs);
+     margin-bottom: spacing(xl);
+     flex-wrap: wrap;
+   }
+
+   &__tab {
+     @include button(transparent, var(--text-secondary));
+     padding: spacing(sm) spacing(lg);
+     font-size: font-size(sm);
+
+     &--active {
+       background-color: var(--text-primary);
+       color: var(--bg-primary);
+     }
+
+     &:hover:not(&--active) {
+       background-color: var(--bg-secondary);
+       color: var(--text-primary);
+     }
+   }
+
+   &__content {
+     max-height: 300px;
+     overflow-y: auto;
+     @include custom-scrollbar;
+   }
+
+   &__empty {
+     text-align: center;
+     color: var(--text-muted);
+     padding: spacing(xxl);
+     font-size: font-size(base);
+   }
+ }
+
+.draggable-macro {
+  padding: spacing(md) spacing(lg);
+  margin: spacing(xs) 0;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: border-radius(lg);
+  cursor: grab;
+  transition: transition(normal);
+
+  @include hover-effect(var(--bg-primary), var(--border-dark));
+
+  &--dragging {
+    opacity: 0.5;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &__label {
+    font-size: font-size(base);
+    font-weight: font-weight(medium);
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+
+  &__action {
+    font-size: font-size(xs);
+    color: var(--text-secondary);
+    font-family: monospace;
+  }
+}

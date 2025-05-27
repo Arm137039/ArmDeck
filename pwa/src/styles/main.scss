@@ -1,243 +1,94 @@
 @use 'variables' as *;
+@use 'mixins' as *;
 
-/* Reset and base styles */
+// Import components
+@use 'components/app';
+@use 'components/connection-status';
+@use 'components/key-grid';
+@use 'components/macro-list';
+@use 'components/macro-modal';
+
+// Global theme setup
+:root {
+  @include theme(light);
+}
+
+[data-theme="dark"] {
+  @include theme(dark);
+}
+
+// Global styles
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
-html, body {
-  font-family: $font-family-base;
-  font-size: $font-size-base;
-  line-height: $line-height-base;
-  color: var(--color-text);
-  background-color: var(--color-bg);
-  height: 100%;
-  transition: background-color 0.3s ease, color 0.3s ease;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: $font-family;
+  font-size: font-size(base);
+  line-height: 1.5;
+
+  &.theme-light {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+
+  &.theme-dark {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
 }
 
-#root {
-  height: 100%;
+// Utility classes
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-/* App container */
-.app-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  max-width: 1200px;
+.container {
+  max-width: 1400px;
   margin: 0 auto;
-  padding: $spacing-md;
+  padding: 0 spacing(xxxl);
 }
 
-/* Header styles */
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: $spacing-md 0;
-  margin-bottom: $spacing-lg;
-  border-bottom: $border-width solid var(--color-border);
+// Animations
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: $spacing-md;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-
-  h1 {
-    font-size: 1.8rem;
-    font-weight: $font-weight-bold;
-    color: var(--color-primary);
-  }
-
-  .theme-toggle-button {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: $spacing-xs;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: $transition-base;
-
-    &:hover {
-      background-color: var(--color-key-hover);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Connection status */
-.connection-status {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-
-  .status-connected {
-    color: $success-color;
-    font-weight: $font-weight-bold;
-  }
-
-  .connect-button {
-    background-color: var(--color-primary);
-    color: $white;
-    border: none;
-    padding: $spacing-sm $spacing-md;
-    border-radius: $border-radius;
-    cursor: pointer;
-    transition: $transition-base;
-
-    &:hover {
-      background-color: color-mix(in srgb, var(--color-primary), black 10%);
-    }
-  }
-
-  .disconnect-button {
-    background-color: $danger-color;
-    color: $white;
-    border: none;
-    padding: $spacing-sm $spacing-md;
-    border-radius: $border-radius;
-    cursor: pointer;
-    transition: $transition-base;
-    margin-left: $spacing-md;
-
-    &:hover {
-      background-color: color-mix(in srgb, $danger-color, black 10%);
-    }
-  }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
-/* Battery indicator */
-.battery-indicator {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-
-  .battery-level {
-    height: $battery-height;
-    background-color: $battery-fill-color;
-    border-radius: $battery-border-radius;
-    min-width: 20px;
-  }
-
-  span {
-    font-size: 0.9rem;
-    font-weight: $font-weight-bold;
-  }
+.fade-in {
+  animation: fadeIn transition(slow) ease-in-out;
 }
 
-/* Main content */
-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-lg;
+.slide-in {
+  animation: slideIn transition(slow) ease-out;
 }
 
-/* OTA progress */
-.ota-progress {
-  margin: $spacing-lg 0;
-
-  h3 {
-    margin-bottom: $spacing-sm;
-  }
-
-  .progress-bar {
-    height: $progress-height;
-    background-color: $progress-background;
-    border-radius: $progress-border-radius;
-    overflow: hidden;
-    margin-bottom: $spacing-xs;
-  }
-
-  .progress {
-    height: 100%;
-    background-color: $progress-fill-color;
-    transition: width 0.3s ease;
-  }
-
-  span {
-    font-size: 0.9rem;
-    font-weight: $font-weight-bold;
-  }
-}
-
-/* Keymap actions */
-.keymap-actions {
-  display: flex;
-  gap: $spacing-md;
-  margin-top: $spacing-lg;
-
-  button {
-    padding: $spacing-sm $spacing-md;
-    border-radius: $border-radius;
-    border: none;
-    cursor: pointer;
-    transition: $transition-base;
-    font-weight: $font-weight-bold;
-  }
-
-  .export-button {
-    background-color: $info-color;
-    color: $white;
-
-    &:hover {
-      background-color: color-mix(in srgb, $info-color, black 10%);
-    }
-  }
-
-  .import-button {
-    background-color: var(--color-secondary);
-    color: $white;
-
-    &:hover {
-      background-color: color-mix(in srgb, var(--color-secondary), black 10%);
-    }
-  }
-
-  .firmware-button {
-    background-color: $warning-color;
-    color: $black;
-
-    &:hover {
-      background-color: color-mix(in srgb, $warning-color, black 10%);
-    }
-  }
-}
-
-/* Footer */
-footer {
-  margin-top: $spacing-lg;
-  padding-top: $spacing-md;
-  border-top: $border-width solid var(--color-border);
-  text-align: center;
-  color: var(--color-secondary);
-  font-size: 0.9rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: $breakpoint-md) {
-  .app-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-md;
-
-    .header-left {
-      width: 100%;
-      justify-content: space-between;
-    }
-  }
-
-  .connection-status {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .keymap-actions {
-    flex-direction: column;
-  }
+.pulse {
+  animation: pulse 2s infinite;
 }

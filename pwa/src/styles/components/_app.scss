@@ -1,0 +1,320 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.app {
+  min-height: 100vh;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  transition: transition(slow);
+}
+
+.app-header {
+  padding: spacing(xl) 0;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-default);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: spacing(xl);
+
+  &-title {
+    margin: 0;
+    font-size: font-size(xxl);
+    font-weight: font-weight(semibold);
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
+  }
+
+  &-subtitle {
+    padding: spacing(xs) spacing(md);
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-default);
+    border-radius: border-radius(sm);
+    font-size: font-size(sm);
+    font-weight: font-weight(medium);
+    color: var(--text-secondary);
+  }
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: spacing(xl);
+}
+
+.connection-status {
+  @include status-indicator(color(danger));
+
+  &.connected {
+    @include status-indicator(color(success));
+    background-color: var(--bg-secondary);
+  }
+
+  &.disconnected {
+    background-color: var(--bg-secondary);
+  }
+}
+
+.theme-toggle {
+  @include button(transparent, var(--text-primary));
+  padding: spacing(md);
+  border: 1px solid var(--border-default);
+  font-size: font-size(lg);
+
+  &:hover {
+    background-color: var(--bg-primary);
+  }
+}
+
+.main-content {
+  .container {
+    padding-top: spacing(xxxl);
+    padding-bottom: spacing(xxxl);
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(800px, 1fr) #{$sidebar-width};
+  gap: spacing(xxxl);
+  align-items: start;
+}
+
+.content-area {
+  min-width: 0;
+}
+
+.sidebar {
+  position: sticky;
+  top: 100px;
+  min-width: $sidebar-width;
+}
+
+.quick-guide {
+  @include card;
+  margin-top: spacing(xxxl);
+  padding: spacing(xl);
+
+  h3 {
+    margin: 0 0 spacing(lg) 0;
+    font-size: font-size(lg);
+    font-weight: font-weight(semibold);
+    color: var(--text-primary);
+  }
+
+  .guide-content {
+    font-size: font-size(base);
+    line-height: 1.5;
+    color: var(--text-secondary);
+
+    div {
+      margin-bottom: spacing(sm);
+
+      strong {
+        color: var(--text-primary);
+      }
+    }
+  }
+}
+
+.error-display {
+  margin-top: spacing(xl);
+  padding: spacing(lg);
+  background-color: var(--bg-secondary);
+  border: 1px solid color(orange);
+  border-radius: border-radius(lg);
+  font-size: font-size(base);
+  color: color(orange);
+}
+
+.app-footer {
+  padding: spacing(xxxl);
+  text-align: center;
+  font-size: font-size(sm);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-default);
+  margin-top: spacing(huge);
+}
+
+// Responsive design
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: spacing(xl);
+  }
+
+  .sidebar {
+    position: static;
+    min-width: auto;
+  }
+}.app {
+   min-height: 100vh;
+   background-color: var(--bg-tertiary);
+   color: var(--text-primary);
+   transition: transition(slow);
+ }
+
+.app-header {
+  padding: spacing(xl) 0;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-default);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: spacing(xl);
+
+  &-title {
+    margin: 0;
+    font-size: font-size(xxl);
+    font-weight: font-weight(semibold);
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
+  }
+
+  &-subtitle {
+    padding: spacing(xs) spacing(md);
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-default);
+    border-radius: border-radius(sm);
+    font-size: font-size(sm);
+    font-weight: font-weight(medium);
+    color: var(--text-secondary);
+  }
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: spacing(xl);
+}
+
+.connection-status {
+  @include status-indicator(color(danger));
+
+  &.connected {
+    @include status-indicator(color(success));
+    background-color: var(--bg-secondary);
+  }
+
+  &.disconnected {
+    background-color: var(--bg-secondary);
+  }
+}
+
+.theme-toggle {
+  @include button(transparent, var(--text-primary));
+  padding: spacing(md);
+  border: 1px solid var(--border-default);
+  font-size: font-size(lg);
+
+  &:hover {
+    background-color: var(--bg-primary);
+  }
+}
+
+.main-content {
+  .container {
+    padding-top: spacing(xxxl);
+    padding-bottom: spacing(xxxl);
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(800px, 1fr) #{$sidebar-width};
+  gap: spacing(xxxl);
+  align-items: start;
+}
+
+.content-area {
+  min-width: 0;
+}
+
+.sidebar {
+  position: sticky;
+  top: 100px;
+  min-width: $sidebar-width;
+}
+
+.quick-guide {
+  @include card;
+  margin-top: spacing(xxxl);
+  padding: spacing(xl);
+
+  h3 {
+    margin: 0 0 spacing(lg) 0;
+    font-size: font-size(lg);
+    font-weight: font-weight(semibold);
+    color: var(--text-primary);
+  }
+
+  .guide-content {
+    font-size: font-size(base);
+    line-height: 1.5;
+    color: var(--text-secondary);
+
+    div {
+      margin-bottom: spacing(sm);
+
+      strong {
+        color: var(--text-primary);
+      }
+    }
+  }
+}
+
+.error-display {
+  margin-top: spacing(xl);
+  padding: spacing(lg);
+  background-color: var(--bg-secondary);
+  border: 1px solid color(orange);
+  border-radius: border-radius(lg);
+  font-size: font-size(base);
+  color: color(orange);
+}
+
+.app-footer {
+  padding: spacing(xxxl);
+  text-align: center;
+  font-size: font-size(sm);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-default);
+  margin-top: spacing(huge);
+}
+
+// Responsive design
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: spacing(xl);
+  }
+
+  .sidebar {
+    position: static;
+    min-width: auto;
+  }
+}

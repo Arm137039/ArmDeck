@@ -1,0 +1,190 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.connection-status-panel {
+  @include card;
+  padding: spacing(xxl);
+  margin-bottom: spacing(xxxl);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: spacing(xl);
+
+    h2 {
+      margin: 0;
+      font-size: font-size(xl);
+      font-weight: font-weight(semibold);
+      color: var(--text-primary);
+    }
+  }
+
+  &__button {
+    @include button(transparent, color(danger));
+    border: 1px solid color(danger);
+
+    &--connect {
+      @include button(var(--text-primary), var(--bg-primary));
+    }
+
+    &--disconnect {
+      &:hover {
+        background-color: color(danger);
+        color: white;
+      }
+    }
+  }
+
+  &__grid {
+    @include responsive-grid(150px);
+  }
+
+  &__card {
+    padding: spacing(lg);
+    background-color: var(--bg-secondary);
+    border-radius: border-radius(lg);
+    border: 1px solid var(--border-light);
+
+    .label {
+      font-size: font-size(sm);
+      color: var(--text-muted);
+      margin-bottom: spacing(xs);
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-size: font-size(md);
+      font-weight: font-weight(semibold);
+      margin-bottom: 2px;
+
+      &--connected {
+        color: color(success);
+      }
+
+      &--disconnected {
+        color: color(danger);
+      }
+
+      &--syncing {
+        color: color(warning);
+      }
+
+      &--ready {
+        color: color(success);
+      }
+    }
+
+    .description {
+      font-size: font-size(xs);
+      color: var(--text-secondary);
+    }
+  }
+
+  &__error {
+    margin-top: spacing(lg);
+    padding: spacing(md);
+    background-color: var(--bg-secondary);
+    border: 1px solid color(danger);
+    border-radius: border-radius(lg);
+    font-size: font-size(base);
+    color: color(danger);
+
+    strong {
+      font-weight: font-weight(semibold);
+    }
+  }
+}.connection-status-panel {
+   @include card;
+   padding: spacing(xxl);
+   margin-bottom: spacing(xxxl);
+
+   &__header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     margin-bottom: spacing(xl);
+
+     h2 {
+       margin: 0;
+       font-size: font-size(xl);
+       font-weight: font-weight(semibold);
+       color: var(--text-primary);
+     }
+   }
+
+   &__button {
+     @include button(transparent, color(danger));
+     border: 1px solid color(danger);
+
+     &--connect {
+       @include button(var(--text-primary), var(--bg-primary));
+     }
+
+     &--disconnect {
+       &:hover {
+         background-color: color(danger);
+         color: white;
+       }
+     }
+   }
+
+   &__grid {
+     @include responsive-grid(150px);
+   }
+
+   &__card {
+     padding: spacing(lg);
+     background-color: var(--bg-secondary);
+     border-radius: border-radius(lg);
+     border: 1px solid var(--border-light);
+
+     .label {
+       font-size: font-size(sm);
+       color: var(--text-muted);
+       margin-bottom: spacing(xs);
+       text-transform: uppercase;
+     }
+
+     .value {
+       font-size: font-size(md);
+       font-weight: font-weight(semibold);
+       margin-bottom: 2px;
+
+       &--connected {
+         color: color(success);
+       }
+
+       &--disconnected {
+         color: color(danger);
+       }
+
+       &--syncing {
+         color: color(warning);
+       }
+
+       &--ready {
+         color: color(success);
+       }
+     }
+
+     .description {
+       font-size: font-size(xs);
+       color: var(--text-secondary);
+     }
+   }
+
+   &__error {
+     margin-top: spacing(lg);
+     padding: spacing(md);
+     background-color: var(--bg-secondary);
+     border: 1px solid color(danger);
+     border-radius: border-radius(lg);
+     font-size: font-size(base);
+     color: color(danger);
+
+     strong {
+       font-weight: font-weight(semibold);
+     }
+   }
+ }

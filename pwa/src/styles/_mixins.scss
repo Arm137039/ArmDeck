@@ -1,0 +1,168 @@
+@use 'sass:map';
+@use 'variables' as *;
+
+// Theme helper mixin
+@mixin theme($theme-name) {
+  $theme-map: map.get($themes, $theme-name);
+
+  @each $property, $value in $theme-map {
+    --#{$property}: #{$value};
+  }
+}
+
+// Color helper function
+@function color($color-name) {
+  @return map.get($colors, $color-name);
+}
+
+// Spacing helper function
+@function spacing($size) {
+  @return map.get($spacing, $size);
+}
+
+// Font size helper function
+@function font-size($size) {
+  @return map.get($font-sizes, $size);
+}
+
+// Font weight helper function
+@function font-weight($weight) {
+  @return map.get($font-weights, $weight);
+}
+
+// Border radius helper function
+@function border-radius($size) {
+  @return map.get($border-radius, $size);
+}
+
+// Transition helper function
+@function transition($speed) {
+  @return map.get($transitions, $speed);
+}
+
+// Button mixin
+@mixin button($bg-color, $text-color, $hover-bg: null) {
+  padding: spacing(md) spacing(xl);
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  border-radius: border-radius(lg);
+  cursor: pointer;
+  font-size: font-size(base);
+  font-weight: font-weight(medium);
+  transition: transition(normal);
+
+  @if $hover-bg {
+    &:hover {
+      background-color: $hover-bg;
+      opacity: 0.9;
+    }
+  } @else {
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// Card mixin
+@mixin card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: border-radius(xl);
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+// Text styles
+@mixin text-primary {
+  color: var(--text-primary);
+  font-weight: font-weight(semibold);
+}
+
+@mixin text-secondary {
+  color: var(--text-secondary);
+  font-weight: font-weight(normal);
+}
+
+@mixin text-muted {
+  color: var(--text-muted);
+  font-weight: font-weight(normal);
+}
+
+// Status indicator
+@mixin status-indicator($color) {
+  display: flex;
+  align-items: center;
+  gap: spacing(md);
+  padding: spacing(sm) spacing(lg);
+  border: 1px solid $color;
+  border-radius: border-radius(lg);
+  font-size: font-size(base);
+  font-weight: font-weight(medium);
+  color: $color;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: $color;
+  }
+}
+
+// Grid layout
+@mixin grid-layout($columns: $grid-columns, $gap: $grid-gap) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+}
+
+// Responsive grid
+@mixin responsive-grid($min-width: 150px) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  gap: spacing(lg);
+}
+
+// Hover effect
+@mixin hover-effect($bg-color: var(--bg-secondary), $border-color: var(--border-dark)) {
+  transition: transition(normal);
+
+  &:hover {
+    background-color: $bg-color;
+    border-color: $border-color;
+  }
+}
+
+// Focus styles
+@mixin focus-ring($color: color(primary)) {
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($color, 0.3);
+  }
+}
+
+// Scrollbar styles
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: border-radius(sm);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: border-radius(sm);
+
+    &:hover {
+      background: var(--scrollbar-thumb-hover);
+    }
+  }
+}
