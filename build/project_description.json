@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "hidd_demos",
-    "project_version":    "1",
+    "project_version":    "ddcd2ab-dirty",
     "project_path":       "C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo",
     "idf_path":           "C:/Users/Arman/esp/v5.4.1/esp-idf",
     "build_dir":          "C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build",
@@ -65,12 +65,12 @@
             "dir": "C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/components/armdeck_service",
             "type": "LIBRARY",
             "lib": "__idf_armdeck_service",
-            "reqs": [ "bt", "esp_hid", "esp_timer" ],
+            "reqs": [ "bt", "esp_hid", "esp_timer", "json", "nvs_flash" ],
             "priv_reqs": [ "main" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/armdeck_service/libarmdeck_service.a",
-            "sources": [ "C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/components/armdeck_service/armdeck_service.c" ],
+            "sources": [ "C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/components/armdeck_service/armdeck_config.c", "C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/components/armdeck_service/armdeck_service.c" ],
             "include_dirs": [ "include" ]
         },
         "bootloader": {
@@ -2883,7 +2883,7 @@
             "prefix": "idf",
             "dir": "C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/components/armdeck_service",
             "lib": "__idf_armdeck_service",
-            "reqs": [ "bt", "esp_hid", "esp_timer" ],
+            "reqs": [ "bt", "esp_hid", "esp_timer", "json", "nvs_flash" ],
             "priv_reqs": [ "main" ],
             "managed_reqs": [],
             "managed_priv_reqs": [],

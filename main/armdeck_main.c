@@ -25,6 +25,7 @@
 #include "esp_bt_main.h"
 #include "esp_bt_device.h"
 #include "hid_dev.h"
+#include "armdeck_config.h"
 
 #define ARMDECK_TAG "ARMDECK_MAIN"
 #define HIDD_DEVICE_NAME "ArmDeck"
@@ -226,20 +227,76 @@ void send_hid_key(uint8_t key_code, bool pressed) {
              (key_code - 0x68) + 13, key_code);
 }
 
+void send_hid_action(const char* action, bool pressed) {
+    if (!ble_connected || hid_conn_id == 0) {
+        ESP_LOGW(ARMDECK_TAG, "Cannot send action - not connected");
+        return;
+    }
+    
+    uint8_t hid_code;
+    bool is_consumer;
+    
+    esp_err_t ret = armdeck_config_get_hid_code(action, &hid_code, &is_consumer);
+    if (ret != ESP_OK) {
+        ESP_LOGW(ARMDECK_TAG, "Unknown action: %s", action);
+        return;
+    }
+    
+    if (is_consumer) {
+        // Consumer Control (media keys, volume)
+        uint8_t consumer_report[2] = {0};
+        if (pressed) {
+            consumer_report[0] = hid_code & 0xFF;
+            consumer_report[1] = (hid_code >> 8) & 0xFF;
+        }
+        // TODO: Send consumer control report via HID
+        // For now, we'll log it
+        ESP_LOGI(ARMDECK_TAG, "📤 Consumer %s: %s (0x%02x)", 
+                 pressed ? "PRESS" : "RELEASE", action, hid_code);
+    } else {
+        // Standard keyboard key
+        uint8_t key_report[8] = {0};
+        if (pressed) {
+            key_report[2] = hid_code;
+        }
+        
+        esp_hidd_send_keyboard_value(hid_conn_id, 0, key_report, 8);
+        ESP_LOGI(ARMDECK_TAG, "📤 Key %s: %s (0x%02x)", 
+                 pressed ? "PRESS" : "RELEASE", action, hid_code);
+    }
+}
+
 void handle_button_action(int button_id, bool pressed) {
     if (button_id < 0 || button_id >= TOTAL_BUTTONS) {
         return;
     }
     
+    // Get current configuration
+    const armdeck_config_t* config = armdeck_config_get_current();
+    if (!config) {
+        ESP_LOGW(ARMDECK_TAG, "⚠️ Configuration not available, using fallback");
+        // Fallback to static mapping
+        if (pressed) {
+            ESP_LOGI(ARMDECK_TAG, "🔘 Button %d PRESSED (fallback)", button_id + 1);
+            send_hid_key(button_to_fkey[button_id], true);
+        } else {
+            ESP_LOGI(ARMDECK_TAG, "🔘 Button %d RELEASED (fallback)", button_id + 1);
+            send_hid_key(button_to_fkey[button_id], false);
+        }
+        return;
+    }
+    
     if (pressed) {
-        ESP_LOGI(ARMDECK_TAG, "🔘 Button %d PRESSED (Row %d, Col %d)", 
+        ESP_LOGI(ARMDECK_TAG, "🔘 Button %d PRESSED: %s (%s)", 
                  button_id + 1, 
-                 (button_id / MATRIX_COLS) + 1, 
-                 (button_id % MATRIX_COLS) + 1);
-        send_hid_key(button_to_fkey[button_id], true);
+                 config->buttons[button_id].label,
+                 config->buttons[button_id].action);
+        send_hid_action(config->buttons[button_id].action, true);
     } else {
-        ESP_LOGI(ARMDECK_TAG, "🔘 Button %d RELEASED", button_id + 1);
-        send_hid_key(button_to_fkey[button_id], false);
+        ESP_LOGI(ARMDECK_TAG, "🔘 Button %d RELEASED: %s", 
+                 button_id + 1,
+                 config->buttons[button_id].label);
+        send_hid_action(config->buttons[button_id].action, false);
     }
 }
 
@@ -455,12 +512,14 @@ static void armdeck_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_
                     }
                 }
             }
-            break;
-
-        case ESP_GATTS_WRITE_EVT:
+            break;        case ESP_GATTS_WRITE_EVT:
             if (param->write.handle == command_char_handle && param->write.len > 0) {
                 uint8_t cmd = param->write.value[0];
                 ESP_LOGI(ARMDECK_TAG, "📝 Command received: 0x%02x", cmd);
+                
+                // Buffer for response
+                uint8_t response[1500];
+                uint16_t response_len = 0;
                 
                 switch (cmd) {
                     case 0x01:
@@ -486,9 +545,44 @@ static void armdeck_gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_
                         }
                         ESP_LOGI(ARMDECK_TAG, "✅ Button test completed");
                         break;
+                    
+                    // 🔥 NEW: Configuration commands
+                    case ARMDECK_CMD_READ_CONFIG:   // 0x50
+                    case ARMDECK_CMD_RESET_CONFIG:  // 0x52
+                        // Handle config commands that respond via command characteristic
+                        esp_err_t ret = armdeck_config_handle_ble_command(cmd, NULL, 0, response, sizeof(response), &response_len);
+                        if (ret == ESP_OK && response_len > 0) {
+                            // Send response via command characteristic notification
+                            esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, command_char_handle,
+                                                       response_len, response, false);
+                            ESP_LOGI(ARMDECK_TAG, "📤 Config response sent (%d bytes)", response_len);
+                        }
+                        break;
+                    
                     default:
                         ESP_LOGI(ARMDECK_TAG, "❓ Unknown command");
                         break;
+                }
+            }
+              // Handle keymap characteristic writes (for WRITE_CONFIG command)
+            if (param->write.handle == keymap_char_handle && param->write.len > 0) {
+                ESP_LOGI(ARMDECK_TAG, "📝 Keymap data received (%d bytes)", param->write.len);
+                
+                uint8_t response[1500];  // Increased buffer size to handle large JSON responses
+                uint16_t response_len = 0;
+                
+                // Handle WRITE_CONFIG via keymap characteristic
+                esp_err_t ret = armdeck_config_handle_ble_command(ARMDECK_CMD_WRITE_CONFIG, 
+                                                                 param->write.value, 
+                                                                 param->write.len,
+                                                                 response, 
+                                                                 sizeof(response), 
+                                                                 &response_len);
+                if (ret == ESP_OK && response_len > 0) {
+                    // Send response via command characteristic notification
+                    esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, command_char_handle,
+                                               response_len, response, false);
+                    ESP_LOGI(ARMDECK_TAG, "📤 Write config response sent (%d bytes)", response_len);
                 }
             }
             
@@ -690,15 +784,22 @@ void app_main(void)
 
     ESP_LOGI(ARMDECK_TAG, "🚀 === ArmDeck Stream Deck 4x3 - CHROME COMPATIBLE ===");
     ESP_LOGI(ARMDECK_TAG, "🎮 Features: 12 buttons mapped to F13-F24");
-    ESP_LOGI(ARMDECK_TAG, "🌐 Web Bluetooth: Device Info + ArmDeck Custom services");
-
-    // NVS
+    ESP_LOGI(ARMDECK_TAG, "🌐 Web Bluetooth: Device Info + ArmDeck Custom services");    // NVS (déjà initialisé, mais on s'assure)
     ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+
+    // 🔥 NOUVEAU: Initialiser le système de configuration
+    ret = armdeck_config_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(ARMDECK_TAG, "❌ Failed to initialize configuration system: %s", esp_err_to_name(ret));
+        ESP_LOGI(ARMDECK_TAG, "🔄 Continuing with fallback configuration...");
+    } else {
+        ESP_LOGI(ARMDECK_TAG, "✅ Configuration system initialized successfully");
+    }
 
     // 🔥 NOUVEAU: Initialiser la matrice de boutons
     init_button_matrix();
