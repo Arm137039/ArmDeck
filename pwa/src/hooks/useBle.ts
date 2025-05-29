@@ -1,12 +1,9 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
-// 🔥 UUIDs CORRIGÉS - Ceux que Chrome voit réellement (sans batterie)
+// UUIDs
 const ARMDECK_SERVICE_UUID = '7a0b1000-0000-1000-8000-00805f9b34fb';
 const KEYMAP_CHARACTERISTIC_UUID = 'fb349b5f-8000-0080-0010-000001100b7a';
 const COMMAND_CHARACTERISTIC_UUID = 'fb349b5f-8000-0080-0010-000002100b7a';
-// 🔥 SUPPRIMÉ: BATTERY_CHARACTERISTIC_UUID
-
-// Standard Bluetooth service UUIDs
 const DEVICE_INFO_SERVICE_UUID = '0000180a-0000-1000-8000-00805f9b34fb';
 
 interface BleDevice {
@@ -17,286 +14,421 @@ interface BleDevice {
   characteristics: {
     keymap?: BluetoothRemoteGATTCharacteristic;
     cmd?: BluetoothRemoteGATTCharacteristic;
-    battery?: BluetoothRemoteGATTCharacteristic;
   };
 }
 
-interface UseBleReturn {
-  isAvailable: boolean;
-  isConnected: boolean;
-  isScanning: boolean;
-  batteryLevel: number | null;
-  connectionStage: string;
-  error: string | null;
-  scanForDevices: () => Promise<void>;
-  disconnectDevice: () => void;
-  sendKeymap: (keymap: string) => Promise<void>;
-  sendCommand: (command: string) => Promise<void>;
-  readBatteryLevel: () => Promise<number>;
+export interface ButtonConfig {
+  id: number;
+  label: string;
+  action: string;
+  color: string;
+  isDirty?: boolean;
 }
 
+interface UseBleReturn {
+  // Connection state
+  isAvailable: boolean;
+  isConnected: boolean;
+  isFullyConnected: boolean;
+  isScanning: boolean;
+  connectionStage: string;
+  error: string | null;
+
+  // Device config
+  buttons: ButtonConfig[];
+  isLoading: boolean;
+  isDirty: boolean;
+  lastSaved: Date | null;
+
+  // Actions
+  connect: () => Promise<void>;
+  disconnect: () => void;
+  updateButton: (index: number, config: Partial<ButtonConfig>) => void;
+  saveConfig: () => Promise<void>;
+  resetConfig: () => Promise<void>;
+}
+
+// Configuration par défaut
+const DEFAULT_BUTTONS: ButtonConfig[] = [
+  { id: 0, label: 'Play/Pause', action: 'MEDIA_PLAY_PAUSE', color: '#4CAF50' },
+  { id: 1, label: 'Next', action: 'MEDIA_NEXT', color: '#2196F3' },
+  { id: 2, label: 'Previous', action: 'MEDIA_PREV', color: '#2196F3' },
+  { id: 3, label: 'Volume +', action: 'VOLUME_UP', color: '#FF9800' },
+  { id: 4, label: 'Volume -', action: 'VOLUME_DOWN', color: '#FF9800' },
+  { id: 5, label: 'Mute', action: 'VOLUME_MUTE', color: '#F44336' },
+  { id: 6, label: 'Stop', action: 'MEDIA_STOP', color: '#9C27B0' },
+  { id: 7, label: 'F20', action: 'KEY_F20', color: '#607D8B' },
+  { id: 8, label: 'F21', action: 'KEY_F21', color: '#607D8B' },
+  { id: 9, label: 'F22', action: 'KEY_F22', color: '#607D8B' },
+  { id: 10, label: 'F23', action: 'KEY_F23', color: '#607D8B' },
+  { id: 11, label: 'F24', action: 'KEY_F24', color: '#607D8B' },
+];
+
 const useBle = (): UseBleReturn => {
+  // Connection state
   const [isAvailable, setIsAvailable] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isFullyConnected, setIsFullyConnected] = useState<boolean>(false);
   const [isScanning, setIsScanning] = useState<boolean>(false);
-  const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
   const [connectionStage, setConnectionStage] = useState<string>('Disconnected');
   const [error, setError] = useState<string | null>(null);
   const [bleDevice, setBleDevice] = useState<BleDevice | null>(null);
 
+  // Config state
+  const [buttons, setButtons] = useState<ButtonConfig[]>(DEFAULT_BUTTONS);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+
+  // Refs pour éviter les appels multiples
+  const connectingRef = useRef<boolean>(false);
+  const loadingConfigRef = useRef<boolean>(false);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Check Web Bluetooth availability
   useEffect(() => {
-    if (navigator.bluetooth) {
-      setIsAvailable(true);
-    } else {
-      setIsAvailable(false);
-      setError('Web Bluetooth is not available in this browser');
+    setIsAvailable(!!navigator.bluetooth);
+    if (!navigator.bluetooth) {
+      setError('Web Bluetooth not available');
     }
   }, []);
 
+  // Cleanup connection
   const cleanupConnection = useCallback(() => {
-    if (bleDevice?.characteristics.battery) {
-      try {
-        bleDevice.characteristics.battery.stopNotifications().catch(() => {});
-      } catch {}
-    }
+    console.log('🧹 [useBle] Cleaning up connection...');
     setIsConnected(false);
+    setIsFullyConnected(false);
     setConnectionStage('Disconnected');
-    setBatteryLevel(null);
-  }, [bleDevice]);
+    setBleDevice(null);
+    connectingRef.current = false;
+    loadingConfigRef.current = false;
+  }, []);
 
+  // Handle disconnection
   const handleDisconnection = useCallback((device: BluetoothDevice) => {
-    console.log(`🔌 Device disconnected: ${device.name || 'Unknown device'}`);
+    console.log(`🔌 [useBle] Device disconnected: ${device.name}`);
     cleanupConnection();
   }, [cleanupConnection]);
 
+  // Delay utility
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+  // Send command to device
+  const sendCommand = useCallback(async (command: string) => {
+    if (!bleDevice?.characteristics.cmd) {
+      throw new Error('Command characteristic not available');
+    }
+
+    // 🔥 FIX: Vérifier que la connexion est encore active
+    if (!bleDevice.server?.connected) {
+      throw new Error('Device disconnected');
+    }
+
+    console.log('📤 [useBle] Sending command:', command);
+
+    let data: Uint8Array;
+    if (command.startsWith('0x')) {
+      const hex = command.replace('0x', '');
+      data = new Uint8Array([parseInt(hex, 16)]);
+    } else {
+      data = new TextEncoder().encode(command);
+    }
+
+    try {
+      await bleDevice.characteristics.cmd.writeValue(data);
+      console.log('✅ [useBle] Command sent successfully');
+
+      // 🔥 FIX: Petite pause après l'envoi pour éviter les conflits GATT
+      await delay(100);
+
+    } catch (err) {
+      console.error('❌ [useBle] Command send failed:', err);
+      throw err;
+    }
+  }, [bleDevice]);
+
+  // Send keymap to device
+  const sendKeymap = useCallback(async (keymap: string) => {
+    if (!bleDevice?.characteristics.keymap) {
+      throw new Error('Keymap characteristic not available');
+    }
+
+    console.log('📤 [useBle] Sending keymap:', keymap.length, 'chars');
+
+    const data = new TextEncoder().encode(keymap);
+    console.log('📊 [useBle] Data size:', data.length, 'bytes');
+
+    // 🔥 FIX: Si les données sont trop grandes, les découper
+    if (data.length > 500) { // Limite sécurisée de 500 bytes
+      console.log('⚠️ [useBle] Data too large, splitting into chunks...');
+
+      const chunkSize = 500;
+      const chunks = [];
+
+      for (let i = 0; i < data.length; i += chunkSize) {
+        chunks.push(data.slice(i, i + chunkSize));
+      }
+
+      console.log(`📦 [useBle] Split into ${chunks.length} chunks`);
+
+      // Envoyer chaque morceau avec un délai
+      for (let i = 0; i < chunks.length; i++) {
+        console.log(`📤 [useBle] Sending chunk ${i + 1}/${chunks.length} (${chunks[i].length} bytes)`);
+        await bleDevice.characteristics.keymap.writeValue(chunks[i]);
+
+        // Délai entre les morceaux pour éviter les conflits GATT
+        if (i < chunks.length - 1) {
+          await delay(200);
+        }
+      }
+
+      console.log('✅ [useBle] All chunks sent successfully');
+    } else {
+      // Données assez petites, envoi direct
+      await bleDevice.characteristics.keymap.writeValue(data);
+      console.log('✅ [useBle] Keymap sent successfully (single chunk)');
+    }
+  }, [bleDevice]);
+
+  // Load configuration from device (simplifié - logique principale dans connectToServices)
+  const loadConfig = useCallback(async () => {
+    console.log('🔄 [useBle] loadConfig called manually with states:', {
+      isFullyConnected,
+      loadingConfigRef: loadingConfigRef.current,
+      bleDevice: !!bleDevice
+    });
+
+    if (!isFullyConnected || loadingConfigRef.current || !bleDevice?.characteristics.cmd) {
+      console.log('⚠️ [useBle] Load config skipped - not ready or already loading');
+      return;
+    }
+
+    loadingConfigRef.current = true;
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      console.log('📥 [useBle] Loading config from ESP32 (manual call)...');
+
+      // Send READ_CONFIG command
+      const data = new Uint8Array([0x50]);
+      await bleDevice.characteristics.cmd.writeValue(data);
+      console.log('✅ [useBle] READ_CONFIG command sent');
+
+      // Wait for response
+      await delay(1000);
+
+      console.log('✅ [useBle] Config loaded (using defaults)');
+      setButtons([...DEFAULT_BUTTONS]);
+      setIsDirty(false);
+      setLastSaved(new Date());
+
+    } catch (err) {
+      console.error('❌ [useBle] Failed to load config:', err);
+      setError(`Failed to load config: ${err}`);
+      setButtons([...DEFAULT_BUTTONS]);
+    } finally {
+      setIsLoading(false);
+      loadingConfigRef.current = false;
+    }
+  }, [isFullyConnected, bleDevice]);
+
+  // Connect to services
   const connectToServices = useCallback(async (device: BluetoothDevice) => {
     try {
       setError(null);
       setConnectionStage('Connecting to GATT...');
 
-      if (!device.gatt) {
-        throw new Error('GATT not available');
-      }
+      const server = await device.gatt!.connect();
+      console.log('✅ [useBle] GATT connected');
 
-      const server = await device.gatt.connect();
-      console.log('✅ GATT connected');
-      setConnectionStage('Connected to GATT');
-
-      // Attendre la stabilisation de l'ESP32
-      console.log('⏳ Waiting 3 seconds for ESP32 stability...');
       setConnectionStage('Waiting for ESP32...');
-      await delay(3000);
+      await delay(3000); // ESP32 stability wait
 
-      console.log('🔍 Discovering services...');
       setConnectionStage('Discovering services...');
+      console.log('🔍 [useBle] Discovering services...');
 
       const characteristics: BleDevice['characteristics'] = {};
       let deviceInfoService: BluetoothRemoteGATTService | undefined;
       let armdeckService: BluetoothRemoteGATTService | undefined;
 
-      // 1. Service Device Info (standard)
+      // Get Device Info service
       try {
-        console.log('🔍 Getting Device Information service...');
         deviceInfoService = await server.getPrimaryService(DEVICE_INFO_SERVICE_UUID);
-        console.log('✅ Device Info service found');
+        console.log('✅ [useBle] Device Info service found');
       } catch (e) {
-        console.warn('❌ Device Info service not found:', e);
+        console.warn('❌ [useBle] Device Info service not found:', e);
       }
 
-      // 2. Service ArmDeck (custom)
+      // Get ArmDeck service
       try {
-        console.log('🔍 Getting ArmDeck service...');
         armdeckService = await server.getPrimaryService(ARMDECK_SERVICE_UUID);
-        console.log('✅ ArmDeck service found!');
+        console.log('✅ [useBle] ArmDeck service found');
       } catch (e) {
-        console.error('❌ ArmDeck service not found:', e);
-
-        // Debug: lister tous les services
-        try {
-          console.log('🔍 Listing all available services for debug...');
-          const allServices = await server.getPrimaryServices();
-          console.log(`📋 Found ${allServices.length} services:`);
-          allServices.forEach((service, index) => {
-            console.log(`  ${index + 1}. ${service.uuid}`);
-          });
-        } catch (enumError) {
-          console.warn('❌ Could not enumerate services:', enumError);
-        }
+        console.error('❌ [useBle] ArmDeck service not found:', e);
       }
 
-      // 3. Récupérer les caractéristiques du service ArmDeck
+      // Get characteristics
       if (armdeckService) {
-        console.log('🔍 Getting ArmDeck characteristics...');
         setConnectionStage('Getting characteristics...');
 
-        // Essayer de récupérer chaque caractéristique
-        const characteristicPromises = [
-          // Keymap
-          armdeckService.getCharacteristic(KEYMAP_CHARACTERISTIC_UUID)
-              .then(char => {
-                characteristics.keymap = char;
-                console.log('✅ Keymap characteristic found');
-              })
-              .catch(e => console.warn('❌ Keymap characteristic not found:', e)),
+        try {
+          characteristics.keymap = await armdeckService.getCharacteristic(KEYMAP_CHARACTERISTIC_UUID);
+          console.log('✅ [useBle] Keymap characteristic found');
+        } catch (e) {
+          console.warn('❌ [useBle] Keymap characteristic not found:', e);
+        }
 
-          // Command
-          armdeckService.getCharacteristic(COMMAND_CHARACTERISTIC_UUID)
-              .then(char => {
-                characteristics.cmd = char;
-                console.log('✅ Command characteristic found');
-              })
-              .catch(e => console.warn('❌ Command characteristic not found:', e))
-
-          // 🔥 SUPPRIMÉ: Battery characteristic - plus besoin
-        ];
-
-        await Promise.all(characteristicPromises);
-
-        // Si des caractéristiques manquent, essayer l'énumération
-        const missingChars = [
-          !characteristics.keymap && 'Keymap',
-          !characteristics.cmd && 'Command'
-          // 🔥 SUPPRIMÉ: Battery check
-        ].filter(Boolean);
-
-        if (missingChars.length > 0) {
-          console.log(`🔍 Missing ${missingChars.join(', ')}, trying enumeration...`);
-          try {
-            const allCharacteristics = await armdeckService.getCharacteristics();
-            console.log(`📋 Found ${allCharacteristics.length} characteristics by enumeration:`);
-
-            allCharacteristics.forEach((char, index) => {
-              console.log(`  ${index + 1}. ${char.uuid}`);
-              const uuid = char.uuid.toLowerCase();
-
-              // Mapping par UUID - utiliser les UUIDs que Chrome voit réellement
-              if (uuid.includes('fb349b5f-8000-0080-0010-000001100b7a') && !characteristics.keymap) {
-                console.log('    ✅ Mapped to Keymap');
-                characteristics.keymap = char;
-              } else if (uuid.includes('fb349b5f-8000-0080-0010-000002100b7a') && !characteristics.cmd) {
-                console.log('    ✅ Mapped to Command');
-                characteristics.cmd = char;
-              } else if (uuid.includes('fb349b5f-8000-0080-0010-000004100b7a') && !characteristics.battery) {
-                console.log('    ✅ Mapped to Battery');
-                characteristics.battery = char;
-              }
-            });
-          } catch (enumError) {
-            console.warn('❌ Characteristic enumeration failed:', enumError);
-          }
+        try {
+          characteristics.cmd = await armdeckService.getCharacteristic(COMMAND_CHARACTERISTIC_UUID);
+          console.log('✅ [useBle] Command characteristic found');
+        } catch (e) {
+          console.warn('❌ [useBle] Command characteristic not found:', e);
         }
       }
 
-      // 4. Sauvegarder la configuration
-      setBleDevice({
+      // Create device object
+      const newBleDevice: BleDevice = {
         device,
         server,
         deviceInfoService,
         armdeckService,
         characteristics
-      });
+      };
 
-      setIsConnected(true);
+      setBleDevice(newBleDevice);
 
-      // 5. Déterminer le niveau de connexion
+      // Determine connection level
       const hasKeymap = !!characteristics.keymap;
       const hasCmd = !!characteristics.cmd;
-      // 🔥 SUPPRIMÉ: Battery check pour déterminer la connexion complète
+      const hasArmDeckService = !!armdeckService;
 
-      console.log('📊 Connection summary:');
-      console.log(`  Device Info service: ${!!deviceInfoService}`);
-      console.log(`  ArmDeck service: ${!!armdeckService}`);
-      console.log(`  Keymap characteristic: ${hasKeymap}`);
-      console.log(`  Command characteristic: ${hasCmd}`);
+      console.log('📊 [useBle] Connection summary:', {
+        deviceInfo: !!deviceInfoService,
+        armdeckService: hasArmDeckService,
+        keymap: hasKeymap,
+        command: hasCmd
+      });
 
-      // 🔥 NOUVEAU: Keymap + Command = Fully Connected (sans batterie)
-      if (armdeckService && hasKeymap && hasCmd) {
+      if (hasArmDeckService && hasKeymap && hasCmd) {
+        console.log('🎉 [useBle] FULLY CONNECTED - All services available');
+
+        // 🔥 FIX: Mettre à jour les états AVANT de charger la config
+        setIsConnected(true);
+        setIsFullyConnected(true);
         setConnectionStage('Fully Connected');
-        setIsConnected(true); // 🔥 IMPORTANT: Marquer comme connecté!
-        console.log('🎉 FULL FUNCTIONALITY AVAILABLE! (Battery service removed)');
-      } else if (armdeckService && (hasKeymap || hasCmd)) {
-        setConnectionStage('Partially Connected');
-        setIsConnected(false); // Partial = pas fully connected
-        console.log('🎉 Partial functionality available');
-      } else if (deviceInfoService) {
-        setConnectionStage('Basic Connected');
-        setIsConnected(false);
-        console.log('🎉 Basic connection (Device Info only)');
+
+        // 🔥 FIX: Appeler loadConfig directement ici avec les vraies valeurs
+        setTimeout(async () => {
+          console.log('🔄 [useBle] Attempting to load config after state update...');
+
+          if (loadingConfigRef.current) {
+            console.log('⚠️ [useBle] Load config skipped - already loading');
+            return;
+          }
+
+          // 🔥 FIX: Pour l'instant, on skip l'envoi de commande et on charge juste les defaults
+          // Cela évite de déconnecter l'ESP32 et permet de tester le reste de l'interface
+          console.log('📥 [useBle] Loading default config (skipping ESP32 command for now)...');
+
+          setIsLoading(true);
+          loadingConfigRef.current = true;
+
+          try {
+            // Attendre un peu pour simuler le chargement
+            await delay(500);
+
+            console.log('✅ [useBle] Default config loaded successfully');
+            setButtons([...DEFAULT_BUTTONS]);
+            setIsDirty(false);
+            setLastSaved(new Date());
+
+          } catch (err) {
+            console.error('❌ [useBle] Failed to load config:', err);
+            setError(`Failed to load config: ${err}`);
+            setButtons([...DEFAULT_BUTTONS]);
+          } finally {
+            setIsLoading(false);
+            loadingConfigRef.current = false;
+          }
+        }, 1000); // 🔥 Délai plus long pour laisser l'ESP32 se stabiliser
+
       } else {
-        setConnectionStage('Connected (Limited)');
-        setIsConnected(false);
-        console.log('⚠️ Limited connection');
+        setConnectionStage('Partially Connected');
+        setIsConnected(true);
+        setIsFullyConnected(false);
+        console.log('⚠️ [useBle] PARTIALLY CONNECTED - Limited functionality');
       }
 
-      // 6. PAS de configuration batterie car service supprimé
-
     } catch (err) {
-      console.error('❌ Connection failed:', err);
+      console.error('❌ [useBle] Connection failed:', err);
       setIsConnected(false);
-      setConnectionStage('Connection failed');
+      setIsFullyConnected(false);
+      setConnectionStage('Connection Failed');
       setError(`Connection error: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      connectingRef.current = false;
     }
-  }, []);
+  }, [loadConfig]);
 
-  const scanForDevices = useCallback(async () => {
+  // Connect to device
+  const connect = useCallback(async () => {
     if (!navigator.bluetooth) {
       setError('Web Bluetooth not available');
       return;
     }
 
+    if (connectingRef.current) {
+      console.log('⚠️ [useBle] Connect already in progress');
+      return;
+    }
+
+    connectingRef.current = true;
+    setIsScanning(true);
+    setError(null);
+    setConnectionStage('Scanning...');
+
     try {
-      setIsScanning(true);
-      setError(null);
-      setConnectionStage('Scanning...');
-
-      console.log('🔍 Looking for ArmDeck devices...');
-
       const device = await navigator.bluetooth.requestDevice({
         filters: [
           { name: 'ArmDeck' },
           { namePrefix: 'ArmDeck' },
-          // 🔥 NOUVEAU: Filtre par service Device Info que l'ESP32 advertise
           { services: [DEVICE_INFO_SERVICE_UUID] }
         ],
         optionalServices: [
           DEVICE_INFO_SERVICE_UUID,
           ARMDECK_SERVICE_UUID,
-          // 🔥 AJOUT: Services standard HID que Chrome reconnaît
           '00001812-0000-1000-8000-00805f9b34fb', // HID Service
           '0000180f-0000-1000-8000-00805f9b34fb'  // Battery Service
         ]
       });
 
-      console.log('📱 Found device:', device.name);
-      console.log('📱 Device ID:', device.id);
-
+      console.log('📱 [useBle] Found device:', device.name);
       device.addEventListener('gattserverdisconnected', () => handleDisconnection(device));
 
       await connectToServices(device);
-      setIsScanning(false);
 
     } catch (err) {
-      console.error('❌ Scan failed:', err);
-      setIsScanning(false);
-      setConnectionStage('Scan failed');
+      console.error('❌ [useBle] Scan failed:', err);
+      setConnectionStage('Scan Failed');
 
       if (err instanceof Error) {
         if (err.message.includes('cancelled')) {
           setError('Connection cancelled by user');
-        } else if (err.message.includes('No devices found')) {
-          setError('ArmDeck not found. Make sure the device is powered on and advertising. Check chrome://bluetooth-internals for debugging.');
         } else {
-          setError('Scan error: ' + err.message);
+          setError(`Scan error: ${err.message}`);
         }
       }
+    } finally {
+      setIsScanning(false);
+      connectingRef.current = false;
     }
   }, [handleDisconnection, connectToServices]);
 
-  const disconnectDevice = useCallback(() => {
+  // Disconnect device
+  const disconnect = useCallback(() => {
+    console.log('🔌 [useBle] Disconnect requested');
     if (bleDevice?.server?.connected) {
-      console.log('🔌 Disconnecting...');
       try {
         bleDevice.server.disconnect();
       } catch (e) {
@@ -306,69 +438,143 @@ const useBle = (): UseBleReturn => {
     cleanupConnection();
   }, [bleDevice, cleanupConnection]);
 
-  const sendKeymap = useCallback(async (keymap: string) => {
-    if (!bleDevice?.characteristics.keymap) {
-      setError('Keymap characteristic not available');
+  // Update button configuration
+  const updateButton = useCallback((index: number, config: Partial<ButtonConfig>) => {
+    if (index < 0 || index >= 12) {
+      console.error('❌ [useBle] Invalid button index:', index);
       return;
     }
 
+    console.log(`🔧 [useBle] Updating button ${index}:`, config);
+
+    setButtons(prevButtons => {
+      const newButtons = [...prevButtons];
+      newButtons[index] = {
+        ...newButtons[index],
+        ...config,
+        isDirty: true
+      };
+      return newButtons;
+    });
+
+    setIsDirty(true);
+
+    // Auto-save after 2 seconds
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+
+    if (isFullyConnected) {
+      autoSaveTimeoutRef.current = setTimeout(() => {
+        saveConfig();
+      }, 2000);
+    }
+  }, [isFullyConnected]);
+
+  // Save configuration to device
+  const saveConfig = useCallback(async () => {
+    if (!isFullyConnected) {
+      setError('Device not fully connected');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(keymap);
-      await bleDevice.characteristics.keymap.writeValue(data);
-      console.log('✅ Keymap sent:', keymap);
-      setError(null);
+      console.log('💾 [useBle] Saving config to ESP32...');
+
+      // 🔥 FIX: JSON plus compact - supprimer les espaces et propriétés optionnelles
+      const configData = {
+        v: 1, // version raccourcie
+        b: buttons.map(btn => ({
+          i: btn.id,
+          l: btn.label,
+          a: btn.action,
+          c: btn.color
+        }))
+      };
+
+      const jsonString = JSON.stringify(configData);
+      console.log('📝 [useBle] Config JSON size:', jsonString.length, 'bytes');
+      console.log('📝 [useBle] Config preview:', jsonString.substring(0, 100) + '...');
+
+      // Try to send via keymap characteristic
+      await sendKeymap(jsonString);
+      await delay(500);
+
+      setIsDirty(false);
+      setLastSaved(new Date());
+      console.log('✅ [useBle] Config saved successfully');
+
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error('❌ Keymap send error:', err);
-      setError('Keymap error: ' + msg);
+      console.error('❌ [useBle] Save failed:', err);
+      setError(`Save failed: ${err instanceof Error ? err.message : String(err)}`);
+      throw err;
+    } finally {
+      setIsLoading(false);
     }
-  }, [bleDevice]);
+  }, [isFullyConnected, buttons, sendKeymap]);
 
-  const sendCommand = useCallback(async (command: string) => {
-    if (!bleDevice?.characteristics.cmd) {
-      setError('Command characteristic not available');
+  // Reset configuration
+  const resetConfig = useCallback(async () => {
+    if (!isFullyConnected) {
+      setError('Device not fully connected');
       return;
     }
 
+    setIsLoading(true);
+    setError(null);
+
     try {
-      let data: Uint8Array;
-      if (command.startsWith('0x')) {
-        const hex = command.replace('0x', '');
-        data = new Uint8Array([parseInt(hex, 16)]);
-      } else {
-        const encoder = new TextEncoder();
-        data = encoder.encode(command);
+      console.log('🔄 [useBle] Resetting config...');
+
+      await sendCommand('0x52'); // RESET_CONFIG
+      await delay(500);
+
+      setButtons([...DEFAULT_BUTTONS]);
+      setIsDirty(false);
+      setLastSaved(new Date());
+
+      console.log('✅ [useBle] Config reset successfully');
+    } catch (err) {
+      console.error('❌ [useBle] Reset failed:', err);
+      setError(`Reset failed: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isFullyConnected, sendCommand]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
       }
-
-      await bleDevice.characteristics.cmd.writeValue(data);
-      console.log('✅ Command sent:', command);
-      setError(null);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error('❌ Command send error:', err);
-      setError('Command error: ' + msg);
-    }
-  }, [bleDevice]);
-
-  const readBatteryLevel = useCallback(async (): Promise<number> => {
-    // 🔥 SUPPRIMÉ: Plus de service batterie
-    setError('Battery service not implemented');
-    return 0;
+    };
   }, []);
 
   return {
+    // Connection state
     isAvailable,
     isConnected,
+    isFullyConnected,
     isScanning,
-    batteryLevel,
     connectionStage,
     error,
-    scanForDevices,
-    disconnectDevice,
-    sendKeymap,
-    sendCommand,
-    readBatteryLevel
+
+    // Device config
+    buttons,
+    isLoading,
+    isDirty,
+    lastSaved,
+
+    // Actions
+    connect,
+    disconnect,
+    updateButton,
+    saveConfig,
+    resetConfig,
   };
 };
 

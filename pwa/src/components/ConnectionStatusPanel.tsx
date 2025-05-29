@@ -1,25 +1,51 @@
 import React from 'react';
-import useBle from '../hooks/useBle';
-import useDeviceConfig from '../hooks/useDeviceConfig';
+import { useBleContext } from '../hooks/BleProvider';
 
 const ConnectionStatusPanel: React.FC = () => {
     const {
         isConnected,
+        isFullyConnected,
         connectionStage,
         error,
-        scanForDevices,
-        disconnectDevice,
-    } = useBle();
-
-    const {
-        deviceInfo,
+        connect,
+        disconnect,
+        isScanning,
         buttons,
         isDirty,
         lastSaved,
         isLoading
-    } = useDeviceConfig();
+    } = useBleContext();
 
     const configuredButtons = buttons.filter(b => b.action && b.action !== '').length;
+
+    // Status helpers
+    const getConnectionStatus = () => {
+        if (isScanning) return 'Scanning...';
+        if (isFullyConnected) return 'Fully Connected';
+        if (isConnected) return 'Connected';
+        return 'Disconnected';
+    };
+
+    const getConnectionClass = () => {
+        if (isScanning) return 'connection-status-panel__card--scanning';
+        if (isFullyConnected) return 'connection-status-panel__card--fully-connected';
+        if (isConnected) return 'connection-status-panel__card--connected';
+        return 'connection-status-panel__card--disconnected';
+    };
+
+    const getConfigurationStatus = () => {
+        if (isLoading) return 'Syncing...';
+        if (isDirty) return 'Pending changes';
+        if (lastSaved) return 'Synchronized';
+        return 'Not synced';
+    };
+
+    const getConfigurationClass = () => {
+        if (isLoading) return 'value--syncing';
+        if (isDirty) return 'value--dirty';
+        if (lastSaved) return 'value--synced';
+        return 'value--not-synced';
+    };
 
     return (
         <div className="connection-status-panel">
@@ -28,35 +54,49 @@ const ConnectionStatusPanel: React.FC = () => {
 
                 {isConnected ? (
                     <button
-                        onClick={disconnectDevice}
+                        onClick={disconnect}
                         className="connection-status-panel__button connection-status-panel__button--disconnect"
+                        disabled={isScanning}
                     >
                         Disconnect
                     </button>
                 ) : (
                     <button
-                        onClick={scanForDevices}
+                        onClick={connect}
                         className="connection-status-panel__button connection-status-panel__button--connect"
+                        disabled={isScanning}
                     >
-                        Connect Device
+                        {isScanning ? 'Scanning...' : 'Connect Device'}
                     </button>
                 )}
             </div>
 
             <div className="connection-status-panel__grid">
-                <div className="connection-status-panel__card">
+                <div className={`connection-status-panel__card ${getConnectionClass()}`}>
                     <div className="label">CONNECTION</div>
-                    <div className={`value ${isConnected ? 'value--connected' : 'value--disconnected'}`}>
-                        {isConnected ? 'Connected' : 'Disconnected'}
+                    <div className={`value ${isFullyConnected ? 'value--fully-connected' : isConnected ? 'value--connected' : 'value--disconnected'}`}>
+                        {getConnectionStatus()}
                     </div>
-                    <div className="description">{connectionStage}</div>
+                    <div className="description">
+                        <div>{connectionStage}</div>
+                        <div className="connection-level">
+                            {isFullyConnected ? (
+                                <small className="status-success">✅ Full functionality</small>
+                            ) : isConnected ? (
+                                <small className="status-warning">⚠️ Limited functionality</small>
+                            ) : (
+                                <small className="status-error">❌ Not connected</small>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 <div className="connection-status-panel__card">
                     <div className="label">DEVICE</div>
-                    <div className="value">{deviceInfo?.name || 'ArmDeck'}</div>
+                    <div className="value">ArmDeck</div>
                     <div className="description">
-                        {deviceInfo?.firmware ? `v${deviceInfo.firmware}` : 'Firmware unknown'}
+                        Stream Deck 4x3
+                        <div><small>12 programmable buttons</small></div>
                     </div>
                 </div>
 
@@ -64,24 +104,94 @@ const ConnectionStatusPanel: React.FC = () => {
                     <div className="label">CONFIGURATION</div>
                     <div className="value">{configuredButtons}/12</div>
                     <div className="description">
-                        {isDirty ? 'Pending sync' : 'Synchronized'}
+                        <div className={getConfigurationClass()}>
+                            {getConfigurationStatus()}
+                        </div>
+                        {!isFullyConnected && isConnected && (
+                            <div className="warning-text">
+                                <small>⚠️ Need full connection to save</small>
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 <div className="connection-status-panel__card">
                     <div className="label">STATUS</div>
-                    <div className={`value ${isLoading ? 'value--syncing' : 'value--ready'}`}>
-                        {isLoading ? 'Syncing' : 'Ready'}
+                    <div className={`value ${isLoading ? 'value--syncing' : isFullyConnected ? 'value--ready' : 'value--not-ready'}`}>
+                        {isLoading ? 'Busy' : isFullyConnected ? 'Ready' : 'Limited'}
                     </div>
                     <div className="description">
-                        {lastSaved ? `Last: ${lastSaved.toLocaleTimeString()}` : 'Not synced'}
+                        {lastSaved ? (
+                            <>
+                                Last sync: {lastSaved.toLocaleTimeString()}
+                                <br />
+                                <small className={isDirty ? 'status-dirty' : 'status-clean'}>
+                                    {isDirty ? 'Changes pending' : 'Up to date'}
+                                </small>
+                            </>
+                        ) : (
+                            'Not synchronized'
+                        )}
                     </div>
                 </div>
             </div>
 
+            {/* Status bar */}
+            <div className="connection-status-panel__status-bar">
+                <div className={`status-indicator ${isFullyConnected ? 'ready' : 'not-ready'}`}>
+                    <div className="status-icon">
+                        {isFullyConnected ? '✅' : isConnected ? '⚠️' : '❌'}
+                    </div>
+                    <div className="status-text">
+                        {isFullyConnected ?
+                            'Ready for configuration changes' :
+                            isConnected ?
+                                'Partial connection - limited functionality' :
+                                'Connect device to start configuration'
+                        }
+                    </div>
+                </div>
+            </div>
+
+            {/* Debug info */}
+            {process.env.NODE_ENV === 'development' && (
+                <div className="connection-status-panel__debug">
+                    <details>
+                        <summary>🔧 Debug Information</summary>
+                        <div className="debug-grid">
+                            <div><strong>Connected:</strong> {isConnected ? '✅ Yes' : '❌ No'}</div>
+                            <div><strong>Fully Connected:</strong> {isFullyConnected ? '✅ Yes' : '❌ No'}</div>
+                            <div><strong>Connection Stage:</strong> {connectionStage}</div>
+                            <div><strong>Is Scanning:</strong> {isScanning ? '🔄 Yes' : '✅ No'}</div>
+                            <div><strong>Is Loading:</strong> {isLoading ? '🔄 Yes' : '✅ No'}</div>
+                            <div><strong>Is Dirty:</strong> {isDirty ? '⚠️ Yes' : '✅ No'}</div>
+                            <div><strong>Last Saved:</strong> {lastSaved?.toISOString() || 'Never'}</div>
+                            <div><strong>Architecture:</strong> Unified Hook ✅</div>
+                            <div><strong>Buttons Configured:</strong> {configuredButtons}/12</div>
+                        </div>
+                    </details>
+                </div>
+            )}
+
             {error && (
                 <div className="connection-status-panel__error">
-                    <strong>Error:</strong> {error}
+                    <div className="error-header">
+                        <strong>⚠️ Error:</strong>
+                    </div>
+                    <div className="error-message">
+                        {error}
+                    </div>
+                    {error.includes('not found') && (
+                        <div className="error-suggestions">
+                            <p><strong>Troubleshooting:</strong></p>
+                            <ul>
+                                <li>Make sure your ESP32 is powered on</li>
+                                <li>Check that Bluetooth is enabled</li>
+                                <li>Try refreshing the page</li>
+                                <li>Check chrome://bluetooth-internals for detailed info</li>
+                            </ul>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
