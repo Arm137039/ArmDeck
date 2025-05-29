@@ -549,16 +549,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/armdeck_service/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/button_matrix/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/main/cmake_install.cmake")
 endif()
 

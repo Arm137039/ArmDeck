@@ -362,6 +362,15 @@ USE_SHARED_MBEDTLS_LIBRARY:BOOL=OFF
 USE_STATIC_MBEDTLS_LIBRARY:BOOL=ON
 
 //Value Computed by CMake
+armdeck_BINARY_DIR:STATIC=C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build
+
+//Value Computed by CMake
+armdeck_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+armdeck_SOURCE_DIR:STATIC=C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo
+
+//Value Computed by CMake
 esp-idf_BINARY_DIR:STATIC=C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf
 
 //Value Computed by CMake
@@ -542,7 +551,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=119
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=117
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

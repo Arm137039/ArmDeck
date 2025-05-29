@@ -82,6 +82,4 @@ $<TARGET_FILE:__idf_perfmon>
 $<TARGET_FILE:__idf_rt>
 $<TARGET_FILE:__idf_spiffs>
 $<TARGET_FILE:__idf_wifi_provisioning>
-$<TARGET_FILE:__idf_armdeck_service>
-$<TARGET_FILE:__idf_button_matrix>
 $<TARGET_FILE:__idf_main>
