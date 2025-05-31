@@ -64,19 +64,18 @@ esp_err_t armdeck_hid_init(void) {
 }
 
 esp_err_t armdeck_hid_send_key(uint8_t key_code, uint8_t modifiers, bool pressed) {
-    if (!hid_connected || hid_conn_id == 0) {
-        ESP_LOGW(TAG, "Cannot send key - not connected");
+    if (!hid_connected) {
         return ESP_ERR_INVALID_STATE;
     }
     
-    uint8_t key_report[8] = {0};
-    
     if (pressed) {
-        key_report[0] = modifiers;  /* Modifier keys */
-        key_report[2] = key_code;   /* First key code */
+        // Send key press
+        uint8_t key_codes[1] = {key_code};
+        esp_hidd_send_keyboard_value(hid_conn_id, modifiers, key_codes, 1);
+    } else {
+        // Send key release (empty report)
+        esp_hidd_send_keyboard_value(hid_conn_id, 0, NULL, 0);
     }
-    /* If not pressed, report stays zero (key release) */
-      esp_hidd_send_keyboard_value(hid_conn_id, 0, key_report, sizeof(key_report));
     
     ESP_LOGD(TAG, "Key %s: 0x%02x (mod:0x%02x)", 
             pressed ? "press" : "release", key_code, modifiers);
@@ -85,31 +84,39 @@ esp_err_t armdeck_hid_send_key(uint8_t key_code, uint8_t modifiers, bool pressed
 }
 
 esp_err_t armdeck_hid_send_consumer(uint16_t usage_code, bool pressed) {
-    if (!hid_connected || hid_conn_id == 0) {
-        ESP_LOGW(TAG, "Cannot send consumer - not connected");
+    ESP_LOGD(TAG, "send_consumer: hid_connected=%s, hid_conn_id=%d", 
+             hid_connected ? "true" : "false", hid_conn_id);
+    if (!hid_connected) {
+        ESP_LOGW(TAG, "Cannot send consumer - not connected (hid_connected=%s, hid_conn_id=%d)", 
+                 hid_connected ? "true" : "false", hid_conn_id);
         return ESP_ERR_INVALID_STATE;
     }
-    
-    esp_hidd_send_consumer_value(hid_conn_id, (uint8_t)(usage_code & 0xFF), pressed);
-    
-    ESP_LOGD(TAG, "Consumer %s: 0x%04x", 
-            pressed ? "press" : "release", usage_code);
+      esp_hidd_send_consumer_value(hid_conn_id, (uint8_t)(usage_code & 0xFF), pressed);
     
     return ESP_OK;
 }
 
 esp_err_t armdeck_hid_send_empty(void) {
-    if (!hid_connected || hid_conn_id == 0) {
+    if (!hid_connected) {
         return ESP_ERR_INVALID_STATE;
     }
     
-    uint8_t empty_report[8] = {0};
-    esp_hidd_send_keyboard_value(hid_conn_id, 0, empty_report, sizeof(empty_report));
+    // Send empty keyboard report (no keys pressed)
+    esp_hidd_send_keyboard_value(hid_conn_id, 0, NULL, 0);
     return ESP_OK;
 }
 
 bool armdeck_hid_is_connected(void) {
     return hid_connected;
+}
+
+// Force HID connection state when custom service connects
+void armdeck_hid_force_connected(uint16_t conn_id) {
+    hid_connected = true;
+    hid_conn_id = conn_id;
+    
+    /* Send initial empty report */
+    armdeck_hid_send_empty();
 }
 
 uint16_t armdeck_hid_get_conn_id(void) {

@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "hidd_demos",
-    "project_version":    "03685a1-dirty",
+    "project_version":    "6422e51-dirty",
     "project_path":       "C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo",
     "idf_path":           "C:/Users/Arman/esp/v5.4.1/esp-idf",
     "build_dir":          "C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build",

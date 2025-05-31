@@ -191,9 +191,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         case ESP_GAP_BLE_SEC_REQ_EVT:
             /* Accept pairing request */
             esp_ble_gap_security_rsp(param->ble_security.ble_req.bd_addr, true);
-            break;
-            
-        case ESP_GAP_BLE_AUTH_CMPL_EVT:
+            break;        case ESP_GAP_BLE_AUTH_CMPL_EVT:
             ESP_LOGI(TAG, "Authentication %s", 
                      param->ble_security.auth_cmpl.success ? "success" : "failed");
             break;
@@ -220,10 +218,9 @@ static void status_task(void *pvParameters) {
 
 void app_main(void) {
     esp_err_t ret;
-    
-    ESP_LOGI(TAG, "=== ArmDeck Stream Deck Starting ===");
+      ESP_LOGI(TAG, "=== ArmDeck Stream Deck Starting ===");
     ESP_LOGI(TAG, "Version: 1.2.0");
-    ESP_LOGI(TAG, "Buttons: 4x3 matrix (12 total)");
+    ESP_LOGI(TAG, "Buttons: 5x3 matrix (15 total)");
     
     /* Initialize NVS */
     ret = nvs_flash_init();

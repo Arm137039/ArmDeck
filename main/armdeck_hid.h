@@ -24,8 +24,11 @@ esp_err_t armdeck_hid_send_consumer(uint16_t usage_code, bool pressed);
 /* Send empty report (for keep-alive) */
 esp_err_t armdeck_hid_send_empty(void);
 
-/* Get connection status */
+/* Check if HID is connected */
 bool armdeck_hid_is_connected(void);
+
+/* TEMPORARY WORKAROUND: Force HID connection state */
+void armdeck_hid_force_connected(uint16_t conn_id);
 
 /* Get connection ID */
 uint16_t armdeck_hid_get_conn_id(void);

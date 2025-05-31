@@ -2,12 +2,12 @@
 95273	96346	7700081124922865	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/external/sbc/decoder/srce/bitalloc-sbc.c.obj	49425f4129350e9f
 182	302	7699265178150672	project_elf_src_esp32.c	354c6e0981fe908a
 48382	49107	7700080656009541	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32/i2c_periph.c.obj	d2a22db37b3dc486
-4033	5694	7700080212517751	esp-idf/http_parser/CMakeFiles/__idf_http_parser.dir/http_parser.c.obj	2277f0b368edf810
 173	318	7700080175255187	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld.in	19ead175ed688c60
+4033	5694	7700080212517751	esp-idf/http_parser/CMakeFiles/__idf_http_parser.dir/http_parser.c.obj	2277f0b368edf810
 363	1925	7700080175822361	esp-idf/esp_http_server/CMakeFiles/__idf_esp_http_server.dir/src/util/ctrl_sock.c.obj	bc3d8ecbff5c5799
+93821	95327	7700081110399772	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/btc/profile/std/gap/btc_gap_bt.c.obj	1d8de8264d5e89e7
 16872	18327	7700080340918539	esp-idf/lwip/CMakeFiles/__idf_lwip.dir/lwip/src/core/memp.c.obj	f4331b8cf87581e7
 65238	66165	7700080824576731	esp-idf/mbedtls/mbedtls/library/CMakeFiles/mbedcrypto.dir/aria.c.obj	9343e2e3323afc4b
-93821	95327	7700081110399772	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/btc/profile/std/gap/btc_gap_bt.c.obj	1d8de8264d5e89e7
 50814	51906	7700080680333211	esp-idf/hal/CMakeFiles/__idf_hal.dir/wdt_hal_iram.c.obj	f94247a30e32308e
 29419	30722	7700080466386413	esp-idf/esp_driver_i2s/CMakeFiles/__idf_esp_driver_i2s.dir/i2s_std.c.obj	112d22adf8acfb4c
 17219	17920	7700080344386750	esp-idf/lwip/CMakeFiles/__idf_lwip.dir/lwip/src/core/stats.c.obj	426e29aecbbc0acd
@@ -138,7 +138,7 @@
 10391	11806	7700080276097593	esp-idf/wpa_supplicant/CMakeFiles/__idf_wpa_supplicant.dir/src/utils/wpa_debug.c.obj	8a6c4869a6acf5f2
 2244	3988	7700080194634935	esp-idf/esp_adc/CMakeFiles/__idf_esp_adc.dir/adc_oneshot.c.obj	32444a8192c6fabe
 4638	5389	7700080218568569	esp-idf/esp_wifi/CMakeFiles/__idf_esp_wifi.dir/src/wifi_default_ap.c.obj	bee9d2ef172c0800
-118308	119060	7700081355278397	esp-idf/main/libmain.a	48cccb8d30719b0
+389	502	7703742302137860	esp-idf/main/libmain.a	ea9e226d679d9aee
 49080	50432	7700080662994084	esp-idf/heap/CMakeFiles/__idf_heap.dir/heap_caps_init.c.obj	1340111c34f93277
 5232	5981	7700080224573335	esp-idf/esp_coex/CMakeFiles/__idf_esp_coex.dir/src/lib_printf.c.obj	454185078821d1d7
 118469	119443	7700081356879490	esp-idf/cmock/CMakeFiles/__idf_cmock.dir/CMock/src/cmock.c.obj	c5155dbc5dc47eb0
@@ -210,7 +210,7 @@
 55028	55610	7700080722469658	esp-idf/esp_system/CMakeFiles/__idf_esp_system.dir/startup.c.obj	9243a6be3de94962
 7162	8142	7700080243817309	esp-idf/wpa_supplicant/CMakeFiles/__idf_wpa_supplicant.dir/src/crypto/dh_group5.c.obj	5c981bd0a0cdbe6e
 51491	52162	7700080687103624	esp-idf/hal/CMakeFiles/__idf_hal.dir/uart_hal_iram.c.obj	b848872cc08085d
-176	339	7700082245236018	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+12535	12620	7703742423596212	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
 6852	7834	7700080240710033	esp-idf/wpa_supplicant/CMakeFiles/__idf_wpa_supplicant.dir/src/utils/bitfield.c.obj	a5f9702fc893162b
 11323	12654	7700080285433514	esp-idf/wpa_supplicant/CMakeFiles/__idf_wpa_supplicant.dir/src/wps/wps_attr_parse.c.obj	1f268aaec65fa006
 5626	8165	7700080228447551	esp-idf/wpa_supplicant/CMakeFiles/__idf_wpa_supplicant.dir/src/ap/wpa_auth.c.obj	61505ee20d10f3c8
@@ -291,6 +291,7 @@
 87779	88862	7700081049980798	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/bta/hh/bta_hh_main.c.obj	8443f5d24fa89f9f
 115447	116250	7700081326664139	esp-idf/unity/CMakeFiles/__idf_unity.dir/unity_utils_memory.c.obj	21d3c6bc87e501b7
 36085	38105	7700080533043878	esp-idf/esp_event/CMakeFiles/__idf_esp_event.dir/default_event_loop.c.obj	30f4c18341354b75
+131	315	7702544281075081	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
 56403	57974	7700080736235530	esp-idf/esp_system/CMakeFiles/__idf_esp_system.dir/port/arch/xtensa/debug_helpers.c.obj	7e1201744c429eee
 10128	11427	7700080273479004	esp-idf/wpa_supplicant/CMakeFiles/__idf_wpa_supplicant.dir/src/utils/ext_password.c.obj	6157dfbfe7651c5e
 58287	59703	7700080755065025	esp-idf/esp_mm/CMakeFiles/__idf_esp_mm.dir/esp_mmu_map.c.obj	3f6b290d52e5d1d9
@@ -478,7 +479,7 @@
 62988	63952	7700080802071172	esp-idf/mbedtls/mbedtls/library/CMakeFiles/mbedtls.dir/ssl_tls13_server.c.obj	7e19f955a991bbc6
 58894	59696	7700080761137531	esp-idf/esp_mm/CMakeFiles/__idf_esp_mm.dir/cache_esp32.c.obj	c73ba68eb3f63886
 20996	22088	7700080382155683	esp-idf/lwip/CMakeFiles/__idf_lwip.dir/lwip/src/netif/ppp/ipv6cp.c.obj	653dfdf623d4146f
-169	404	7700082245161623	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+122	302	7703742299474931	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
 31918	39741	7700080491717705	esp-idf/nvs_flash/CMakeFiles/__idf_nvs_flash.dir/src/nvs_page.cpp.obj	4ff596c07700fc38
 46936	48248	7700080641546302	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32/rtc_time.c.obj	35009845bd71129
 20895	22245	7700080381262117	esp-idf/lwip/CMakeFiles/__idf_lwip.dir/lwip/src/netif/ppp/ecp.c.obj	e1b72dfa808bc730
@@ -509,8 +510,8 @@
 48601	49747	7700080658203552	esp-idf/soc/CMakeFiles/__idf_soc.dir/esp32/twai_periph.c.obj	bd798cee1efbc116
 22376	23647	7700080395966092	esp-idf/lwip/CMakeFiles/__idf_lwip.dir/port/freertos/sys_arch.c.obj	e64797e9c5af782c
 23305	24614	7700080405246719	esp-idf/lwip/CMakeFiles/__idf_lwip.dir/lwip/src/netif/ppp/polarssl/md5.c.obj	6ac9a3a1bd893067
-46306	47537	7700080635261820	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32/rtc_clk.c.obj	f7efdf242e88c152
 113517	116922	7700081307368995	esp-idf/bt/libbt.a	fdfad0ae2129e7db
+46306	47537	7700080635261820	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32/rtc_clk.c.obj	f7efdf242e88c152
 43773	44644	7700080609925093	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/cpu.c.obj	787152d4ca2d092a
 22898	23731	7700080401166133	esp-idf/lwip/CMakeFiles/__idf_lwip.dir/apps/ping/esp_ping.c.obj	821d879b82aea5f2
 123119	124045	7700081403388219	esp-idf/wifi_provisioning/CMakeFiles/__idf_wifi_provisioning.dir/src/wifi_ctrl.c.obj	5461e341dd14754f
@@ -621,7 +622,7 @@
 29917	31264	7700080471366765	esp-idf/esp_driver_mcpwm/CMakeFiles/__idf_esp_driver_mcpwm.dir/src/mcpwm_com.c.obj	6637da77744ac311
 120831	121462	7700081380504451	esp-idf/espcoredump/CMakeFiles/__idf_espcoredump.dir/src/core_dump_crc.c.obj	d65d74e89cb24aa3
 47058	48114	7700080642776424	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/port/esp32/chip_info.c.obj	e692f555b1598036
-182340	182466	7699266998845637	CMakeFiles/hidd_demos.elf.dir/project_elf_src_esp32.c.obj	7492e1f95dc10522
+12247	12445	7702485984783975	CMakeFiles/hidd_demos.elf.dir/project_elf_src_esp32.c.obj	3b2a66d0f3fba687
 30482	31961	7700080477007473	esp-idf/esp_driver_mcpwm/CMakeFiles/__idf_esp_driver_mcpwm.dir/src/mcpwm_sync.c.obj	88d1a9b5d8a1bc75
 53305	54451	7700080705242559	esp-idf/hal/CMakeFiles/__idf_hal.dir/spi_slave_hal.c.obj	11fc22256eb2a1f4
 30440	31911	7700080476625835	esp-idf/esp_driver_mcpwm/CMakeFiles/__idf_esp_driver_mcpwm.dir/src/mcpwm_gen.c.obj	af82af2b7bc86217
@@ -652,11 +653,11 @@
 39710	41506	7700080569293156	esp-idf/esp_driver_uart/CMakeFiles/__idf_esp_driver_uart.dir/src/uart_vfs.c.obj	fa0c04d37501265b
 66067	68004	7700080832891202	esp-idf/mbedtls/mbedtls/library/CMakeFiles/mbedcrypto.dir/ccm.c.obj	aa7846af4955480d
 33348	39710	7700080505954353	esp-idf/nvs_flash/CMakeFiles/__idf_nvs_flash.dir/src/nvs_types.cpp.obj	a0af30ff6ab8014
-169	404	7700082245161623	bootloader/bootloader.elf	c4e8689075522dab
+122	302	7703742299474931	bootloader/bootloader.elf	c4e8689075522dab
 52297	53289	7700080695172413	esp-idf/hal/CMakeFiles/__idf_hal.dir/sdm_hal.c.obj	f06af6ef73ef0280
 31698	39698	7700080489172362	esp-idf/nvs_flash/CMakeFiles/__idf_nvs_flash.dir/src/nvs_item_hash_list.cpp.obj	107432771c6a8e3a
 39733	40450	7700080569523946	esp-idf/esp_driver_gptimer/CMakeFiles/__idf_esp_driver_gptimer.dir/src/gptimer_common.c.obj	5f000a4c50e3cdc2
-455	560	7700082248955342	CMakeFiles/bootloader-complete	3908a9599a0ed01e
+344	425	7703742302428017	CMakeFiles/bootloader-complete	3908a9599a0ed01e
 31480	39725	7700080486993986	esp-idf/nvs_flash/CMakeFiles/__idf_nvs_flash.dir/src/nvs_cxx_api.cpp.obj	7c5e28bfab051102
 31982	39749	7700080492144373	esp-idf/nvs_flash/CMakeFiles/__idf_nvs_flash.dir/src/nvs_pagemanager.cpp.obj	db0f61740215d0b0
 97308	98904	7700081145277004	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/hci/packet_fragmenter.c.obj	b420863a0bcb81ec
@@ -700,7 +701,7 @@
 42184	42751	7700080594133474	esp-idf/newlib/CMakeFiles/__idf_newlib.dir/scandir.c.obj	38153653805e96a7
 121487	122417	7700081387067866	esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir/port/freertos/ffsystem.c.obj	2ede9c488704e196
 42499	43409	7700080597178338	esp-idf/freertos/CMakeFiles/__idf_freertos.dir/port_common.c.obj	9eeb94e988dcc0ce
-75601	75791	7700080928210853	esp-idf/esp_app_format/libesp_app_format.a	f2f5331643508ac8
+453	706	7703737459532424	esp-idf/esp_app_format/libesp_app_format.a	f2f5331643508ac8
 44645	47122	7700080618637559	esp-idf/esp_hw_support/CMakeFiles/__idf_esp_hw_support.dir/sleep_modes.c.obj	9549d00321c5ca9b
 42215	43463	7700080594354208	esp-idf/freertos/CMakeFiles/__idf_freertos.dir/app_startup.c.obj	f14ecca2cbff4d0a
 69626	71379	7700080868463998	esp-idf/mbedtls/mbedtls/library/CMakeFiles/mbedcrypto.dir/psa_crypto_cipher.c.obj	674f58a0f9131a88
@@ -904,7 +905,7 @@
 59488	60775	7700080767274207	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_random_esp32.c.obj	240032562905f0bb
 59719	60791	7700080769397368	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/flash_partitions.c.obj	1b8dc35ba7338153
 59084	59740	7700080763040087	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/flash_encrypt.c.obj	bd7d0c9a065d0e06
-405	455	7700082247523645	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+303	344	7703742301275671	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
 59704	60812	7700080769226595	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/bootloader_flash/src/bootloader_flash_config_esp32.c.obj	62820f5d70733444
 59741	60798	7700080769603366	esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/esp32/secure_boot_secure_features.c.obj	9ca921fa3710cb30
 70160	72472	7700080873793212	esp-idf/mbedtls/mbedtls/library/CMakeFiles/mbedcrypto.dir/psa_crypto_driver_wrappers_no_static.c.obj	a9fe9387d158651b
@@ -923,7 +924,7 @@
 60834	62090	7700080780533599	esp-idf/app_update/CMakeFiles/__idf_app_update.dir/esp_ota_app_desc.c.obj	60cf32d825d86a92
 60806	62584	7700080780252496	esp-idf/efuse/CMakeFiles/__idf_efuse.dir/src/esp_efuse_startup.c.obj	86e378f8df62d69d
 75044	75224	7700080922640786	esp-idf/esp_partition/libesp_partition.a	569844e1415a15b1
-61091	62316	7700080783108844	esp-idf/esp_app_format/CMakeFiles/__idf_esp_app_format.dir/esp_app_desc.c.obj	84f0ca49fb7ab04c
+120	452	7703737456207023	esp-idf/esp_app_format/CMakeFiles/__idf_esp_app_format.dir/esp_app_desc.c.obj	f1b68e99be5db0f6
 68012	69608	7700080852317909	esp-idf/mbedtls/mbedtls/library/CMakeFiles/mbedcrypto.dir/md.c.obj	159afe8cbd8f68e
 62105	63469	7700080793238047	esp-idf/mbedtls/mbedtls/library/CMakeFiles/mbedtls.dir/mps_trace.c.obj	29e04e1439be6ad6
 60819	62262	7700080780382999	esp-idf/esp_partition/CMakeFiles/__idf_esp_partition.dir/partition_target.c.obj	e759f340c0fe4d6c
@@ -1009,7 +1010,7 @@
 67134	68128	7700080843538636	esp-idf/esp_common/libesp_common.a	bbe480cf1c23c0ea
 87740	88811	7700081049599648	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/bta/hh/bta_hh_api.c.obj	e2b341cfe8ee5a2f
 73342	73984	7700080905616158	esp-idf/mbedtls/mbedtls/library/CMakeFiles/mbedcrypto.dir/C_/Users/Arman/esp/v5.4.1/esp-idf/components/mbedtls/port/esp_timing.c.obj	53aabc7f397a809e
-125657	137124	7700081542909137	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+502	8230	7703742380117163	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
 73376	74122	7700080905962121	esp-idf/mbedtls/mbedtls/library/CMakeFiles/mbedcrypto.dir/C_/Users/Arman/esp/v5.4.1/esp-idf/components/mbedtls/port/aes/esp_aes_common.c.obj	b1b6579f198aad94
 95335	96322	7700081125545334	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/external/sbc/decoder/srce/decoder-oina.c.obj	d960843892ed0aff
 73885	74778	7700080911037571	esp-idf/mbedtls/mbedtls/library/CMakeFiles/mbedcrypto.dir/C_/Users/Arman/esp/v5.4.1/esp-idf/components/mbedtls/port/bignum/esp_bignum.c.obj	3dc294821f84cc3
@@ -1150,6 +1151,7 @@
 97316	98650	7700081145352381	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/main/bte_init.c.obj	90677c4ddc6b3656
 97506	99367	7700081147275098	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/a2dp/a2d_api.c.obj	83798cb8b81ea7b
 124103	124991	7700081413229436	esp-idf/armdeck_service/CMakeFiles/__idf_armdeck_service.dir/armdeck_service.c.obj	81939409bce6cb36
+128	593	7702527077807040	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_hid.c.obj	efba37e3c22182f0
 97284	99350	7700081145036048	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/hci/hci_layer.c.obj	8d8da2b9adde16ab
 98636	100158	7700081158562000	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/avct/avct_lcb.c.obj	327df0a9eed1c4d9
 98629	100165	7700081158481898	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/avct/avct_l2c.c.obj	67ec8f21b4164c81
@@ -1170,7 +1172,7 @@
 100639	102037	7700081178614096	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/hid/hidd_conn.c.obj	169a28f6f21e3e21
 121858	122971	7700081390778946	esp-idf/mqtt/CMakeFiles/__idf_mqtt.dir/esp-mqtt/lib/mqtt_msg.c.obj	71e4903c201700c1
 100945	102722	7700081181720245	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/hid/hidh_api.c.obj	4d97b55d509d5ae2
-60	13489	7702467351926455	build.ninja	98ad1ef2ef052394
+128	17991	7703805309879939	build.ninja	98ad1ef2ef052394
 100986	102796	7700081182061257	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/hid/hidh_conn.c.obj	7307b507f6b5ed93
 101207	103105	7700081184264251	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/btm/btm_ble_addr.c.obj	209c66a5dae2eed4
 139649	140534	7699266571937711	esp-idf/bt/CMakeFiles/__idf_bt.dir/porting/ext/tinycrypt/src/ctr_mode.c.obj	2847bbedb250aa60
@@ -1180,7 +1182,7 @@
 101600	103430	7700081188191189	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/btm/btm_ble_5_gap.c.obj	84295faf39297d9c
 103097	104604	7700081203170463	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/btm/btm_main.c.obj	fcbb693ad9425d2c
 102053	104547	7700081192973526	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/btm/btm_ble_privacy.c.obj	e4665584a79077a9
-455	560	7700082248955342	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+344	425	7703742302428017	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
 102728	104625	7700081199561822	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/btm/btm_devctl.c.obj	a1787ad555dbc297
 103112	104595	7700081203321109	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/btm/btm_sco.c.obj	ae5ac79339ea0480
 103105	104915	7700081203250683	esp-idf/bt/CMakeFiles/__idf_bt.dir/host/bluedroid/stack/btm/btm_pm.c.obj	ad49727cab12ab26
@@ -1247,11 +1249,11 @@
 114359	115010	7700081315839073	esp-idf/console/CMakeFiles/__idf_console.dir/argtable3/arg_str.c.obj	faa478bcad257f66
 114376	115443	7700081315954411	esp-idf/console/CMakeFiles/__idf_console.dir/argtable3/arg_utils.c.obj	a86f5ba456e89ee
 114328	115433	7700081315523016	esp-idf/console/CMakeFiles/__idf_console.dir/argtable3/arg_rex.c.obj	b2ddfbfd06f6f72b
-114632	115462	7700081318510483	esp-idf/main/CMakeFiles/__idf_main.dir/hid_dev.c.obj	5319c4d43406fee9
-114638	115455	7700081318575748	esp-idf/main/CMakeFiles/__idf_main.dir/hid_device_le_prf.c.obj	cff7025a6226bd5c
-114625	115469	7700081318445081	esp-idf/main/CMakeFiles/__idf_main.dir/esp_hidd_prf_api.c.obj	66430c1e8eadd9d9
+894	1409	7702467361870946	esp-idf/main/CMakeFiles/__idf_main.dir/hid_dev.c.obj	9c070c265ed01a9d
+900	1405	7702467361931024	esp-idf/main/CMakeFiles/__idf_main.dir/hid_device_le_prf.c.obj	4bb81afa9c7ad3e
+889	1406	7702467361818826	esp-idf/main/CMakeFiles/__idf_main.dir/esp_hidd_prf_api.c.obj	7f7e594f341b0dfc
 115011	115708	7700081322301373	esp-idf/unity/CMakeFiles/__idf_unity.dir/unity_runner.c.obj	7cf93364f9235e4f
-114619	115837	7700081318389853	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	d4d60abbad9c202f
+108	389	7703742299335060	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
 114454	115844	7700081316732682	esp-idf/console/CMakeFiles/__idf_console.dir/argtable3/argtable3.c.obj	33d46470488454ae
 115165	115960	7700081323842750	esp-idf/unity/CMakeFiles/__idf_unity.dir/unity_utils_freertos.c.obj	d8fc11b724db217b
 115721	116524	7700081329400868	esp-idf/protocomm/CMakeFiles/__idf_protocomm.dir/proto-c/constants.pb-c.c.obj	e5efddfc7f2ffd34
@@ -1332,422 +1334,215 @@
 125049	125632	7700081422681498	esp-idf/perfmon/libperfmon.a	27d8a1e22c6a6de4
 125060	125632	7700081422796146	esp-idf/rt/librt.a	b7f5bc8dfad4ccbe
 125085	125657	7700081423046776	esp-idf/wifi_provisioning/libwifi_provisioning.a	3131ebe8a13ca99a
-169	404	7700082245161623	bootloader/bootloader.bin	c4e8689075522dab
-169	404	7700082245161623	bootloader/bootloader.map	c4e8689075522dab
-169	404	7700082245161623	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-137124	142726	7700081543434445	hidd_demos.elf	a82f859f451abf68
-169	404	7700082245161623	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-169	404	7700082245161623	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-169	404	7700082245161623	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-405	455	7700082247523645	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-455	560	7700082248955342	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-455	560	7700082248955342	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-125657	137124	7700081542909137	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-142727	143127	7700081603327472	.bin_timestamp	185b029162e819df
-142727	143127	7700081603327472	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-176	339	7700082245236018	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-70	12263	7702467351926455	build.ninja	98ad1ef2ef052394
-155	482	7702467354480342	esp-idf/esp_app_format/CMakeFiles/__idf_esp_app_format.dir/esp_app_desc.c.obj	6c91aac33d7c5c2d
-483	854	7702467357759496	esp-idf/esp_app_format/libesp_app_format.a	f2f5331643508ac8
-860	1119	7702467361539105	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-900	1405	7702467361931024	esp-idf/main/CMakeFiles/__idf_main.dir/hid_device_le_prf.c.obj	4bb81afa9c7ad3e
-889	1406	7702467361818826	esp-idf/main/CMakeFiles/__idf_main.dir/esp_hidd_prf_api.c.obj	7f7e594f341b0dfc
-894	1409	7702467361870946	esp-idf/main/CMakeFiles/__idf_main.dir/hid_dev.c.obj	9c070c265ed01a9d
-882	1530	7702467361768508	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-159	10826	7702467354520409	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-159	10826	7702467354520409	bootloader/bootloader.elf	c4e8689075522dab
-159	10826	7702467354520409	bootloader/bootloader.bin	c4e8689075522dab
-159	10826	7702467354520409	bootloader/bootloader.map	c4e8689075522dab
-159	10826	7702467354520409	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-159	10826	7702467354520409	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-159	10826	7702467354520409	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-159	10826	7702467354520409	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-148	527	7702469980281427	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-148	527	7702469980281427	bootloader/bootloader.elf	c4e8689075522dab
-148	527	7702469980281427	bootloader/bootloader.bin	c4e8689075522dab
-148	527	7702469980281427	bootloader/bootloader.map	c4e8689075522dab
-148	527	7702469980281427	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-148	527	7702469980281427	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-148	527	7702469980281427	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-148	527	7702469980281427	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-136	543	7702469980166192	esp-idf/main/CMakeFiles/__idf_main.dir/button_matrix.c.obj	3363166520f669f
-140	444	7702483773458455	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-153	456	7702483773583680	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-159	483	7702483773638807	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-159	483	7702483773638807	bootloader/bootloader.elf	c4e8689075522dab
-159	483	7702483773638807	bootloader/bootloader.bin	c4e8689075522dab
-159	483	7702483773638807	bootloader/bootloader.map	c4e8689075522dab
-159	483	7702483773638807	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-159	483	7702483773638807	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-159	483	7702483773638807	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-159	483	7702483773638807	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-149	355	7702483987566834	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-149	355	7702483987566834	bootloader/bootloader.elf	c4e8689075522dab
-149	355	7702483987566834	bootloader/bootloader.bin	c4e8689075522dab
-149	355	7702483987566834	bootloader/bootloader.map	c4e8689075522dab
-149	355	7702483987566834	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-149	355	7702483987566834	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-149	355	7702483987566834	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-149	355	7702483987566834	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-164	473	7702485863945897	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_hid.c.obj	efba37e3c22182f0
-177	519	7702485864071179	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-177	519	7702485864071179	bootloader/bootloader.elf	c4e8689075522dab
-177	519	7702485864071179	bootloader/bootloader.bin	c4e8689075522dab
-177	519	7702485864071179	bootloader/bootloader.map	c4e8689075522dab
-177	519	7702485864071179	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-177	519	7702485864071179	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-177	519	7702485864071179	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-177	519	7702485864071179	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-169	558	7702485863995885	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_protocol.c.obj	a1945cfb5000a55d
-519	625	7702485867503716	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-519	625	7702485867503716	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-158	634	7702485863884886	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
-625	855	7702485870570285	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-625	855	7702485870570285	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-625	855	7702485870570285	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-625	855	7702485870570285	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-635	939	7702485868659970	esp-idf/main/libmain.a	ea9e226d679d9aee
-939	12247	7702485983989382	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-939	12247	7702485983989382	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-12247	12445	7702485984783975	CMakeFiles/hidd_demos.elf.dir/project_elf_src_esp32.c.obj	3b2a66d0f3fba687
-12445	17473	7702485986754300	hidd_demos.elf	5473cbc0c7153246
-17474	17892	7702486041106637	.bin_timestamp	185b029162e819df
-17474	17892	7702486041106637	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-17893	18020	7702486041226879	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-17893	18020	7702486041226879	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-277	542	7702492380856222	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-277	542	7702492380856222	bootloader/bootloader.elf	c4e8689075522dab
-277	542	7702492380856222	bootloader/bootloader.bin	c4e8689075522dab
-277	542	7702492380856222	bootloader/bootloader.map	c4e8689075522dab
-277	542	7702492380856222	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-277	542	7702492380856222	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-277	542	7702492380856222	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-277	542	7702492380856222	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-269	554	7702492380791043	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-543	640	7702492383525409	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-543	640	7702492383525409	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-640	778	7702492385732100	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-640	778	7702492385732100	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-640	778	7702492385732100	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-640	778	7702492385732100	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-555	883	7702492383645823	esp-idf/main/libmain.a	ea9e226d679d9aee
-884	11462	7702492492190836	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-884	11462	7702492492190836	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-11462	16199	7702492492717301	hidd_demos.elf	5473cbc0c7153246
-16200	16599	7702492543969095	.bin_timestamp	185b029162e819df
-16200	16599	7702492543969095	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-16599	16714	7702492544084264	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-16599	16714	7702492544084264	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-155	470	7702496529515623	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-155	470	7702496529515623	bootloader/bootloader.elf	c4e8689075522dab
-155	470	7702496529515623	bootloader/bootloader.bin	c4e8689075522dab
-155	470	7702496529515623	bootloader/bootloader.map	c4e8689075522dab
-155	470	7702496529515623	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-155	470	7702496529515623	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-155	470	7702496529515623	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-155	470	7702496529515623	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-149	480	7702496529460365	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-471	584	7702496532676711	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-471	584	7702496532676711	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-481	747	7702496532786969	esp-idf/main/libmain.a	ea9e226d679d9aee
-584	767	7702496535495201	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-584	767	7702496535495201	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-584	767	7702496535495201	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-584	767	7702496535495201	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-747	10993	7702496637146261	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-747	10993	7702496637146261	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-10993	15496	7702496637898110	hidd_demos.elf	5473cbc0c7153246
-15497	15940	7702496687265528	.bin_timestamp	185b029162e819df
-15497	15940	7702496687265528	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-15941	16167	7702496687375696	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-15941	16167	7702496687375696	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-159	442	7702498904769493	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-159	442	7702498904769493	bootloader/bootloader.elf	c4e8689075522dab
-159	442	7702498904769493	bootloader/bootloader.bin	c4e8689075522dab
-159	442	7702498904769493	bootloader/bootloader.map	c4e8689075522dab
-159	442	7702498904769493	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-159	442	7702498904769493	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-159	442	7702498904769493	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-159	442	7702498904769493	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-154	447	7702498904719451	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-143	679	7702498904605577	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
-183	573	7702499857066034	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-183	573	7702499857066034	bootloader/bootloader.elf	c4e8689075522dab
-183	573	7702499857066034	bootloader/bootloader.bin	c4e8689075522dab
-183	573	7702499857066034	bootloader/bootloader.map	c4e8689075522dab
-183	573	7702499857066034	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-183	573	7702499857066034	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-183	573	7702499857066034	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-183	573	7702499857066034	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-176	583	7702499856990880	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-574	649	7702499860984273	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-574	649	7702499860984273	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-583	814	7702499861089669	esp-idf/main/libmain.a	ea9e226d679d9aee
-649	850	7702499863393278	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-649	850	7702499863393278	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-649	850	7702499863393278	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-649	850	7702499863393278	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-814	11282	7702499967527421	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-814	11282	7702499967527421	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-11282	15913	7702499968053480	hidd_demos.elf	5473cbc0c7153246
-15914	16373	7702500018777546	.bin_timestamp	185b029162e819df
-15914	16373	7702500018777546	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-16373	16559	7702500018966725	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-16373	16559	7702500018966725	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-147	414	7702502748289261	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-153	421	7702502748354502	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-159	457	7702502748416134	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-159	457	7702502748416134	bootloader/bootloader.elf	c4e8689075522dab
-159	457	7702502748416134	bootloader/bootloader.bin	c4e8689075522dab
-159	457	7702502748416134	bootloader/bootloader.map	c4e8689075522dab
-159	457	7702502748416134	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-159	457	7702502748416134	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-159	457	7702502748416134	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-159	457	7702502748416134	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-141	512	7702502748239257	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
-458	588	7702502751408516	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-458	588	7702502751408516	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-512	760	7702502751939998	esp-idf/main/libmain.a	ea9e226d679d9aee
-588	781	7702502754505681	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-588	781	7702502754505681	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-588	781	7702502754505681	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-588	781	7702502754505681	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-761	10716	7702502853356287	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-761	10716	7702502853356287	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-10716	15553	7702502853983225	hidd_demos.elf	5473cbc0c7153246
-15554	15945	7702502906162103	.bin_timestamp	185b029162e819df
-15554	15945	7702502906162103	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-15945	16083	7702502906274394	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-15945	16083	7702502906274394	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-144	495	7702508220962639	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-144	495	7702508220962639	bootloader/bootloader.elf	c4e8689075522dab
-144	495	7702508220962639	bootloader/bootloader.bin	c4e8689075522dab
-144	495	7702508220962639	bootloader/bootloader.map	c4e8689075522dab
-144	495	7702508220962639	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-144	495	7702508220962639	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-144	495	7702508220962639	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-144	495	7702508220962639	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-134	506	7702508220857368	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-139	508	7702508220922594	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-126	509	7702508220787117	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
-496	717	7702508224487882	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-496	717	7702508224487882	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-717	846	7702508227693364	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-717	846	7702508227693364	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-717	846	7702508227693364	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-717	846	7702508227693364	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-509	850	7702508224613162	esp-idf/main/libmain.a	ea9e226d679d9aee
-850	11529	7702508333835789	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-850	11529	7702508333835789	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-11529	16087	7702508334821657	hidd_demos.elf	5473cbc0c7153246
-16088	16443	7702508383845397	.bin_timestamp	185b029162e819df
-16088	16443	7702508383845397	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-16444	16556	7702508383958264	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-16444	16556	7702508383958264	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-159	533	7702513106124187	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-154	537	7702513106068905	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-165	538	7702513106174165	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-165	538	7702513106174165	bootloader/bootloader.elf	c4e8689075522dab
-165	538	7702513106174165	bootloader/bootloader.bin	c4e8689075522dab
-165	538	7702513106174165	bootloader/bootloader.map	c4e8689075522dab
-165	538	7702513106174165	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-165	538	7702513106174165	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-165	538	7702513106174165	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-165	538	7702513106174165	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-148	547	7702513106008898	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
-539	597	7702513109914339	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-539	597	7702513109914339	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-597	785	7702513112098734	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-597	785	7702513112098734	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-597	785	7702513112098734	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-597	785	7702513112098734	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-548	830	7702513110004626	esp-idf/main/libmain.a	ea9e226d679d9aee
-831	10617	7702513210138687	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-831	10617	7702513210138687	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-10618	15325	7702513210701820	hidd_demos.elf	5473cbc0c7153246
-15326	15728	7702513261672747	.bin_timestamp	185b029162e819df
-15326	15728	7702513261672747	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-15728	15906	7702513261809584	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-15728	15906	7702513261809584	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-250	680	7702516665443398	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-259	711	7702516665528958	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-269	714	7702516665634198	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-269	714	7702516665634198	bootloader/bootloader.elf	c4e8689075522dab
-269	714	7702516665634198	bootloader/bootloader.bin	c4e8689075522dab
-269	714	7702516665634198	bootloader/bootloader.map	c4e8689075522dab
-269	714	7702516665634198	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-269	714	7702516665634198	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-269	714	7702516665634198	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-269	714	7702516665634198	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-714	800	7702516670085381	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-714	800	7702516670085381	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-240	835	7702516665348268	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
-800	967	7702516672438351	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-800	967	7702516672438351	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-800	967	7702516672438351	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-800	967	7702516672438351	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-836	1069	7702516671295511	esp-idf/main/libmain.a	ea9e226d679d9aee
-1070	11783	7702516780229191	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-1070	11783	7702516780229191	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-11783	16325	7702516780760492	hidd_demos.elf	5473cbc0c7153246
-16326	16709	7702516829910250	.bin_timestamp	185b029162e819df
-16326	16709	7702516829910250	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-16709	16858	7702516830027832	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-16709	16858	7702516830027832	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-188	620	7702522093406700	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-188	620	7702522093406700	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-176	703	7702522093286286	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-176	703	7702522093286286	bootloader/bootloader.elf	c4e8689075522dab
-176	703	7702522093286286	bootloader/bootloader.bin	c4e8689075522dab
-176	703	7702522093286286	bootloader/bootloader.map	c4e8689075522dab
-176	703	7702522093286286	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-176	703	7702522093286286	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-176	703	7702522093286286	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-176	703	7702522093286286	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-703	778	7702522098564950	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-703	778	7702522098564950	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-779	920	7702522100598320	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-779	920	7702522100598320	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-779	920	7702522100598320	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-779	920	7702522100598320	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-128	593	7702527077807040	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_hid.c.obj	efba37e3c22182f0
-140	594	7702527077923370	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-122	595	7702527077741897	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-145	620	7702527077968591	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-145	620	7702527077968591	bootloader/bootloader.elf	c4e8689075522dab
-145	620	7702527077968591	bootloader/bootloader.bin	c4e8689075522dab
-145	620	7702527077968591	bootloader/bootloader.map	c4e8689075522dab
-145	620	7702527077968591	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-145	620	7702527077968591	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-145	620	7702527077968591	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-145	620	7702527077968591	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-134	643	7702527077857041	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_protocol.c.obj	a1945cfb5000a55d
-116	648	7702527077691918	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
-620	681	7702527082729320	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-620	681	7702527082729320	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-681	798	7702527084366879	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-681	798	7702527084366879	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-681	798	7702527084366879	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-681	798	7702527084366879	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-649	840	7702527083010298	esp-idf/main/libmain.a	ea9e226d679d9aee
-840	11204	7702527185279737	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-840	11204	7702527185279737	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-11204	16099	7702527188570359	hidd_demos.elf	5473cbc0c7153246
-16100	16520	7702527241616864	.bin_timestamp	185b029162e819df
-16100	16520	7702527241616864	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-16521	16812	7702527241731995	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-16521	16812	7702527241731995	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-156	435	7702527585375265	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-156	435	7702527585375265	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-146	465	7702527585270038	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-146	465	7702527585270038	bootloader/bootloader.elf	c4e8689075522dab
-146	465	7702527585270038	bootloader/bootloader.bin	c4e8689075522dab
-146	465	7702527585270038	bootloader/bootloader.map	c4e8689075522dab
-146	465	7702527585270038	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-146	465	7702527585270038	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-146	465	7702527585270038	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-146	465	7702527585270038	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-466	518	7702527588478981	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-466	518	7702527588478981	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-518	642	7702527590116056	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-518	642	7702527590116056	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-518	642	7702527590116056	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-518	642	7702527590116056	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-169	448	7702530919229743	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-164	450	7702530919179740	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-175	469	7702530919285001	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-175	469	7702530919285001	bootloader/bootloader.elf	c4e8689075522dab
-175	469	7702530919285001	bootloader/bootloader.bin	c4e8689075522dab
-175	469	7702530919285001	bootloader/bootloader.map	c4e8689075522dab
-175	469	7702530919285001	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-175	469	7702530919285001	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-175	469	7702530919285001	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-175	469	7702530919285001	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-157	524	7702530919108696	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
-470	532	7702530922237146	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-470	532	7702530922237146	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-532	663	7702530924056178	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-532	663	7702530924056178	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-532	663	7702530924056178	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-532	663	7702530924056178	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-525	699	7702530922787380	esp-idf/main/libmain.a	ea9e226d679d9aee
-700	11272	7702531029654104	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-700	11272	7702531029654104	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-11273	16112	7702531030258719	hidd_demos.elf	5473cbc0c7153246
-16114	16558	7702531083020098	.bin_timestamp	185b029162e819df
-16114	16558	7702531083020098	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-16559	16679	7702531083125805	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-16559	16679	7702531083125805	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-206	540	7702534061511243	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-199	542	7702534061445389	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-211	573	7702534061566560	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-211	573	7702534061566560	bootloader/bootloader.elf	c4e8689075522dab
-211	573	7702534061566560	bootloader/bootloader.bin	c4e8689075522dab
-211	573	7702534061566560	bootloader/bootloader.map	c4e8689075522dab
-211	573	7702534061566560	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-211	573	7702534061566560	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-211	573	7702534061566560	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-211	573	7702534061566560	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-574	652	7702534065189526	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-574	652	7702534065189526	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-192	664	7702534061375305	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
-652	1175	7702534069757667	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-652	1175	7702534069757667	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-652	1175	7702534069757667	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-652	1175	7702534069757667	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-665	1177	7702534066099120	esp-idf/main/libmain.a	ea9e226d679d9aee
-1177	11459	7702534173468467	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-1177	11459	7702534173468467	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-11459	15956	7702534174054792	hidd_demos.elf	5473cbc0c7153246
-15957	16343	7702534222787852	.bin_timestamp	185b029162e819df
-15957	16343	7702534222787852	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-16344	16468	7702534222893454	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-16344	16468	7702534222893454	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-162	392	7702540292258468	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-162	392	7702540292258468	bootloader/bootloader.elf	c4e8689075522dab
-162	392	7702540292258468	bootloader/bootloader.bin	c4e8689075522dab
-162	392	7702540292258468	bootloader/bootloader.map	c4e8689075522dab
-162	392	7702540292258468	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-162	392	7702540292258468	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-162	392	7702540292258468	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-162	392	7702540292258468	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-154	435	7702540292173300	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-393	444	7702540294567676	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-393	444	7702540294567676	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-444	594	7702540296422524	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-444	594	7702540296422524	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-444	594	7702540296422524	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-444	594	7702540296422524	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-435	648	7702540294996347	esp-idf/main/libmain.a	ea9e226d679d9aee
-648	11755	7702540407565418	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-648	11755	7702540407565418	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-11755	16534	7702540408186499	hidd_demos.elf	5473cbc0c7153246
-16535	17020	7702540460731241	.bin_timestamp	185b029162e819df
-16535	17020	7702540460731241	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-17020	17129	7702540460836680	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-17020	17129	7702540460836680	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-131	315	7702544281075081	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_ble.c.obj	8a4ddd7b0a5deff3
-140	345	7702544281170275	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-140	345	7702544281170275	bootloader/bootloader.elf	c4e8689075522dab
-140	345	7702544281170275	bootloader/bootloader.bin	c4e8689075522dab
-140	345	7702544281170275	bootloader/bootloader.map	c4e8689075522dab
-140	345	7702544281170275	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
-140	345	7702544281170275	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
-140	345	7702544281170275	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
-140	345	7702544281170275	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
-136	353	7702544281125136	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
-346	391	7702544283219226	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-346	391	7702544283219226	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
-126	405	7702544281025352	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
-391	491	7702544284577127	CMakeFiles/bootloader-complete	3908a9599a0ed01e
-391	491	7702544284577127	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-391	491	7702544284577127	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
-391	491	7702544284577127	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
-405	543	7702544283811932	esp-idf/main/libmain.a	ea9e226d679d9aee
-543	8381	7702544363201665	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-543	8381	7702544363201665	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
-8381	12386	7702544363574381	hidd_demos.elf	5473cbc0c7153246
-12387	12664	7702544406309814	.bin_timestamp	185b029162e819df
-12387	12664	7702544406309814	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
-12664	12758	7702544406405320	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
-12664	12758	7702544406405320	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+122	302	7703742299474931	bootloader/bootloader.bin	c4e8689075522dab
+122	302	7703742299474931	bootloader/bootloader.map	c4e8689075522dab
+122	302	7703742299474931	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+8231	12257	7703742380556189	hidd_demos.elf	5473cbc0c7153246
+122	302	7703742299474931	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
+122	302	7703742299474931	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
+122	302	7703742299474931	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
+303	344	7703742301275671	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+344	425	7703742302428017	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
+344	425	7703742302428017	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+502	8230	7703742380117163	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+12258	12534	7703742423541585	.bin_timestamp	185b029162e819df
+12258	12534	7703742423541585	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
+12535	12620	7703742423596212	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+118	309	7703742299424934	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
+710	891	7703737462099436	esp-idf/main/CMakeFiles/__idf_main.dir/button_matrix.c.obj	3363166520f669f
+113	357	7703742299384859	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_protocol.c.obj	a1945cfb5000a55d
+74	18210	7703805309879939	build.ninja	98ad1ef2ef052394
+127	411	7703805312053131	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+127	411	7703805312053131	bootloader/bootloader.elf	c4e8689075522dab
+127	411	7703805312053131	bootloader/bootloader.bin	c4e8689075522dab
+127	411	7703805312053131	bootloader/bootloader.map	c4e8689075522dab
+127	411	7703805312053131	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+127	411	7703805312053131	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
+127	411	7703805312053131	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
+127	411	7703805312053131	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
+412	489	7703805314897374	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+412	489	7703805314897374	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+123	548	7703805312014132	esp-idf/esp_app_format/CMakeFiles/__idf_esp_app_format.dir/esp_app_desc.c.obj	79e6a210efedbf18
+489	593	7703805316478054	CMakeFiles/bootloader-complete	3908a9599a0ed01e
+489	593	7703805316478054	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+489	593	7703805316478054	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
+489	593	7703805316478054	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+550	795	7703805316278007	esp-idf/esp_app_format/libesp_app_format.a	f2f5331643508ac8
+807	1014	7703805318849690	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
+800	1252	7703805318779698	esp-idf/main/CMakeFiles/__idf_main.dir/button_matrix.c.obj	3363166520f669f
+803	1310	7703805318809702	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_protocol.c.obj	a1945cfb5000a55d
+796	1348	7703805318739704	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
+123	297	7703805777974575	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+123	297	7703805777974575	bootloader/bootloader.elf	c4e8689075522dab
+123	297	7703805777974575	bootloader/bootloader.bin	c4e8689075522dab
+123	297	7703805777974575	bootloader/bootloader.map	c4e8689075522dab
+123	297	7703805777974575	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+123	297	7703805777974575	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
+123	297	7703805777974575	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
+123	297	7703805777974575	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
+124	318	7703806966859648	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_hid.c.obj	efba37e3c22182f0
+132	328	7703806966944721	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+132	328	7703806966944721	bootloader/bootloader.elf	c4e8689075522dab
+132	328	7703806966944721	bootloader/bootloader.bin	c4e8689075522dab
+132	328	7703806966944721	bootloader/bootloader.map	c4e8689075522dab
+132	328	7703806966944721	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+132	328	7703806966944721	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
+132	328	7703806966944721	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
+132	328	7703806966944721	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
+128	336	7703806966899577	esp-idf/main/CMakeFiles/__idf_main.dir/hid_device_le_prf.c.obj	4bb81afa9c7ad3e
+329	364	7703806968907865	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+329	364	7703806968907865	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+119	399	7703806966804274	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
+364	444	7703806970004822	CMakeFiles/bootloader-complete	3908a9599a0ed01e
+364	444	7703806970004822	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+364	444	7703806970004822	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
+364	444	7703806970004822	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+399	540	7703806969608985	esp-idf/main/libmain.a	ea9e226d679d9aee
+540	9977	7703807065019282	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+540	9977	7703807065019282	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+9977	14342	7703807065392199	hidd_demos.elf	5473cbc0c7153246
+14343	14653	7703807112084654	.bin_timestamp	185b029162e819df
+14343	14653	7703807112084654	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
+14653	14749	7703807112159690	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+14653	14749	7703807112159690	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+128	308	7703809527028442	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+128	308	7703809527028442	bootloader/bootloader.elf	c4e8689075522dab
+128	308	7703809527028442	bootloader/bootloader.bin	c4e8689075522dab
+128	308	7703809527028442	bootloader/bootloader.map	c4e8689075522dab
+128	308	7703809527028442	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+128	308	7703809527028442	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
+128	308	7703809527028442	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
+128	308	7703809527028442	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
+123	317	7703809526987562	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
+308	379	7703809528842157	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+308	379	7703809528842157	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+117	415	7703809526923757	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_main.c.obj	9a9284a14becac5f
+379	472	7703809530395269	CMakeFiles/bootloader-complete	3908a9599a0ed01e
+379	472	7703809530395269	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+379	472	7703809530395269	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
+379	472	7703809530395269	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+416	542	7703809529907502	esp-idf/main/libmain.a	ea9e226d679d9aee
+542	8330	7703809608644323	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+542	8330	7703809608644323	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+8330	12415	7703809609050042	hidd_demos.elf	5473cbc0c7153246
+12415	12708	7703809652766517	.bin_timestamp	185b029162e819df
+12415	12708	7703809652766517	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
+12708	12804	7703809652830242	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+12708	12804	7703809652830242	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+125	297	7703811738333933	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+125	297	7703811738333933	bootloader/bootloader.elf	c4e8689075522dab
+125	297	7703811738333933	bootloader/bootloader.bin	c4e8689075522dab
+125	297	7703811738333933	bootloader/bootloader.map	c4e8689075522dab
+125	297	7703811738333933	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+125	297	7703811738333933	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
+125	297	7703811738333933	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
+125	297	7703811738333933	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
+120	316	7703811738283714	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_hid.c.obj	efba37e3c22182f0
+298	344	7703811740062052	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+298	344	7703811740062052	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+344	427	7703811741279347	CMakeFiles/bootloader-complete	3908a9599a0ed01e
+344	427	7703811741279347	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+344	427	7703811741279347	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
+344	427	7703811741279347	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+317	452	7703811740249803	esp-idf/main/libmain.a	ea9e226d679d9aee
+452	10028	7703811836623272	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+452	10028	7703811836623272	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+10029	14596	7703811837365369	hidd_demos.elf	5473cbc0c7153246
+14597	14929	7703811886266180	.bin_timestamp	185b029162e819df
+14597	14929	7703811886266180	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
+14930	15033	7703811886381313	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+14930	15033	7703811886381313	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+216	396	7703822919915889	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+216	396	7703822919915889	bootloader/bootloader.elf	c4e8689075522dab
+216	396	7703822919915889	bootloader/bootloader.bin	c4e8689075522dab
+216	396	7703822919915889	bootloader/bootloader.map	c4e8689075522dab
+216	396	7703822919915889	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+216	396	7703822919915889	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
+216	396	7703822919915889	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
+216	396	7703822919915889	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
+211	422	7703822919870900	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
+397	441	7703822921728384	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+397	441	7703822921728384	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+441	530	7703822922990529	CMakeFiles/bootloader-complete	3908a9599a0ed01e
+441	530	7703822922990529	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+441	530	7703822922990529	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
+441	530	7703822922990529	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+424	562	7703822921998948	esp-idf/main/libmain.a	ea9e226d679d9aee
+562	9279	7703823010127843	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+562	9279	7703823010127843	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+9280	13569	7703823010566352	hidd_demos.elf	5473cbc0c7153246
+13570	14073	7703823058346984	.bin_timestamp	185b029162e819df
+13570	14073	7703823058346984	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
+14074	14201	7703823058497308	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+14074	14201	7703823058497308	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+130	323	7703827838956276	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+130	323	7703827838956276	bootloader/bootloader.elf	c4e8689075522dab
+130	323	7703827838956276	bootloader/bootloader.bin	c4e8689075522dab
+130	323	7703827838956276	bootloader/bootloader.map	c4e8689075522dab
+130	323	7703827838956276	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+130	323	7703827838956276	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
+130	323	7703827838956276	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
+130	323	7703827838956276	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
+124	334	7703827838891251	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_hid.c.obj	efba37e3c22182f0
+324	369	7703827840889910	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+324	369	7703827840889910	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+369	465	7703827842222090	CMakeFiles/bootloader-complete	3908a9599a0ed01e
+369	465	7703827842222090	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+369	465	7703827842222090	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
+369	465	7703827842222090	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+334	490	7703827840995084	esp-idf/main/libmain.a	ea9e226d679d9aee
+490	9207	7703827929288797	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+490	9207	7703827929288797	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+9207	13414	7703827929722417	hidd_demos.elf	5473cbc0c7153246
+13414	13794	7703827975512558	.bin_timestamp	185b029162e819df
+13414	13794	7703827975512558	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
+13795	13894	7703827975592866	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+13795	13894	7703827975592866	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+176	400	7703867982249724	esp-idf/main/CMakeFiles/__idf_main.dir/esp_hidd_prf_api.c.obj	7f7e594f341b0dfc
+169	401	7703867982188657	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_hid.c.obj	efba37e3c22182f0
+182	411	7703867982309726	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+182	411	7703867982309726	bootloader/bootloader.elf	c4e8689075522dab
+182	411	7703867982309726	bootloader/bootloader.bin	c4e8689075522dab
+182	411	7703867982309726	bootloader/bootloader.map	c4e8689075522dab
+182	411	7703867982309726	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+182	411	7703867982309726	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
+182	411	7703867982309726	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
+182	411	7703867982309726	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
+412	461	7703867984605775	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+412	461	7703867984605775	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+461	555	7703867985956184	CMakeFiles/bootloader-complete	3908a9599a0ed01e
+461	555	7703867985956184	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+461	555	7703867985956184	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
+461	555	7703867985956184	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+401	629	7703867984505788	esp-idf/main/libmain.a	ea9e226d679d9aee
+629	9223	7703868072325107	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+629	9223	7703868072325107	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+9223	13513	7703868072715401	hidd_demos.elf	5473cbc0c7153246
+13513	13833	7703868118765382	.bin_timestamp	185b029162e819df
+13513	13833	7703868118765382	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
+13834	13931	7703868118825391	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+13834	13931	7703868118825391	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+129	339	7703872689437430	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_hid.c.obj	efba37e3c22182f0
+134	343	7703872689487409	esp-idf/main/CMakeFiles/__idf_main.dir/armdeck_service.c.obj	d4b2a78a08f81bc
+139	354	7703872689542565	bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+139	354	7703872689542565	bootloader/bootloader.elf	c4e8689075522dab
+139	354	7703872689542565	bootloader/bootloader.bin	c4e8689075522dab
+139	354	7703872689542565	bootloader/bootloader.map	c4e8689075522dab
+139	354	7703872689542565	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-build	c4e8689075522dab
+139	354	7703872689542565	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.elf	c4e8689075522dab
+139	354	7703872689542565	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.bin	c4e8689075522dab
+139	354	7703872689542565	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader/bootloader.map	c4e8689075522dab
+355	404	7703872691703239	bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+355	404	7703872691703239	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-install	5a56469139717e9d
+343	500	7703872691583423	esp-idf/main/libmain.a	ea9e226d679d9aee
+404	507	7703872693098086	CMakeFiles/bootloader-complete	3908a9599a0ed01e
+404	507	7703872693098086	bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+404	507	7703872693098086	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/CMakeFiles/bootloader-complete	3908a9599a0ed01e
+404	507	7703872693098086	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/bootloader-prefix/src/bootloader-stamp/bootloader-done	3908a9599a0ed01e
+500	8705	7703872774754055	esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+500	8705	7703872774754055	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esp_system/ld/sections.ld	5005ca7715459a9c
+8705	12894	7703872775194343	hidd_demos.elf	5473cbc0c7153246
+12895	13211	7703872820163828	.bin_timestamp	185b029162e819df
+12895	13211	7703872820163828	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/.bin_timestamp	185b029162e819df
+13211	13299	7703872820263848	esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48
+13211	13299	7703872820263848	C:/Users/Arman/Desktop/sys emb/ble hid demo/ble_hid_device_demo/build/esp-idf/esptool_py/CMakeFiles/app_check_size	92e3032b14545f48

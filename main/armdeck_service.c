@@ -1,5 +1,6 @@
 #include "armdeck_service.h"
 #include "armdeck_protocol.h"
+#include "armdeck_hid.h"
 #include "esp_log.h"
 #include <string.h>
 
@@ -143,20 +144,12 @@ void armdeck_service_gatts_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gat
                     command_char_handle = param->add_char.attr_handle;
                     command_char_val_handle = command_char_handle + 1;
                     ESP_LOGI(TAG, "Command characteristic added: %d", command_char_handle);
-                    
-                    /* Add keymap characteristic */
+                      /* Add keymap characteristic */
                     esp_bt_uuid_t keymap_char_uuid = {
                         .len = ESP_UUID_LEN_128,
                         .uuid = {.uuid128 = {0}}
                     };
                     memcpy(keymap_char_uuid.uuid.uuid128, keymap_uuid, 16);
-                    
-                    /* Log the UUID being used */
-                    ESP_LOGI(TAG, "Keymap characteristic UUID: %02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-                             keymap_uuid[15], keymap_uuid[14], keymap_uuid[13], keymap_uuid[12],
-                             keymap_uuid[11], keymap_uuid[10], keymap_uuid[9], keymap_uuid[8],
-                             keymap_uuid[7], keymap_uuid[6], keymap_uuid[5], keymap_uuid[4],
-                             keymap_uuid[3], keymap_uuid[2], keymap_uuid[1], keymap_uuid[0]);
                     
                     esp_ble_gatts_add_char(
                         service_handle,
@@ -235,11 +228,12 @@ void armdeck_service_gatts_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gat
             }
             
             esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
-            break;
-            
-        case ESP_GATTS_CONNECT_EVT:
+            break;        case ESP_GATTS_CONNECT_EVT:
             conn_id = param->connect.conn_id;
             ESP_LOGI(TAG, "Device connected: conn_id=%d", conn_id);
+            
+            /* Force HID connection since Windows connects to custom service but not HID service */
+            armdeck_hid_force_connected(conn_id);
             break;
             
         case ESP_GATTS_DISCONNECT_EVT:

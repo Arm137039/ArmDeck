@@ -98,9 +98,8 @@ void esp_hidd_send_consumer_value(uint16_t conn_id, uint8_t key_cmd, bool key_pr
 }
 
 void esp_hidd_send_keyboard_value(uint16_t conn_id, key_mask_t special_key_mask, uint8_t *keyboard_cmd, uint8_t num_key)
-{
-    if (num_key > HID_KEYBOARD_IN_RPT_LEN - 2) {
-        ESP_LOGE(HID_LE_PRF_TAG, "%s(), the number key should not be more than %d", __func__, HID_KEYBOARD_IN_RPT_LEN);
+{    if (num_key > HID_KEYBOARD_IN_RPT_LEN - 2) {
+        ESP_LOGE(HID_LE_PRF_TAG, "%s(), the number of keys should not be more than %d", __func__, HID_KEYBOARD_IN_RPT_LEN - 2);
         return;
     }
 

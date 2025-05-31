@@ -12,8 +12,7 @@
 struct prf_char_pres_fmt
 {
     /// Unit (The Unit is a UUID)
-    uint16_t unit;
-    /// Description
+    uint16_t unit;    /// Description
     uint16_t description;
     /// Format
     uint8_t format;
@@ -409,7 +408,7 @@ static esp_gatts_attr_db_t hidd_le_gatt_db[HIDD_LE_IDX_NB] =
     // Report Characteristic Value
     [HIDD_LE_IDX_REPORT_KEY_IN_VAL]            = {{ESP_GATT_AUTO_RSP}, {ESP_UUID_LEN_16, (uint8_t *)&hid_report_uuid,
                                                                        ESP_GATT_PERM_READ,
-                                                                       HIDD_LE_REPORT_MAX_LEN, 0,
+                                                                                                                                              HIDD_LE_REPORT_MAX_LEN, 0,
                                                                        NULL}},
     // Report KEY INPUT Characteristic - Client Characteristic Configuration Descriptor
     [HIDD_LE_IDX_REPORT_KEY_IN_CCC]              = {{ESP_GATT_AUTO_RSP}, {ESP_UUID_LEN_16, (uint8_t *)&character_client_config_uuid,
@@ -563,14 +562,16 @@ void esp_hidd_prf_cb_hdl(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if,
             break;
         }
         case ESP_GATTS_CREATE_EVT:
-            break;
-        case ESP_GATTS_CONNECT_EVT: {
+            break;        case ESP_GATTS_CONNECT_EVT: {
             esp_hidd_cb_param_t cb_param = {0};
 			ESP_LOGI(HID_LE_PRF_TAG, "HID connection establish, conn_id = %x",param->connect.conn_id);
 			memcpy(cb_param.connect.remote_bda, param->connect.remote_bda, sizeof(esp_bd_addr_t));
             cb_param.connect.conn_id = param->connect.conn_id;
             hidd_clcb_alloc(param->connect.conn_id, param->connect.remote_bda);
             esp_ble_set_encryption(param->connect.remote_bda, ESP_BLE_SEC_ENCRYPT_NO_MITM);
+            
+            // Force HID connection immediately when GATT connects
+            ESP_LOGI(HID_LE_PRF_TAG, "Forcing HID connection event");
             if(hidd_le_env.hidd_cb != NULL) {
                 (hidd_le_env.hidd_cb)(ESP_HIDD_EVENT_BLE_CONNECT, &cb_param);
             }
@@ -584,8 +585,7 @@ void esp_hidd_prf_cb_hdl(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if,
             break;
         }
         case ESP_GATTS_CLOSE_EVT:
-            break;
-        case ESP_GATTS_WRITE_EVT: {
+            break;        case ESP_GATTS_WRITE_EVT: {
             esp_hidd_cb_param_t cb_param = {0};
             if (param->write.handle == hidd_le_env.hidd_inst.att_tbl[HIDD_LE_IDX_REPORT_LED_OUT_VAL]) {
                 cb_param.led_write.conn_id = param->write.conn_id;

@@ -15,7 +15,7 @@ Le système de configuration ArmDeck permet de configurer dynamiquement les 12 b
 
 ```c
 typedef struct {
-    uint8_t id;              // ID bouton (0-11)
+    uint8_t id;              // ID bouton (0-14)
     char label[16];          // Label affiché ("Play/Pause")
     char action[32];         // Action ("MEDIA_PLAY_PAUSE")
     char color[8];           // Couleur ("#4CAF50")
@@ -23,7 +23,7 @@ typedef struct {
 
 typedef struct {
     uint8_t version;         // Version config (1)
-    button_config_t buttons[12];
+    button_config_t buttons[15];
     uint32_t checksum;       // CRC32 pour validation
 } armdeck_config_t;
 ```
