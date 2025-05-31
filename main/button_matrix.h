@@ -7,7 +7,7 @@
 
 /* Matrix configuration */
 #define MATRIX_ROWS         3
-#define MATRIX_COLS         4
+#define MATRIX_COLS         5
 #define TOTAL_BUTTONS       (MATRIX_ROWS * MATRIX_COLS)
 #define DEBOUNCE_DELAY_MS   50
 #define SCAN_PERIOD_MS      10

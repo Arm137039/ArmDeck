@@ -10,7 +10,7 @@
 static const char* TAG = "ARMDECK_PROTOCOL";
 
 /* Default button configuration */
-static const armdeck_button_t default_buttons[12] = {
+static const armdeck_button_t default_buttons[15] = {
     {0,  ACTION_MEDIA, 0xCD, 0, 0x4C, 0xAF, 0x50, 0, "Play"},    // Play/Pause - Green
     {1,  ACTION_MEDIA, 0xB5, 0, 0x21, 0x96, 0xF3, 0, "Next"},    // Next - Blue
     {2,  ACTION_MEDIA, 0xB6, 0, 0x21, 0x96, 0xF3, 0, "Prev"},    // Previous - Blue
@@ -23,12 +23,15 @@ static const armdeck_button_t default_buttons[12] = {
     {9,  ACTION_KEY,   0x71, 0, 0x60, 0x7D, 0x8B, 0, "F22"},     // F22
     {10, ACTION_KEY,   0x72, 0, 0x60, 0x7D, 0x8B, 0, "F23"},     // F23
     {11, ACTION_KEY,   0x73, 0, 0x60, 0x7D, 0x8B, 0, "F24"},     // F24
+    {12, ACTION_KEY,   0x74, 0, 0x3F, 0x51, 0xB5, 0, "F13"},     // F13 - Indigo
+    {13, ACTION_KEY,   0x75, 0, 0x3F, 0x51, 0xB5, 0, "F14"},     // F14 - Indigo
+    {14, ACTION_KEY,   0x76, 0, 0x3F, 0x51, 0xB5, 0, "F15"},     // F15 - Indigo
 };
 
 /* Current configuration in memory */
 static armdeck_config_t current_config = {
     .version = ARMDECK_PROTOCOL_VERSION,
-    .num_buttons = 12,
+    .num_buttons = 15,
     .reserved = 0
 };
 
@@ -139,9 +142,8 @@ static esp_err_t handle_get_info(uint8_t* output, uint16_t* output_len) {
     armdeck_device_info_t info = {
         .protocol_version = ARMDECK_PROTOCOL_VERSION,
         .firmware_major = 1,
-        .firmware_minor = 2,
-        .firmware_patch = 0,
-        .num_buttons = 12,
+        .firmware_minor = 2,        .firmware_patch = 0,
+        .num_buttons = 15,
         .battery_level = 100,  // TODO: Read actual battery
         .uptime_seconds = esp_timer_get_time() / 1000000,
         .free_heap = esp_get_free_heap_size()
@@ -193,9 +195,8 @@ static esp_err_t handle_get_button(const uint8_t* payload, uint8_t payload_len,
                                                       NULL, 0, output, 256);
         return ESP_ERR_INVALID_SIZE;
     }
-    
-    uint8_t button_id = payload[0];
-    if (button_id >= 12) {
+      uint8_t button_id = payload[0];
+    if (button_id >= 15) {
         *output_len = armdeck_protocol_build_response(CMD_GET_BUTTON, ERR_INVALID_PARAM,
                                                       NULL, 0, output, 256);
         return ESP_ERR_INVALID_ARG;
@@ -217,8 +218,7 @@ static esp_err_t handle_set_button(const uint8_t* payload, uint8_t payload_len,
     }
     
     armdeck_button_t* button = (armdeck_button_t*)payload;
-    
-    if (button->button_id >= 12) {
+      if (button->button_id >= 15) {
         *output_len = armdeck_protocol_build_response(CMD_SET_BUTTON, ERR_INVALID_PARAM,
                                                       NULL, 0, output, 256);
         return ESP_ERR_INVALID_ARG;
@@ -243,9 +243,8 @@ static esp_err_t handle_test_button(const uint8_t* payload, uint8_t payload_len,
                                                       NULL, 0, output, 256);
         return ESP_ERR_INVALID_SIZE;
     }
-    
-    uint8_t button_id = payload[0];
-    if (button_id >= 12) {
+      uint8_t button_id = payload[0];
+    if (button_id >= 15) {
         *output_len = armdeck_protocol_build_response(CMD_TEST_BUTTON, ERR_INVALID_PARAM,
                                                       NULL, 0, output, 256);
         return ESP_ERR_INVALID_ARG;
@@ -321,8 +320,7 @@ const armdeck_button_t* armdeck_protocol_get_button_config(uint8_t button_id) {
     if (!config_initialized) {
         load_config_from_nvs();
     }
-    
-    if (button_id >= 12) {
+      if (button_id >= 15) {
         return NULL;
     }
     

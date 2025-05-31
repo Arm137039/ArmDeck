@@ -9,17 +9,18 @@ static const char* TAG = "ARMDECK_MATRIX";
 
 /* GPIO pins for rows (outputs) */
 static const int row_pins[MATRIX_ROWS] = {
-    GPIO_NUM_2,   // ROW1 - Buttons 1,2,3,4
-    GPIO_NUM_4,   // ROW2 - Buttons 5,6,7,8
-    GPIO_NUM_5    // ROW3 - Buttons 9,10,11,12
+    GPIO_NUM_2,   // ROW1 - Buttons 1,2,3,4,5
+    GPIO_NUM_4,   // ROW2 - Buttons 6,7,8,9,10
+    GPIO_NUM_5    // ROW3 - Buttons 11,12,13,14,15
 };
 
 /* GPIO pins for columns (inputs with pull-up) */
 static const int col_pins[MATRIX_COLS] = {
-    GPIO_NUM_18,  // COL1 - Buttons 1,5,9
-    GPIO_NUM_19,  // COL2 - Buttons 2,6,10
-    GPIO_NUM_21,  // COL3 - Buttons 3,7,11
-    GPIO_NUM_22   // COL4 - Buttons 4,8,12
+    GPIO_NUM_18,  // COL1 - Buttons 1,6,11
+    GPIO_NUM_19,  // COL2 - Buttons 2,7,12
+    GPIO_NUM_21,  // COL3 - Buttons 3,8,13
+    GPIO_NUM_22,  // COL4 - Buttons 4,9,14
+    GPIO_NUM_23   // COL5 - Buttons 5,10,15
 };
 
 /* Button state tracking */
@@ -35,7 +36,7 @@ static bool scanning_enabled = false;
 static button_event_cb_t event_callback = NULL;
 
 esp_err_t armdeck_matrix_init(void) {
-    ESP_LOGI(TAG, "Initializing 4x3 button matrix...");
+    ESP_LOGI(TAG, "Initializing 5x3 button matrix...");
     
     /* Configure row pins (outputs, high by default) */
     for (int i = 0; i < MATRIX_ROWS; i++) {

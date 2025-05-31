@@ -11,7 +11,7 @@ static armdeck_config_t current_config;
 static bool config_initialized = false;
 
 /* Default button configuration */
-static const armdeck_button_t default_buttons[12] = {
+static const armdeck_button_t default_buttons[15] = {
     {0,  ACTION_MEDIA, 0xCD, 0, 0x4C, 0xAF, 0x50, 0, "Play"},    // Play/Pause - Green
     {1,  ACTION_MEDIA, 0xB5, 0, 0x21, 0x96, 0xF3, 0, "Next"},    // Next - Blue
     {2,  ACTION_MEDIA, 0xB6, 0, 0x21, 0x96, 0xF3, 0, "Prev"},    // Previous - Blue
@@ -24,14 +24,16 @@ static const armdeck_button_t default_buttons[12] = {
     {9,  ACTION_KEY,   0x71, 0, 0x60, 0x7D, 0x8B, 0, "F22"},     // F22
     {10, ACTION_KEY,   0x72, 0, 0x60, 0x7D, 0x8B, 0, "F23"},     // F23
     {11, ACTION_KEY,   0x73, 0, 0x60, 0x7D, 0x8B, 0, "F24"},     // F24
+    {12, ACTION_KEY,   0x74, 0, 0x3F, 0x51, 0xB5, 0, "F13"},     // F13 - Indigo
+    {13, ACTION_KEY,   0x75, 0, 0x3F, 0x51, 0xB5, 0, "F14"},     // F14 - Indigo
+    {14, ACTION_KEY,   0x76, 0, 0x3F, 0x51, 0xB5, 0, "F15"},     // F15 - Indigo
 };
 
 esp_err_t armdeck_config_init(void) {
     ESP_LOGI(TAG, "Initializing configuration system");
-    
-    /* Initialize with defaults */
+      /* Initialize with defaults */
     current_config.version = ARMDECK_PROTOCOL_VERSION;
-    current_config.num_buttons = 12;
+    current_config.num_buttons = 15;
     current_config.reserved = 0;
     memcpy(current_config.buttons, default_buttons, sizeof(default_buttons));
     
@@ -108,10 +110,9 @@ esp_err_t armdeck_config_save(void) {
 
 esp_err_t armdeck_config_reset(void) {
     ESP_LOGI(TAG, "Resetting configuration to factory defaults");
-    
-    /* Reset to defaults */
+      /* Reset to defaults */
     current_config.version = ARMDECK_PROTOCOL_VERSION;
-    current_config.num_buttons = 12;
+    current_config.num_buttons = 15;
     current_config.reserved = 0;
     memcpy(current_config.buttons, default_buttons, sizeof(default_buttons));
     
@@ -140,14 +141,14 @@ esp_err_t armdeck_config_set(const armdeck_config_t* config) {
 }
 
 const armdeck_button_t* armdeck_config_get_button(uint8_t button_id) {
-    if (!config_initialized || button_id >= 12) {
+    if (!config_initialized || button_id >= 15) {
         return NULL;
     }
     return &current_config.buttons[button_id];
 }
 
 esp_err_t armdeck_config_set_button(uint8_t button_id, const armdeck_button_t* button) {
-    if (!config_initialized || !button || button_id >= 12) {
+    if (!config_initialized || !button || button_id >= 15) {
         return ESP_ERR_INVALID_ARG;
     }
     
@@ -165,15 +166,14 @@ bool armdeck_config_validate(const armdeck_config_t* config) {
         ESP_LOGW(TAG, "Version mismatch: %d != %d", config->version, ARMDECK_PROTOCOL_VERSION);
         return false;
     }
-    
-    /* Check number of buttons */
-    if (config->num_buttons != 12) {
+      /* Check number of buttons */
+    if (config->num_buttons != 15) {
         ESP_LOGW(TAG, "Invalid number of buttons: %d", config->num_buttons);
         return false;
     }
     
     /* Validate each button */
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 15; i++) {
         const armdeck_button_t* btn = &config->buttons[i];
         
         /* Check button ID */

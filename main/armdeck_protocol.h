@@ -81,7 +81,7 @@ typedef struct __attribute__((packed)) {
 
 /* Button configuration */
 typedef struct __attribute__((packed)) {
-    uint8_t button_id;      // 0-11 for 12 buttons
+    uint8_t button_id;      // 0-14 for 15 buttons
     uint8_t action_type;    // ACTION_KEY, ACTION_MEDIA, etc.
     uint8_t key_code;       // HID key code
     uint8_t modifier;       // Modifier keys (Ctrl, Alt, etc.)
@@ -97,7 +97,7 @@ typedef struct __attribute__((packed)) {
     uint8_t version;
     uint8_t num_buttons;
     uint16_t reserved;
-    armdeck_button_t buttons[12];
+    armdeck_button_t buttons[15];
 } armdeck_config_t;
 
 /* Response packet */
