@@ -332,13 +332,6 @@ const useBle = (): UseBleReturn => {
     }
   }, []);
 
-  const sendCommand = useCallback(async (command: number, payload?: Uint8Array): Promise<Uint8Array | null> => {
-    if (!bleDevice || !workingCommandMethodRef.current) {
-      throw new Error('No working command method available');
-    }
-    return workingCommandMethodRef.current(bleDevice, command, payload);
-  }, [bleDevice]);
-
   // ========================================
   // DEVICE INFO & COMMUNICATION TESTING
   // ========================================
@@ -433,59 +426,6 @@ const useBle = (): UseBleReturn => {
     };
   }, []);
 
-  const loadConfig = useCallback(async () => {
-    if (!bleDevice || !workingCommandMethodRef.current || loadingConfigRef.current) {
-      return;
-    }
-
-    loadingConfigRef.current = true;
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      console.log('[useBle] Loading configuration...');
-      const loadedButtons: ButtonConfig[] = [];
-
-      for (let i = 0; i < 15; i++) {
-        try {
-          const payload = new Uint8Array([i]);
-          const response = await workingCommandMethodRef.current(bleDevice, COMMANDS.GET_BUTTON, payload);
-
-          if (response) {
-            const parsed = parseResponse(response);
-            if (parsed && parsed.error === ERRORS.NONE && parsed.payload) {
-              const button = parseButtonData(parsed.payload, i);
-              loadedButtons.push(button);
-              console.log(`[useBle] Button ${i} loaded:`, button);
-            } else {
-              loadedButtons.push(createEmptyButton(i));
-            }
-          } else {
-            loadedButtons.push(createEmptyButton(i));
-          }
-
-          await delay(100);
-        } catch (err) {
-          console.error(`[useBle] Failed to load button ${i}:`, err);
-          loadedButtons.push(createEmptyButton(i));
-        }
-      }
-
-      setButtons(loadedButtons);
-      setIsDirty(false);
-      setLastSaved(new Date());
-      console.log('[useBle] Configuration loaded successfully');
-
-    } catch (err) {
-      console.error('[useBle] Failed to load config:', err);
-      setError(`Failed to load config: ${err}`);
-      setButtons(Array.from({ length: 15 }, (_, i) => createEmptyButton(i)));
-    } finally {
-      setIsLoading(false);
-      loadingConfigRef.current = false;
-    }
-  }, [bleDevice, parseButtonData]);
-
   const buildButtonPayload = useCallback((button: ButtonConfig, buttonIndex: number): Uint8Array => {
     // Convert color hex to RGB
     const colorHex = button.color.replace('#', '');
@@ -493,7 +433,7 @@ const useBle = (): UseBleReturn => {
     const g = parseInt(colorHex.substr(2, 2), 16);
     const b = parseInt(colorHex.substr(4, 2), 16);
 
-    let actionType = ACTION_TYPES.KEY;
+    let actionType: number = ACTION_TYPES.KEY;
     let keyCode = 0x04;
     const modifier = 0;
 
@@ -620,12 +560,72 @@ const useBle = (): UseBleReturn => {
         characteristics
       };
 
+      // Définir la méthode de commande immédiatement
+      const commandMethod = sendCommandStrict;
+      workingCommandMethodRef.current = commandMethod;
+
       setBleDevice(newBleDevice);
 
       if (characteristics.cmd) {
         setIsConnected(true);
         setIsFullyConnected(true);
         setConnectionStage('Fully Connected');
+
+        // Fonction locale pour charger la configuration
+        const loadConfigWithDevice = async (deviceInfo: DeviceInfo | null) => {
+          if (loadingConfigRef.current) return;
+
+          loadingConfigRef.current = true;
+          setIsLoading(true);
+          setError(null);
+
+          try {
+            const loadedButtons: ButtonConfig[] = [];
+            const numButtons = deviceInfo?.num_buttons || 15;
+
+            for (let i = 0; i < numButtons; i++) {
+              try {
+                const payload = new Uint8Array([i]);
+                const response = await commandMethod(newBleDevice, COMMANDS.GET_BUTTON, payload);
+
+                if (response) {
+                  const parsed = parseResponse(response);
+                  if (parsed && parsed.error === ERRORS.NONE && parsed.payload) {
+                    const button = parseButtonData(parsed.payload, i);
+                    loadedButtons.push(button);
+                  } else {
+                    loadedButtons.push(createEmptyButton(i));
+                  }
+                } else {
+                  loadedButtons.push(createEmptyButton(i));
+                }
+
+                await delay(100);
+              } catch (err) {
+                loadedButtons.push(createEmptyButton(i));
+              }
+            }
+
+            // S'assurer du bon nombre de boutons
+            while (loadedButtons.length < numButtons) {
+              loadedButtons.push(createEmptyButton(loadedButtons.length));
+            }
+
+            setButtons(loadedButtons);
+            setIsDirty(false);
+            setLastSaved(new Date());
+          } catch (err) {
+            console.error('[useBle] Failed to load config:', err);
+            setError(`Failed to load config: ${err instanceof Error ? err.message : String(err)}`);
+
+            // En cas d'erreur, utiliser des boutons par défaut
+            const defaultButtons = Array.from({ length: deviceInfo?.num_buttons || 15 }, (_, i) => createEmptyButton(i));
+            setButtons(defaultButtons);
+          } finally {
+            setIsLoading(false);
+            loadingConfigRef.current = false;
+          }
+        };
 
         setTimeout(async () => {
           try {
@@ -634,7 +634,7 @@ const useBle = (): UseBleReturn => {
 
             if (success) {
               console.log('[useBle] Communication established, loading configuration...');
-              await loadConfig();
+              await loadConfigWithDevice(deviceInfo);
             } else {
               setError('Cannot communicate with ESP32');
             }
@@ -656,7 +656,7 @@ const useBle = (): UseBleReturn => {
     } finally {
       connectingRef.current = false;
     }
-  }, [testCommunication, loadConfig]);
+  }, [testCommunication, parseButtonData, sendCommandStrict, deviceInfo]);
 
   // ========================================
   // PUBLIC API METHODS
