@@ -62,6 +62,9 @@ const DEFAULT_BUTTONS: ButtonConfig[] = [
   { id: 9, label: 'F22', action: 'KEY_F22', color: '#607D8B' },
   { id: 10, label: 'F23', action: 'KEY_F23', color: '#607D8B' },
   { id: 11, label: 'F24', action: 'KEY_F24', color: '#607D8B' },
+  { id: 12, label: 'F13', action: 'KEY_F13', color: '#607D8B' },
+  { id: 13, label: 'F14', action: 'KEY_F14', color: '#607D8B' },
+  { id: 14, label: 'F15', action: 'KEY_F15', color: '#607D8B' },
 ];
 
 const useBle = (): UseBleReturn => {
@@ -440,7 +443,7 @@ const useBle = (): UseBleReturn => {
 
   // Update button configuration
   const updateButton = useCallback((index: number, config: Partial<ButtonConfig>) => {
-    if (index < 0 || index >= 12) {
+    if (index < 0 || index >= 15) {
       console.error('❌ [useBle] Invalid button index:', index);
       return;
     }
@@ -579,3 +582,4 @@ const useBle = (): UseBleReturn => {
 };
 
 export default useBle;
+

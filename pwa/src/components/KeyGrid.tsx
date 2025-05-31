@@ -248,7 +248,7 @@ const KeyGrid: React.FC = () => {
             <h1>ArmDeck Configuration</h1>
             <p>
               {deviceInfo ?
-                  `${deviceInfo.name} v${deviceInfo.firmware} • ${configuredButtons}/12 buttons configured` :
+                  `${deviceInfo.name} v${deviceInfo.firmware} • ${configuredButtons}/15 buttons configured` :
                   'Configure your StreamDeck layout • Drag macros or click buttons to assign actions'
               }
               {!connectionReady && (
@@ -339,10 +339,10 @@ const KeyGrid: React.FC = () => {
         <div className="key-grid__stats">
           <div className="key-grid__stat-card">
             <div className="label">Configuration</div>
-            <div className="value">{configuredButtons}/12</div>
+            <div className="value">{configuredButtons}/15</div>
             <div className="description">
               Buttons configured
-              {configuredButtons === 12 && (
+              {configuredButtons === 15 && (
                   <div className="completion-badge">Complete! 🎉</div>
               )}
             </div>
@@ -411,3 +411,4 @@ const KeyGrid: React.FC = () => {
 };
 
 export default KeyGrid;
+

@@ -96,13 +96,13 @@ const ConnectionStatusPanel: React.FC = () => {
                     <div className="value">ArmDeck</div>
                     <div className="description">
                         Stream Deck 4x3
-                        <div><small>12 programmable buttons</small></div>
+                        <div><small>15 programmable buttons</small></div>
                     </div>
                 </div>
 
                 <div className="connection-status-panel__card">
                     <div className="label">CONFIGURATION</div>
-                    <div className="value">{configuredButtons}/12</div>
+                    <div className="value">{configuredButtons}/15</div>
                     <div className="description">
                         <div className={getConfigurationClass()}>
                             {getConfigurationStatus()}
@@ -167,7 +167,7 @@ const ConnectionStatusPanel: React.FC = () => {
                             <div><strong>Is Dirty:</strong> {isDirty ? '⚠️ Yes' : '✅ No'}</div>
                             <div><strong>Last Saved:</strong> {lastSaved?.toISOString() || 'Never'}</div>
                             <div><strong>Architecture:</strong> Unified Hook ✅</div>
-                            <div><strong>Buttons Configured:</strong> {configuredButtons}/12</div>
+                            <div><strong>Buttons Configured:</strong> {configuredButtons}/15</div>
                         </div>
                     </details>
                 </div>
@@ -199,3 +199,4 @@ const ConnectionStatusPanel: React.FC = () => {
 };
 
 export default ConnectionStatusPanel;
+
