@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import useBle, { ButtonConfig } from './useBle';
+import useBle, { ButtonConfig, DeviceInfo } from './useBle'; // ✅ Importer DeviceInfo du hook
 
-// Types pour le Context
+// Types pour le Context - utilise les types du hook useBle
 interface BleContextType {
     // Connection state
     isAvailable: boolean;
@@ -16,6 +16,7 @@ interface BleContextType {
     isLoading: boolean;
     isDirty: boolean;
     lastSaved: Date | null;
+    deviceInfo: DeviceInfo | null;
 
     // Actions
     connect: () => Promise<void>;
@@ -23,6 +24,9 @@ interface BleContextType {
     updateButton: (index: number, config: Partial<ButtonConfig>) => void;
     saveConfig: () => Promise<void>;
     resetConfig: () => Promise<void>;
+    getDeviceInfo: () => Promise<void>;
+    testCommunication: () => Promise<void>;
+    testButtonPress: (buttonId: number) => Promise<void>;
 }
 
 // Créer le Context
@@ -52,9 +56,32 @@ export const BleProvider: React.FC<BleProviderProps> = ({ children }) => {
             isConnected: bleState.isConnected,
             isFullyConnected: bleState.isFullyConnected,
             connectionStage: bleState.connectionStage,
+            deviceInfo: bleState.deviceInfo ?
+                `${bleState.deviceInfo.device_name} v${bleState.deviceInfo.firmware_major}.${bleState.deviceInfo.firmware_minor}.${bleState.deviceInfo.firmware_patch}`
+                : 'None',
             timestamp: new Date().toISOString()
         });
-    }, [bleState.isConnected, bleState.isFullyConnected, bleState.connectionStage]);
+    }, [
+        bleState.isConnected,
+        bleState.isFullyConnected,
+        bleState.connectionStage,
+        bleState.deviceInfo
+    ]);
+
+    // 🔥 DEBUG: Log device info changes
+    React.useEffect(() => {
+        if (bleState.deviceInfo) {
+            console.log('📱 [BleProvider] Device info updated:', {
+                name: bleState.deviceInfo.device_name,
+                firmware: `${bleState.deviceInfo.firmware_major}.${bleState.deviceInfo.firmware_minor}.${bleState.deviceInfo.firmware_patch}`,
+                protocol: bleState.deviceInfo.protocol_version,
+                buttons: bleState.deviceInfo.num_buttons,
+                battery: `${bleState.deviceInfo.battery_level}%`,
+                uptime: `${Math.floor(bleState.deviceInfo.uptime_seconds / 60)}min`,
+                heap: `${Math.floor(bleState.deviceInfo.free_heap / 1024)}KB`
+            });
+        }
+    }, [bleState.deviceInfo]);
 
     return (
         <BleContext.Provider value={bleState}>
@@ -62,3 +89,6 @@ export const BleProvider: React.FC<BleProviderProps> = ({ children }) => {
         </BleContext.Provider>
     );
 };
+
+// ✅ Re-exporter les types du hook useBle pour l'usage externe
+export type { DeviceInfo, ButtonConfig };

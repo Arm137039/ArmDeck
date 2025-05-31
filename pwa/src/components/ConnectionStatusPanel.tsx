@@ -13,7 +13,9 @@ const ConnectionStatusPanel: React.FC = () => {
         buttons,
         isDirty,
         lastSaved,
-        isLoading
+        isLoading,
+        deviceInfo,
+        getDeviceInfo
     } = useBleContext();
 
     const configuredButtons = buttons.filter(b => b.action && b.action !== '').length;
@@ -45,6 +47,26 @@ const ConnectionStatusPanel: React.FC = () => {
         if (isDirty) return 'value--dirty';
         if (lastSaved) return 'value--synced';
         return 'value--not-synced';
+    };
+
+    // Format uptime in a readable way
+    const formatUptime = (seconds: number): string => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        if (hours > 0) {
+            return `${hours}h ${minutes}m`;
+        }
+        return `${minutes}m`;
+    };
+
+    // Format memory in KB/MB
+    const formatMemory = (bytes: number): string => {
+        const kb = Math.floor(bytes / 1024);
+        if (kb > 1024) {
+            const mb = (kb / 1024).toFixed(1);
+            return `${mb}MB`;
+        }
+        return `${kb}KB`;
     };
 
     return (
@@ -93,16 +115,27 @@ const ConnectionStatusPanel: React.FC = () => {
 
                 <div className="connection-status-panel__card">
                     <div className="label">DEVICE</div>
-                    <div className="value">ArmDeck</div>
+                    <div className="value">
+                        {deviceInfo ? deviceInfo.device_name : 'ArmDeck'}
+                    </div>
                     <div className="description">
-                        Stream Deck 4x3
-                        <div><small>15 programmable buttons</small></div>
+                        {deviceInfo ? (
+                            <>
+                                <div>Firmware v{deviceInfo.firmware_major}.{deviceInfo.firmware_minor}.{deviceInfo.firmware_patch}</div>
+                                <div><small>Protocol v{deviceInfo.protocol_version}</small></div>
+                            </>
+                        ) : (
+                            <>
+                                <div>Stream Deck 4x3</div>
+                                <div><small>Device info not available</small></div>
+                            </>
+                        )}
                     </div>
                 </div>
 
                 <div className="connection-status-panel__card">
                     <div className="label">CONFIGURATION</div>
-                    <div className="value">{configuredButtons}/15</div>
+                    <div className="value">{configuredButtons}/{deviceInfo?.num_buttons || 15}</div>
                     <div className="description">
                         <div className={getConfigurationClass()}>
                             {getConfigurationStatus()}
@@ -134,6 +167,46 @@ const ConnectionStatusPanel: React.FC = () => {
                         )}
                     </div>
                 </div>
+
+                {/* Device stats - only show when we have device info */}
+                {deviceInfo && deviceInfo.battery_level > 0 && (
+                    <>
+                        <div className="connection-status-panel__card">
+                            <div className="label">BATTERY</div>
+                            <div className={`value ${
+                                deviceInfo.battery_level > 50 ? 'value--good' :
+                                    deviceInfo.battery_level > 20 ? 'value--warning' : 'value--critical'
+                            }`}>
+                                {deviceInfo.battery_level}%
+                            </div>
+                            <div className="description">
+                                <div className="battery-indicator">
+                                    <div
+                                        className="battery-fill"
+                                        style={{
+                                            width: `${deviceInfo.battery_level}%`,
+                                            backgroundColor: deviceInfo.battery_level > 50 ? '#4CAF50' :
+                                                deviceInfo.battery_level > 20 ? '#FF9800' : '#F44336'
+                                        }}
+                                    />
+                                </div>
+                                <small>
+                                    {deviceInfo.battery_level > 50 ? 'Good' :
+                                        deviceInfo.battery_level > 20 ? 'Low' : 'Critical'}
+                                </small>
+                            </div>
+                        </div>
+
+                        <div className="connection-status-panel__card">
+                            <div className="label">SYSTEM</div>
+                            <div className="value">{formatMemory(deviceInfo.free_heap)}</div>
+                            <div className="description">
+                                <div>Free Memory</div>
+                                <div><small>Uptime: {formatUptime(deviceInfo.uptime_seconds)}</small></div>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Status bar */}
@@ -153,6 +226,45 @@ const ConnectionStatusPanel: React.FC = () => {
                 </div>
             </div>
 
+            {/* Device info panel - expanded view when connected */}
+            {deviceInfo && isFullyConnected && (
+                <div className="connection-status-panel__device-details">
+                    <h3>Device Details</h3>
+                    <div className="device-details-grid">
+                        <div className="detail-item">
+                            <span className="detail-label">Name:</span>
+                            <span className="detail-value">{deviceInfo.device_name}</span>
+                        </div>
+                        <div className="detail-item">
+                            <span className="detail-label">Firmware:</span>
+                            <span className="detail-value">
+                                v{deviceInfo.firmware_major}.{deviceInfo.firmware_minor}.{deviceInfo.firmware_patch}
+                            </span>
+                        </div>
+                        <div className="detail-item">
+                            <span className="detail-label">Protocol:</span>
+                            <span className="detail-value">v{deviceInfo.protocol_version}</span>
+                        </div>
+                        <div className="detail-item">
+                            <span className="detail-label">Buttons:</span>
+                            <span className="detail-value">{deviceInfo.num_buttons}</span>
+                        </div>
+                        <div className="detail-item">
+                            <span className="detail-label">Battery:</span>
+                            <span className="detail-value">{deviceInfo.battery_level}%</span>
+                        </div>
+                        <div className="detail-item">
+                            <span className="detail-label">Free Memory:</span>
+                            <span className="detail-value">{formatMemory(deviceInfo.free_heap)}</span>
+                        </div>
+                        <div className="detail-item">
+                            <span className="detail-label">Uptime:</span>
+                            <span className="detail-value">{formatUptime(deviceInfo.uptime_seconds)}</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Debug info */}
             {process.env.NODE_ENV === 'development' && (
                 <div className="connection-status-panel__debug">
@@ -166,8 +278,18 @@ const ConnectionStatusPanel: React.FC = () => {
                             <div><strong>Is Loading:</strong> {isLoading ? '🔄 Yes' : '✅ No'}</div>
                             <div><strong>Is Dirty:</strong> {isDirty ? '⚠️ Yes' : '✅ No'}</div>
                             <div><strong>Last Saved:</strong> {lastSaved?.toISOString() || 'Never'}</div>
-                            <div><strong>Architecture:</strong> Unified Hook ✅</div>
+                            <div><strong>Architecture:</strong> Unified Hook + Protocol v2 ✅</div>
                             <div><strong>Buttons Configured:</strong> {configuredButtons}/15</div>
+                            {deviceInfo && (
+                                <>
+                                    <div><strong>Device Name:</strong> {deviceInfo.device_name}</div>
+                                    <div><strong>Firmware:</strong> v{deviceInfo.firmware_major}.{deviceInfo.firmware_minor}.{deviceInfo.firmware_patch}</div>
+                                    <div><strong>Protocol Version:</strong> {deviceInfo.protocol_version}</div>
+                                    <div><strong>Battery Level:</strong> {deviceInfo.battery_level}%</div>
+                                    <div><strong>Free Heap:</strong> {formatMemory(deviceInfo.free_heap)}</div>
+                                    <div><strong>Uptime:</strong> {formatUptime(deviceInfo.uptime_seconds)}</div>
+                                </>
+                            )}
                         </div>
                     </details>
                 </div>
@@ -189,6 +311,7 @@ const ConnectionStatusPanel: React.FC = () => {
                                 <li>Check that Bluetooth is enabled</li>
                                 <li>Try refreshing the page</li>
                                 <li>Check chrome://bluetooth-internals for detailed info</li>
+                                <li>Ensure firmware supports the new protocol</li>
                             </ul>
                         </div>
                     )}
@@ -199,4 +322,3 @@ const ConnectionStatusPanel: React.FC = () => {
 };
 
 export default ConnectionStatusPanel;
-

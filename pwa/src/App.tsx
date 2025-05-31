@@ -4,7 +4,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import KeyGrid from './components/KeyGrid';
 import MacroList from './components/MacroList';
 import ConnectionStatusPanel from './components/ConnectionStatusPanel';
-import { BleProvider, useBleContext } from './hooks/BleProvider'; // 🔥 Import du Provider
+import { BleProvider, useBleContext } from './hooks/BleProvider';
 import useTheme from './hooks/useTheme';
 import './styles/main.scss';
 
@@ -13,8 +13,9 @@ const AppContent = () => {
     isConnected,
     isFullyConnected,
     error,
-    connectionStage
-  } = useBleContext(); // 🔥 Utilise le Context
+    connectionStage,
+    deviceInfo
+  } = useBleContext();
 
   const { theme, toggleTheme } = useTheme();
 
@@ -30,9 +31,12 @@ const AppContent = () => {
       isFullyConnected,
       connectionStage,
       hasError: !!error,
+      deviceInfo: deviceInfo ?
+          `${deviceInfo.device_name} v${deviceInfo.firmware_major}.${deviceInfo.firmware_minor}.${deviceInfo.firmware_patch}`
+          : 'None',
       timestamp: new Date().toISOString()
     });
-  }, [isConnected, isFullyConnected, connectionStage, error]);
+  }, [isConnected, isFullyConnected, connectionStage, error, deviceInfo]);
 
   return (
       <DndProvider backend={HTML5Backend}>
@@ -43,6 +47,11 @@ const AppContent = () => {
                 <div className="brand">
                   <h1 className="brand-title">ArmDeck</h1>
                   <span className="brand-subtitle">Configuration Tool</span>
+                  {deviceInfo && (
+                      <span className="brand-device-info">
+                    {deviceInfo.device_name} v{deviceInfo.firmware_major}.{deviceInfo.firmware_minor}.{deviceInfo.firmware_patch}
+                  </span>
+                  )}
                 </div>
 
                 <div className="header-controls">
@@ -86,6 +95,40 @@ const AppContent = () => {
                     </div>
                   </div>
 
+                  {/* Device info panel in sidebar */}
+                  {deviceInfo && isFullyConnected && deviceInfo.battery_level > 0 && (
+                      <div className="device-info-panel">
+                        <h3>Device Status</h3>
+                        <div className="device-info-content">
+                          <div className="info-item">
+                            <span className="info-label">Battery:</span>
+                            <span className={`info-value ${
+                                deviceInfo.battery_level > 50 ? 'status-good' :
+                                    deviceInfo.battery_level > 20 ? 'status-warning' : 'status-critical'
+                            }`}>
+                          {deviceInfo.battery_level}%
+                        </span>
+                          </div>
+                          {deviceInfo.free_heap > 0 && (
+                              <div className="info-item">
+                                <span className="info-label">Memory:</span>
+                                <span className="info-value">
+                            {Math.floor(deviceInfo.free_heap / 1024)}KB free
+                          </span>
+                              </div>
+                          )}
+                          {deviceInfo.uptime_seconds > 0 && (
+                              <div className="info-item">
+                                <span className="info-label">Uptime:</span>
+                                <span className="info-value">
+                            {Math.floor(deviceInfo.uptime_seconds / 60)}min
+                          </span>
+                              </div>
+                          )}
+                        </div>
+                      </div>
+                  )}
+
                   {/* Debug panel pour le développement */}
                   {process.env.NODE_ENV === 'development' && (
                       <div className="debug-panel">
@@ -95,7 +138,11 @@ const AppContent = () => {
                           <div><strong>Fully Connected:</strong> {isFullyConnected ? 'Yes' : 'No'}</div>
                           <div><strong>Stage:</strong> {connectionStage}</div>
                           <div><strong>Error:</strong> {error ? 'Yes' : 'No'}</div>
-                          <div><strong>Architecture:</strong> Context + Unified Hook ✅</div>
+                          <div><strong>Device:</strong> {deviceInfo?.device_name || 'None'}</div>
+                          <div><strong>Firmware:</strong> {deviceInfo ?
+                              `v${deviceInfo.firmware_major}.${deviceInfo.firmware_minor}.${deviceInfo.firmware_patch}` : 'Unknown'}</div>
+                          <div><strong>Protocol:</strong> {deviceInfo?.protocol_version || 'Unknown'}</div>
+                          <div><strong>Architecture:</strong> Context + Unified Hook v2 ✅</div>
                         </div>
                       </div>
                   )}
@@ -116,6 +163,9 @@ const AppContent = () => {
               <div className="footer-content">
                 <span>ArmDeck Configuration Tool</span>
                 <span>Built with React + ESP32</span>
+                {deviceInfo && (
+                    <span>Connected to {deviceInfo.device_name}</span>
+                )}
                 {process.env.NODE_ENV === 'development' && (
                     <span className="dev-badge">Development Mode</span>
                 )}

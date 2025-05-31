@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { useBleContext } from '../hooks/BleProvider'; // 🔥 Context au lieu du hook direct
+import { useBleContext } from '../hooks/BleProvider';
 import { ButtonConfig } from '../hooks/useBle';
 import { Macro } from '../data/macros';
 import MacroModal from './MacroModal';
