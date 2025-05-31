@@ -1,4 +1,5 @@
 #include "armdeck_hid.h"
+#include "armdeck_common.h"
 #include "esp_log.h"
 #include "hid_dev.h"
 #include <string.h>
@@ -6,7 +7,6 @@
 static const char* TAG = "ARMDECK_HID";
 
 /* HID connection state */
-static uint16_t hid_conn_id = 0;
 static bool hid_connected = false;
 
 /* Callback */
@@ -31,11 +31,13 @@ static void hid_event_handler(esp_hidd_cb_event_t event, esp_hidd_cb_param_t *pa
             /* Send initial empty report */
             armdeck_hid_send_empty();
             break;
-            
-        case ESP_HIDD_EVENT_BLE_DISCONNECT:
+              case ESP_HIDD_EVENT_BLE_DISCONNECT:
             ESP_LOGI(TAG, "HID disconnected");
             hid_connected = false;
             hid_conn_id = 0;
+            
+            /* Update global connection state for monitoring */
+            armdeck_main_set_connected(false, 0);
             break;
             
         default:
@@ -114,6 +116,9 @@ bool armdeck_hid_is_connected(void) {
 void armdeck_hid_force_connected(uint16_t conn_id) {
     hid_connected = true;
     hid_conn_id = conn_id;
+    
+    /* Update global connection state for monitoring */
+    armdeck_main_set_connected(true, conn_id);
     
     /* Send initial empty report */
     armdeck_hid_send_empty();

@@ -65,6 +65,20 @@ void stop_keep_alive(void) {
     }
 }
 
+/* Update global connection state for monitoring */
+void armdeck_main_set_connected(bool connected, uint16_t conn_id) {
+    ble_connected = connected;
+    hid_conn_id = conn_id;
+    
+    if (connected) {
+        start_keep_alive();
+        ESP_LOGI(TAG, "Global connection state updated: CONNECTED (conn_id=%d)", conn_id);
+    } else {
+        stop_keep_alive();
+        ESP_LOGI(TAG, "Global connection state updated: DISCONNECTED");
+    }
+}
+
 /* Button event handler */
 static void handle_button_event(uint8_t button_id, bool pressed) {
     const armdeck_button_t* button = armdeck_protocol_get_button_config(button_id);
@@ -106,16 +120,12 @@ static void handle_button_event(uint8_t button_id, bool pressed) {
 static void hid_event_handler(esp_hidd_cb_event_t event, esp_hidd_cb_param_t *param) {
     switch(event) {
         case ESP_HIDD_EVENT_BLE_CONNECT:
-            ble_connected = true;
-            hid_conn_id = param->connect.conn_id;
-            start_keep_alive();
+            armdeck_main_set_connected(true, param->connect.conn_id);
             ESP_LOGI(TAG, "Device connected and ready!");
             break;
             
         case ESP_HIDD_EVENT_BLE_DISCONNECT:
-            ble_connected = false;
-            hid_conn_id = 0;
-            stop_keep_alive();
+            armdeck_main_set_connected(false, 0);
             ESP_LOGI(TAG, "Device disconnected");
             
             /* Restart advertising after delay */

@@ -15,6 +15,9 @@ void start_keep_alive(void);
 void stop_keep_alive(void);
 void send_hid_keep_alive(void);
 
+// Fonction pour mettre à jour l'état de connexion global
+void armdeck_main_set_connected(bool connected, uint16_t conn_id);
+
 // Fonction pour mettre à jour le niveau de batterie
 void armdeck_update_battery_level(uint8_t level);
 

@@ -138,7 +138,8 @@ void armdeck_service_gatts_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gat
                 ESP_LOGI(TAG, "Service started");
                 add_characteristics();
             }
-            break;        case ESP_GATTS_ADD_CHAR_EVT:
+            break;        
+        case ESP_GATTS_ADD_CHAR_EVT:
             if (param->add_char.status == ESP_GATT_OK) {
                 if (command_char_handle == 0) {
                     command_char_handle = param->add_char.attr_handle;
