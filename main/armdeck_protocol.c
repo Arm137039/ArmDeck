@@ -158,12 +158,17 @@ static esp_err_t handle_get_info(uint8_t* output, uint16_t* output_len) {
 }
 
 static esp_err_t handle_get_config(uint8_t* output, uint16_t* output_len) {
-    if (!config_initialized) {
-        load_config_from_nvs();
+    // Use the proper configuration system instead of local config
+    const armdeck_config_t* config = armdeck_config_get();
+    if (!config) {
+        ESP_LOGE(TAG, "Failed to get configuration from main config system");
+        *output_len = armdeck_protocol_build_response(CMD_GET_CONFIG, ERR_MEMORY,
+                                                      NULL, 0, output, 256);
+        return ESP_ERR_INVALID_STATE;
     }
     
     *output_len = armdeck_protocol_build_response(CMD_GET_CONFIG, ERR_NONE,
-                                                  &current_config, sizeof(current_config),
+                                                  config, sizeof(armdeck_config_t),
                                                   output, 256);
     return ESP_OK;
 }
@@ -209,19 +214,20 @@ static esp_err_t handle_get_button(const uint8_t* payload, uint8_t payload_len,
                                                       NULL, 0, output, 256);
         return ESP_ERR_INVALID_ARG;
     }
-    
-    if (!config_initialized) {
-        load_config_from_nvs();
+      // Use the proper configuration system instead of local config
+    const armdeck_button_t* button = armdeck_config_get_button(button_id);
+    if (!button) {
+        ESP_LOGE(TAG, "Failed to get button %d config from main config system", button_id);
+        *output_len = armdeck_protocol_build_response(CMD_GET_BUTTON, ERR_MEMORY,
+                                                      NULL, 0, output, 256);
+        return ESP_ERR_INVALID_STATE;
     }
     
     ESP_LOGI(TAG, "Sending button %d config: %s (action=%d, key=0x%02X)", 
-             button_id, current_config.buttons[button_id].label,
-             current_config.buttons[button_id].action_type,
-             current_config.buttons[button_id].key_code);
+             button_id, button->label, button->action_type, button->key_code);
     
     *output_len = armdeck_protocol_build_response(CMD_GET_BUTTON, ERR_NONE,
-                                                  &current_config.buttons[button_id],
-                                                  sizeof(armdeck_button_t),
+                                                  button, sizeof(armdeck_button_t),
                                                   output, 256);
     return ESP_OK;
 }
