@@ -47,10 +47,11 @@ const ERRORS = {
 } as const;
 
 const ACTION_TYPES = {
-  KEY: 0,
-  MEDIA: 1,
-  MACRO: 2,
-  CUSTOM: 3,
+  NONE: 0x00,  // 0 - Bouton désactivé
+  KEY: 0x01,   // 1 - Touche clavier
+  MEDIA: 0x02, // 2 - Contrôle multimédia
+  MACRO: 0x03, // 3 - Macro
+  CUSTOM: 0x04 // 4 - Action personnalisée
 } as const;
 
 // ========================================
@@ -433,17 +434,46 @@ const useBle = (): UseBleReturn => {
     const g = parseInt(colorHex.substr(2, 2), 16);
     const b = parseInt(colorHex.substr(4, 2), 16);
 
-    let actionType: number = ACTION_TYPES.KEY;
-    let keyCode = 0x04;
+    // Initialiser avec ACTION_NONE par défaut
+    let actionType: number = ACTION_TYPES.NONE;
+    let keyCode = 0x00;
     const modifier = 0;
 
-    if (button.action.startsWith('MEDIA_')) {
+    // Liste des termes considérés comme des actions média
+    const mediaTerms = ['MEDIA_', 'VOLUME_', 'BRIGHTNESS_', 'MUTE'];
+    const isMediaAction = !!(button.action && (
+      mediaTerms.some(term => button.action.includes(term)) ||
+      button.action === 'MUTE'
+    ));
+
+    if (!button.action || button.action === '') {
+      // Bouton désactivé, garder ACTION_NONE
+    } else if (isMediaAction) {
+      // Action média détectée
       actionType = ACTION_TYPES.MEDIA;
-      keyCode = MEDIA_REVERSE_MAP[button.action] || 0xCD;
+
+      // Attribution des codes spécifiques pour certaines actions
+      if (button.action === 'VOLUME_MUTE' || button.action === 'MUTE') {
+        keyCode = 0xE2; // Code pour VOLUME_MUTE
+      } else if (button.action === 'BRIGHTNESS_UP') {
+        keyCode = 0x6F; // Code pour augmenter la luminosité
+      } else if (button.action === 'BRIGHTNESS_DOWN') {
+        keyCode = 0x70; // Code pour diminuer la luminosité
+      } else {
+        // Pour les autres actions média, utiliser la carte de correspondance
+        keyCode = MEDIA_REVERSE_MAP[button.action] || 0xCD;
+      }
+
+      // Log de débogage pour les actions média
+      console.log(`[useBle] Configuration action média: ${button.action}, index=${buttonIndex}, action_type=${actionType}, key_code=0x${keyCode.toString(16).toUpperCase()}`);
     } else if (button.action.startsWith('KEY_')) {
       actionType = ACTION_TYPES.KEY;
       const keyName = button.action.replace('KEY_', '');
       keyCode = KEY_REVERSE_MAP[keyName] || 0x04;
+    } else if (button.action === 'MACRO') {
+      actionType = ACTION_TYPES.MACRO;
+    } else if (button.action === 'CUSTOM') {
+      actionType = ACTION_TYPES.CUSTOM;
     }
 
     const payload = new Uint8Array(16);
