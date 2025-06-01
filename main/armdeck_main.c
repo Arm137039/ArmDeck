@@ -16,6 +16,7 @@
 
 /* ArmDeck modules */
 #include "armdeck_common.h"
+#include "armdeck_config.h"
 #include "armdeck_ble.h"
 #include "armdeck_hid.h"
 #include "armdeck_service.h"
@@ -94,9 +95,12 @@ static void handle_button_event(uint8_t button_id, bool pressed) {
         ESP_LOGW(TAG, "HID not connected, ignoring button event");
         return;
     }
-    
-    /* Send HID report based on action type */
+      /* Send HID report based on action type */
     switch (button->action_type) {
+        case ACTION_NONE:
+            ESP_LOGI(TAG, "Button disabled (ACTION_NONE), ignoring");
+            break;
+            
         case ACTION_KEY:
             armdeck_hid_send_key(button->key_code, button->modifier, pressed);
             break;
@@ -264,8 +268,8 @@ void app_main(void) {
     esp_ble_gap_set_security_param(ESP_BLE_SM_MAX_KEY_SIZE, &key_size, sizeof(uint8_t));
     esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, &init_key, sizeof(uint8_t));
     esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, &rsp_key, sizeof(uint8_t));
-    
-    /* Initialize modules */
+      /* Initialize modules */
+    ESP_ERROR_CHECK(armdeck_config_init());
     ESP_ERROR_CHECK(armdeck_matrix_init());
     ESP_ERROR_CHECK(armdeck_hid_init());
     ESP_ERROR_CHECK(armdeck_ble_init());

@@ -42,11 +42,18 @@ static const uint8_t char_prop_read_write_notify = ESP_GATT_CHAR_PROP_BIT_READ |
 /* Attribute values */
 static const uint8_t command_ccc[2] = {0x00, 0x00};
 static uint8_t command_value[256] = {0};
+static uint16_t command_value_len = 0;  // Track actual response length
 static uint8_t keymap_value[256] = {0};
+static uint16_t keymap_value_len = 0;   // Track actual keymap length
 
 esp_err_t armdeck_service_init(void) {
     ESP_LOGI(TAG, "Initializing ArmDeck service");
     service_state = SERVICE_STATE_IDLE;
+    
+    // Initialize response lengths
+    command_value_len = 0;
+    keymap_value_len = 0;
+    
     return ESP_OK;
 }
 
@@ -163,9 +170,12 @@ void armdeck_service_gatts_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gat
                 } else {
                     keymap_char_handle = param->add_char.attr_handle;
                     keymap_char_val_handle = keymap_char_handle + 1;
-                    ESP_LOGI(TAG, "Keymap characteristic added: %d", keymap_char_handle);
+                    ESP_LOGI(TAG, "Keymap characteristic added: handle=%d, val_handle=%d", 
+                    keymap_char_handle, keymap_char_val_handle);
                     service_state = SERVICE_STATE_READY;
                     ESP_LOGI(TAG, "ArmDeck service ready!");
+                    ESP_LOGI(TAG, "Final handles: command_val=%d, keymap_val=%d", 
+                    command_char_val_handle, keymap_char_val_handle);
                 }
             }
             break;
@@ -173,11 +183,20 @@ void armdeck_service_gatts_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gat
         case ESP_GATTS_WRITE_EVT:
             ESP_LOGI(TAG, "Write event: handle=%d, len=%d", param->write.handle, param->write.len);
             
-            if (param->write.handle == command_char_val_handle) {
-                /* Handle command */
+            // Log des données reçues pour debug
+            ESP_LOG_BUFFER_HEX(TAG, param->write.value, param->write.len);
+            
+            // ⚠️ IMPORTANT: Les writes peuvent arriver sur le handle de déclaration (84) 
+            // ou sur le handle de valeur (85). On doit accepter les deux !
+            if (param->write.handle == command_char_val_handle || param->write.handle == command_char_handle) {
+                ESP_LOGI(TAG, "Command received on handle %d (expected val=%d or decl=%d)", 
+                        param->write.handle, command_char_val_handle, command_char_handle);
+                
+                /* Handle command avec le protocole */
                 uint8_t response[256];
                 uint16_t response_len = 0;
                 
+                ESP_LOGI(TAG, "Calling armdeck_protocol_handle_command...");
                 esp_err_t ret = armdeck_protocol_handle_command(
                     param->write.value,
                     param->write.len,
@@ -185,55 +204,99 @@ void armdeck_service_gatts_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gat
                     &response_len
                 );
                 
-                if (ret == ESP_OK && response_len > 0) {
-                    /* Send response as notification */
-                    esp_ble_gatts_send_indicate(
-                        gatts_if,
-                        param->write.conn_id,
-                        command_char_val_handle,
-                        response_len,
-                        response,
-                        false  /* notification, not indication */
-                    );
-                }
-            } else if (param->write.handle == keymap_char_val_handle) {
+                ESP_LOGI(TAG, "Protocol handler returned: %s, response_len=%d", 
+                        esp_err_to_name(ret), response_len);
+                  if (ret == ESP_OK && response_len > 0) {
+                    ESP_LOGI(TAG, "Storing response in command_value for next read");
+                    // Stocker la réponse pour le prochain read
+                    if (response_len <= sizeof(command_value)) {
+                        memcpy(command_value, response, response_len);
+                        command_value_len = response_len;  // Store actual length
+                        
+                        // Log de la réponse générée
+                        ESP_LOGI(TAG, "Generated response:");
+                        ESP_LOG_BUFFER_HEX(TAG, response, response_len);
+                    } else {
+                        ESP_LOGE(TAG, "Response too large: %d bytes", response_len);
+                    }
+                } else {
+                    ESP_LOGE(TAG, "Protocol handler failed or no response, creating error response");
+                    // Stocker une réponse d'erreur simple
+                    command_value[0] = 0xAD;  // Magic 1
+                    command_value[1] = 0xDC;  // Magic 2  
+                    command_value[2] = 0xA1;  // CMD_NACK
+                    command_value[3] = 0x01;  // Error length
+                    command_value[4] = 0x01;  // ERR_INVALID_CMD
+                    command_value[5] = 0x6A;  // Checksum (calculé manuellement)
+                    command_value_len = 6;     // Error response is 6 bytes
+                    ESP_LOGI(TAG, "Error response stored");
+                }            } else if (param->write.handle == keymap_char_val_handle || param->write.handle == keymap_char_handle) {
                 /* Handle keymap write */
-                ESP_LOGI(TAG, "Keymap write received");
+                ESP_LOGI(TAG, "Keymap write received on handle %d", param->write.handle);
                 if (param->write.len <= sizeof(keymap_value)) {
                     memcpy(keymap_value, param->write.value, param->write.len);
+                    keymap_value_len = param->write.len;  // Store actual keymap length
                 } else {
                     ESP_LOGE(TAG, "Keymap write too large: %d", param->write.len);
                 }
+            }else {
+                ESP_LOGW(TAG, "Write on unknown handle: %d (cmd_decl=%d, cmd_val=%d, keymap_decl=%d, keymap_val=%d)", 
+                        param->write.handle, command_char_handle, command_char_val_handle, 
+                        keymap_char_handle, keymap_char_val_handle);
             }
-              /* Always send response if needed */
+            
+            /* Always send response if needed */
             if (param->write.need_rsp) {
                 esp_err_t ret = esp_ble_gatts_send_response(gatts_if, param->write.conn_id,
-                                           param->write.trans_id, ESP_GATT_OK, NULL);
+                                            param->write.trans_id, ESP_GATT_OK, NULL);
                 if (ret != ESP_OK) {
                     ESP_LOGE(TAG, "Failed to send write response: %s", esp_err_to_name(ret));
                 } else {
                     ESP_LOGI(TAG, "✅ Write response sent successfully");
-                }            }break;
+                }
+            }
+            break;
         case ESP_GATTS_READ_EVT:
             ESP_LOGI(TAG, "Read event: handle=%d", param->read.handle);
             
             esp_gatt_rsp_t rsp = {0};
             rsp.attr_value.handle = param->read.handle;
-            
-            if (param->read.handle == command_char_val_handle) {
-                rsp.attr_value.len = sizeof(command_value);
+              // ✅ FIX : Gérer les reads sur TOUS les handles de commande
+            if (param->read.handle == command_char_handle || 
+                param->read.handle == command_char_val_handle) {
+                
+                // Renvoyer la réponse stockée avec la vraie longueur
+                rsp.attr_value.len = command_value_len;  // Use actual length instead of 256
                 memcpy(rsp.attr_value.value, command_value, rsp.attr_value.len);
-            } else if (param->read.handle == keymap_char_val_handle) {
-                rsp.attr_value.len = sizeof(keymap_value);
+                ESP_LOGI(TAG, "Sending command response: %d bytes (actual length)", rsp.attr_value.len);
+                ESP_LOG_BUFFER_HEX(TAG, rsp.attr_value.value, rsp.attr_value.len);
+                
+            } else if (param->read.handle == keymap_char_handle ||
+                    param->read.handle == keymap_char_val_handle) {
+                
+                rsp.attr_value.len = keymap_value_len;  // Use actual keymap length
                 memcpy(rsp.attr_value.value, keymap_value, rsp.attr_value.len);
+                ESP_LOGI(TAG, "Sending keymap response: %d bytes (actual length)", rsp.attr_value.len);
+                
+            } else {
+                ESP_LOGW(TAG, "Read on unknown handle: %d", param->read.handle);
+                // Envoyer une réponse vide pour les handles inconnus
+                rsp.attr_value.len = 0;
             }
             
-            esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
-            break;        case ESP_GATTS_CONNECT_EVT:
-            conn_id = param->connect.conn_id;
-            ESP_LOGI(TAG, "Device connected: conn_id=%d", conn_id);
+            esp_err_t ret = esp_ble_gatts_send_response(gatts_if, param->read.conn_id, 
+                                                        param->read.trans_id, ESP_GATT_OK, &rsp);
+            if (ret != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to send read response: %s", esp_err_to_name(ret));
+            } else {
+                ESP_LOGI(TAG, "✅ Read response sent successfully");            }
+            break;
             
-            /* Force HID connection since Windows connects to custom service but not HID service */
+        case ESP_GATTS_CONNECT_EVT:
+            conn_id = param->connect.conn_id;
+            ESP_LOGI(TAG, "Device connected, conn_id=%d", conn_id);
+            
+            /* Force HID connection state when custom service connects */
             armdeck_hid_force_connected(conn_id);
             break;
             

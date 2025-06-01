@@ -54,6 +54,8 @@ esp_err_t armdeck_config_load(void) {
     nvs_handle_t handle;
     esp_err_t ret;
     
+    ESP_LOGI(TAG, "Attempting to load configuration from NVS");
+    
     ret = nvs_open(ARMDECK_NVS_NAMESPACE, NVS_READONLY, &handle);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to open NVS: %s", esp_err_to_name(ret));
@@ -61,16 +63,30 @@ esp_err_t armdeck_config_load(void) {
     }
     
     size_t size = sizeof(armdeck_config_t);
+    ESP_LOGI(TAG, "Looking for blob of size %d bytes", size);
+    
     ret = nvs_get_blob(handle, ARMDECK_NVS_KEY_CONFIG, &current_config, &size);
     
     nvs_close(handle);
-      if (ret == ESP_OK) {
+    
+    if (ret == ESP_OK) {
+        ESP_LOGI(TAG, "Successfully read %d bytes from NVS", size);
+        ESP_LOGI(TAG, "Loaded config version: %d, num_buttons: %d", 
+                 current_config.version, current_config.num_buttons);
+        
+        // Log first few buttons for verification
+        for (int i = 0; i < 3 && i < 15; i++) {
+            ESP_LOGI(TAG, "Button %d: action_type=%d, key_code=0x%02X, label='%s'", 
+                     i, current_config.buttons[i].action_type, 
+                     current_config.buttons[i].key_code, current_config.buttons[i].label);
+        }
+        
         /* Validate loaded configuration */
         if (!armdeck_config_validate(&current_config)) {
-            ESP_LOGE(TAG, "Loaded configuration is invalid");
+            ESP_LOGE(TAG, "Loaded configuration is invalid, keeping defaults");
             return ESP_ERR_INVALID_STATE;
         }
-        ESP_LOGI(TAG, "Configuration loaded from NVS");
+        ESP_LOGI(TAG, "Configuration loaded from NVS and validated successfully");
     } else if (ret == ESP_ERR_NVS_NOT_FOUND) {
         ESP_LOGI(TAG, "No configuration found in NVS, using defaults");
         ret = ESP_OK;
@@ -181,9 +197,8 @@ bool armdeck_config_validate(const armdeck_config_t* config) {
             ESP_LOGW(TAG, "Button %d has wrong ID: %d", i, btn->button_id);
             return false;
         }
-        
-        /* Check action type */
-        if (btn->action_type < ACTION_KEY || btn->action_type > ACTION_CUSTOM) {
+          /* Check action type */
+        if (btn->action_type < ACTION_NONE || btn->action_type > ACTION_CUSTOM) {
             ESP_LOGW(TAG, "Button %d has invalid action type: %d", i, btn->action_type);
             return false;
         }

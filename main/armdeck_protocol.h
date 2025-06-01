@@ -23,7 +23,7 @@
 
 /* Magic bytes */
 #define ARMDECK_MAGIC_BYTE1         0xAD
-#define ARMDECK_MAGIC_BYTE2         0xEC
+#define ARMDECK_MAGIC_BYTE2         0xDC  
 
 /* Command codes */
 typedef enum {
@@ -52,6 +52,7 @@ typedef enum {
 
 /* Action types for buttons */
 typedef enum {
+    ACTION_NONE         = 0x00,  // No action (disabled button)
     ACTION_KEY          = 0x01,  // Single key press
     ACTION_MEDIA        = 0x02,  // Media control
     ACTION_MACRO        = 0x03,  // Macro sequence

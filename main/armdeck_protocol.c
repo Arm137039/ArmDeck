@@ -190,17 +190,34 @@ static esp_err_t handle_set_config(const uint8_t* payload, uint8_t payload_len,
 
 static esp_err_t handle_get_button(const uint8_t* payload, uint8_t payload_len,
                                   uint8_t* output, uint16_t* output_len) {
+    ESP_LOGI(TAG, "handle_get_button: payload_len=%d", payload_len);
+    
+    // Le payload contient directement l'ID du bouton (pas d'error code ici)
     if (payload_len != 1) {
+        ESP_LOGE(TAG, "Invalid payload length: %d, expected: 1", payload_len);
         *output_len = armdeck_protocol_build_response(CMD_GET_BUTTON, ERR_INVALID_PARAM,
                                                       NULL, 0, output, 256);
         return ESP_ERR_INVALID_SIZE;
     }
-      uint8_t button_id = payload[0];
+    
+    // L'ID du bouton est directement dans payload[0]
+    uint8_t button_id = payload[0];
+    
     if (button_id >= 15) {
+        ESP_LOGE(TAG, "Invalid button ID: %d", button_id);
         *output_len = armdeck_protocol_build_response(CMD_GET_BUTTON, ERR_INVALID_PARAM,
                                                       NULL, 0, output, 256);
         return ESP_ERR_INVALID_ARG;
     }
+    
+    if (!config_initialized) {
+        load_config_from_nvs();
+    }
+    
+    ESP_LOGI(TAG, "Sending button %d config: %s (action=%d, key=0x%02X)", 
+             button_id, current_config.buttons[button_id].label,
+             current_config.buttons[button_id].action_type,
+             current_config.buttons[button_id].key_code);
     
     *output_len = armdeck_protocol_build_response(CMD_GET_BUTTON, ERR_NONE,
                                                   &current_config.buttons[button_id],
@@ -217,19 +234,39 @@ static esp_err_t handle_set_button(const uint8_t* payload, uint8_t payload_len,
         return ESP_ERR_INVALID_SIZE;
     }
     
+    // Debug: Print raw payload bytes
+    ESP_LOGI(TAG, "Raw payload bytes (%d bytes):", payload_len);
+    ESP_LOG_BUFFER_HEX(TAG, payload, payload_len);
+    
     armdeck_button_t* button = (armdeck_button_t*)payload;
+    
+    // Debug: Print parsed button structure fields
+    ESP_LOGI(TAG, "Parsed button: id=%d, action_type=%d, key_code=0x%02X, modifier=%d", 
+             button->button_id, button->action_type, button->key_code, button->modifier);
+    ESP_LOGI(TAG, "Button colors: R=%d, G=%d, B=%d, reserved=%d", 
+             button->color_r, button->color_g, button->color_b, button->reserved);
+    ESP_LOGI(TAG, "Button label: '%s'", button->label);
+    
       if (button->button_id >= 15) {
         *output_len = armdeck_protocol_build_response(CMD_SET_BUTTON, ERR_INVALID_PARAM,
                                                       NULL, 0, output, 256);
         return ESP_ERR_INVALID_ARG;
     }
     
-    // Update button configuration
+    // Update button configuration in both internal config and proper config system
     memcpy(&current_config.buttons[button->button_id], button, sizeof(armdeck_button_t));
     
-    // TODO: Save to NVS
+    // Save using the proper configuration system
+    esp_err_t ret = armdeck_config_set_button(button->button_id, button);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to save button configuration: %s", esp_err_to_name(ret));
+        *output_len = armdeck_protocol_build_response(CMD_SET_BUTTON, ERR_MEMORY,
+                                                      NULL, 0, output, 256);
+        return ret;
+    }
     
-    ESP_LOGI(TAG, "Button %d updated: %s", button->button_id, button->label);
+    ESP_LOGI(TAG, "Button %d updated and saved: %s (action_type=%d)", 
+             button->button_id, button->label, button->action_type);
     
     *output_len = armdeck_protocol_build_response(CMD_SET_BUTTON, ERR_NONE,
                                                   NULL, 0, output, 256);
@@ -260,40 +297,61 @@ static esp_err_t handle_test_button(const uint8_t* payload, uint8_t payload_len,
 
 esp_err_t armdeck_protocol_handle_command(const uint8_t* input, uint16_t input_len,
                                           uint8_t* output, uint16_t* output_len) {
+    
+    ESP_LOGI(TAG, "=== PROTOCOL HANDLER CALLED ===");
+    ESP_LOGI(TAG, "Input length: %d", input_len);
+    ESP_LOGI(TAG, "Input data:");
+    ESP_LOG_BUFFER_HEX(TAG, input, input_len);
+    
     armdeck_header_t header;
     uint8_t* payload = NULL;
+    
+    ESP_LOGI(TAG, "Received command packet: len=%d, data=[0x%02X 0x%02X 0x%02X 0x%02X...]", 
+             input_len, 
+             input_len > 0 ? input[0] : 0,
+             input_len > 1 ? input[1] : 0, 
+             input_len > 2 ? input[2] : 0,
+             input_len > 3 ? input[3] : 0);
     
     // Parse input packet
     esp_err_t ret = armdeck_protocol_parse(input, input_len, &header, &payload);
     if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to parse packet: %s", esp_err_to_name(ret));
         *output_len = armdeck_protocol_build_response(CMD_NACK, ERR_CHECKSUM,
                                                       NULL, 0, output, 256);
         return ret;
     }
     
-    ESP_LOGI(TAG, "Command: 0x%02X, Length: %d", header.command, header.length);
+    ESP_LOGI(TAG, "Parsed command: 0x%02X, payload_len: %d", header.command, header.length);
     
     // Handle command
     switch (header.command) {
         case CMD_GET_INFO:
+            ESP_LOGI(TAG, "Handling CMD_GET_INFO");
             return handle_get_info(output, output_len);
             
         case CMD_GET_CONFIG:
+            ESP_LOGI(TAG, "Handling CMD_GET_CONFIG");
             return handle_get_config(output, output_len);
             
         case CMD_SET_CONFIG:
+            ESP_LOGI(TAG, "Handling CMD_SET_CONFIG");
             return handle_set_config(payload, header.length, output, output_len);
             
         case CMD_GET_BUTTON:
+            ESP_LOGI(TAG, "Handling CMD_GET_BUTTON");
             return handle_get_button(payload, header.length, output, output_len);
             
         case CMD_SET_BUTTON:
+            ESP_LOGI(TAG, "Handling CMD_SET_BUTTON");
             return handle_set_button(payload, header.length, output, output_len);
             
         case CMD_TEST_BUTTON:
+            ESP_LOGI(TAG, "Handling CMD_TEST_BUTTON");
             return handle_test_button(payload, header.length, output, output_len);
             
         case CMD_RESET_CONFIG:
+            ESP_LOGI(TAG, "Handling CMD_RESET_CONFIG");
             memcpy(current_config.buttons, default_buttons, sizeof(default_buttons));
             ESP_LOGI(TAG, "Configuration reset to defaults");
             *output_len = armdeck_protocol_build_response(CMD_RESET_CONFIG, ERR_NONE,
@@ -301,7 +359,7 @@ esp_err_t armdeck_protocol_handle_command(const uint8_t* input, uint16_t input_l
             return ESP_OK;
             
         case CMD_RESTART:
-            ESP_LOGI(TAG, "Restart requested");
+            ESP_LOGI(TAG, "Handling CMD_RESTART");
             *output_len = armdeck_protocol_build_response(CMD_RESTART, ERR_NONE,
                                                           NULL, 0, output, 256);
             vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -317,20 +375,15 @@ esp_err_t armdeck_protocol_handle_command(const uint8_t* input, uint16_t input_l
 }
 
 const armdeck_button_t* armdeck_protocol_get_button_config(uint8_t button_id) {
-    if (!config_initialized) {
-        load_config_from_nvs();
-    }
-      if (button_id >= 15) {
+    if (button_id >= 15) {
         return NULL;
     }
     
-    return &current_config.buttons[button_id];
+    // Use the proper configuration system
+    return armdeck_config_get_button(button_id);
 }
 
 const armdeck_config_t* armdeck_protocol_get_config(void) {
-    if (!config_initialized) {
-        load_config_from_nvs();
-    }
-    
-    return &current_config;
+    // Use the proper configuration system
+    return armdeck_config_get();
 }

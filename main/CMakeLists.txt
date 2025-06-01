@@ -2,6 +2,7 @@ idf_component_register(    SRCS
         "armdeck_main.c"
         "armdeck_ble.c"
         "armdeck_hid.c"
+        "armdeck_config.c"
         "button_matrix.c"
         "armdeck_protocol.c"
         "armdeck_service.c"
