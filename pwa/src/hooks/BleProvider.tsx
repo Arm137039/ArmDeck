@@ -1,9 +1,8 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import useBle, { ButtonConfig, DeviceInfo } from './useBle'; // ✅ Importer DeviceInfo du hook
+import useBle from '../ble/useBle';
+import type { ButtonConfig, DeviceInfo } from '../ble';
 
-// Types pour le Context - utilise les types du hook useBle
 interface BleContextType {
-    // Connection state
     isAvailable: boolean;
     isConnected: boolean;
     isFullyConnected: boolean;
@@ -11,14 +10,12 @@ interface BleContextType {
     connectionStage: string;
     error: string | null;
 
-    // Device config
     buttons: ButtonConfig[];
     isLoading: boolean;
     isDirty: boolean;
     lastSaved: Date | null;
     deviceInfo: DeviceInfo | null;
 
-    // Actions
     connect: () => Promise<void>;
     disconnect: () => void;
     updateButton: (index: number, config: Partial<ButtonConfig>) => void;
@@ -29,10 +26,8 @@ interface BleContextType {
     testButtonPress: (buttonId: number) => Promise<void>;
 }
 
-// Créer le Context
 const BleContext = createContext<BleContextType | null>(null);
 
-// Hook pour utiliser le Context
 export const useBleContext = (): BleContextType => {
     const context = useContext(BleContext);
     if (!context) {
@@ -41,16 +36,13 @@ export const useBleContext = (): BleContextType => {
     return context;
 };
 
-// Provider qui utilise le hook unifié
 interface BleProviderProps {
     children: ReactNode;
 }
 
 export const BleProvider: React.FC<BleProviderProps> = ({ children }) => {
-    // 🔥 UN SEUL appel au hook unifié ici
     const bleState = useBle();
 
-    // 🔥 DEBUG: Log des changements d'état
     React.useEffect(() => {
         console.log('🔍 [BleProvider] State change:', {
             isConnected: bleState.isConnected,
@@ -68,7 +60,6 @@ export const BleProvider: React.FC<BleProviderProps> = ({ children }) => {
         bleState.deviceInfo
     ]);
 
-    // 🔥 DEBUG: Log device info changes
     React.useEffect(() => {
         if (bleState.deviceInfo) {
             console.log('📱 [BleProvider] Device info updated:', {
@@ -90,5 +81,4 @@ export const BleProvider: React.FC<BleProviderProps> = ({ children }) => {
     );
 };
 
-// ✅ Re-exporter les types du hook useBle pour l'usage externe
 export type { DeviceInfo, ButtonConfig };
