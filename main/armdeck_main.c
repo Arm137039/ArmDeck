@@ -74,9 +74,21 @@ void armdeck_main_set_connected(bool connected, uint16_t conn_id) {
     if (connected) {
         start_keep_alive();
         ESP_LOGI(TAG, "Global connection state updated: CONNECTED (conn_id=%d)", conn_id);
+        
+        /* Stop advertising when connected to save power */
+        if (armdeck_ble_get_adv_state() == BLE_ADV_STARTED) {
+            ESP_LOGI(TAG, "Stopping advertising while connected");
+            armdeck_ble_stop_advertising();
+        }
     } else {
         stop_keep_alive();
         ESP_LOGI(TAG, "Global connection state updated: DISCONNECTED");
+        
+        /* Immediately restart advertising when disconnected */
+        if (armdeck_ble_get_adv_state() != BLE_ADV_STARTED) {
+            ESP_LOGI(TAG, "Starting advertising after disconnection");
+            armdeck_ble_start_advertising();
+        }
     }
 }
 
@@ -127,13 +139,12 @@ static void hid_event_handler(esp_hidd_cb_event_t event, esp_hidd_cb_param_t *pa
             armdeck_main_set_connected(true, param->connect.conn_id);
             ESP_LOGI(TAG, "Device connected and ready!");
             break;
-            
-        case ESP_HIDD_EVENT_BLE_DISCONNECT:
+              case ESP_HIDD_EVENT_BLE_DISCONNECT:
             armdeck_main_set_connected(false, 0);
             ESP_LOGI(TAG, "Device disconnected");
             
-            /* Restart advertising after delay */
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            /* Restart advertising immediately since continuous advertising is enabled */
+            ESP_LOGI(TAG, "Restarting advertising after disconnection");
             armdeck_ble_start_advertising();
             break;
             
@@ -220,11 +231,19 @@ static void status_task(void *pvParameters) {
     uint32_t count = 0;
     
     while(1) {
+        bool adv_running = (armdeck_ble_get_adv_state() == BLE_ADV_STARTED);
+        
         ESP_LOGI(TAG, "[%lu] Connected: %s | Advertising: %s | Heap: %lu KB",
                  count++,
                  ble_connected ? "YES" : "NO",
-                 armdeck_ble_get_adv_state() == BLE_ADV_STARTED ? "YES" : "NO",
+                 adv_running ? "YES" : "NO",
                  esp_get_free_heap_size() / 1024);
+        
+        /* Check if advertising should be running but isn't (fallback mechanism) */
+        if (!ble_connected && !adv_running) {
+            ESP_LOGW(TAG, "Advertising not running while disconnected - restarting");
+            armdeck_ble_start_advertising();
+        }
         
         vTaskDelay(pdMS_TO_TICKS(30000)); /* Every 30 seconds */
     }
@@ -279,10 +298,12 @@ void app_main(void) {
     armdeck_hid_register_callback(hid_event_handler);
     armdeck_ble_register_gap_callback(gap_event_handler);
     armdeck_ble_register_gatts_callback(gatts_event_handler);
-    
-    /* Start services */
+      /* Start services */
     ESP_ERROR_CHECK(armdeck_matrix_start());
     ESP_ERROR_CHECK(armdeck_ble_start_advertising());
+    
+    /* Enable continuous advertising to prevent timeout issues */
+    armdeck_ble_set_continuous_advertising(true);
     
     /* Create status monitoring task */
     xTaskCreate(status_task, "status", 2048, NULL, 1, NULL);

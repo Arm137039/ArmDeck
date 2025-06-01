@@ -28,6 +28,9 @@ esp_err_t armdeck_ble_stop_advertising(void);
 /* Get advertising state */
 ble_adv_state_t armdeck_ble_get_adv_state(void);
 
+/* Enable/disable continuous advertising (restarts automatically when stopped) */
+void armdeck_ble_set_continuous_advertising(bool enable);
+
 /* Register GAP callback */
 void armdeck_ble_register_gap_callback(esp_gap_ble_cb_t callback);
 

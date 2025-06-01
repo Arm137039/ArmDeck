@@ -2,12 +2,18 @@
 #include "armdeck_service.h"
 #include "esp_log.h"
 #include "esp_bt_device.h"
+#include "esp_timer.h"
 #include <string.h>
 
 static const char* TAG = "ARMDECK_BLE";
 
 /* Advertising state */
 static ble_adv_state_t adv_state = BLE_ADV_STOPPED;
+
+/* Continuous advertising control */
+static bool continuous_advertising_enabled = false;
+static esp_timer_handle_t adv_restart_timer = NULL;
+#define ADV_RESTART_DELAY_MS 1000  // 1 second delay before restart
 
 /* Callbacks */
 static esp_gap_ble_cb_t user_gap_callback = NULL;
@@ -64,6 +70,14 @@ static esp_ble_adv_params_t adv_params = {
 static bool adv_data_configured = false;
 static bool scan_rsp_configured = false;
 
+/* Timer callback to restart advertising */
+static void adv_restart_timer_callback(void *arg) {
+    ESP_LOGI(TAG, "Restarting advertising automatically");
+    if (adv_state == BLE_ADV_STOPPED && continuous_advertising_enabled) {
+        armdeck_ble_start_advertising();
+    }
+}
+
 /* GAP event handler */
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) {
     switch (event) {
@@ -110,12 +124,17 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
             } else {
                 adv_state = BLE_ADV_STOPPED;
                 ESP_LOGE(TAG, "Advertising failed to start");
-            }
-            break;
+            }            break;
             
         case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
             adv_state = BLE_ADV_STOPPED;
             ESP_LOGI(TAG, "Advertising stopped");
+            
+            /* Restart automatically if continuous advertising is enabled */
+            if (continuous_advertising_enabled && adv_restart_timer) {
+                ESP_LOGI(TAG, "Scheduling advertising restart in %d ms", ADV_RESTART_DELAY_MS);
+                esp_timer_start_once(adv_restart_timer, ADV_RESTART_DELAY_MS * 1000);
+            }
             break;
             
         default:
@@ -147,6 +166,20 @@ static void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_
 
 esp_err_t armdeck_ble_init(void) {
     ESP_LOGI(TAG, "Initializing BLE");
+    
+    /* Create advertising restart timer */
+    if (!adv_restart_timer) {
+        esp_timer_create_args_t timer_args = {
+            .callback = adv_restart_timer_callback,
+            .name = "adv_restart",
+            .arg = NULL
+        };
+        esp_err_t ret = esp_timer_create(&timer_args, &adv_restart_timer);
+        if (ret != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to create advertising restart timer: %s", esp_err_to_name(ret));
+            return ret;
+        }
+    }
     
     /* Register callbacks */
     esp_err_t ret = esp_ble_gap_register_callback(gap_event_handler);
@@ -235,4 +268,17 @@ void armdeck_ble_register_gap_callback(esp_gap_ble_cb_t callback) {
 
 void armdeck_ble_register_gatts_callback(esp_gatts_cb_t callback) {
     user_gatts_callback = callback;
+}
+
+void armdeck_ble_set_continuous_advertising(bool enable) {
+    continuous_advertising_enabled = enable;
+    ESP_LOGI(TAG, "Continuous advertising %s", enable ? "enabled" : "disabled");
+    
+    if (enable && adv_state == BLE_ADV_STOPPED) {
+        ESP_LOGI(TAG, "Starting advertising immediately");
+        armdeck_ble_start_advertising();
+    } else if (!enable && adv_restart_timer) {
+        ESP_LOGI(TAG, "Stopping advertising restart timer");
+        esp_timer_stop(adv_restart_timer);
+    }
 }
