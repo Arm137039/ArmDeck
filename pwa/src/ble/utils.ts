@@ -154,19 +154,19 @@ export const buildButtonPayload = (button: ButtonConfig, buttonIndex: number): U
     } else if (isMediaAction) {
         actionType = ACTION_TYPES.MEDIA;
 
-        switch (button.action) {
-            case 'VOLUME_MUTE':
-            case 'MUTE':
-                keyCode = 0xE2;
-                break;
-            case 'BRIGHTNESS_UP':
-                keyCode = 0x6F;
-                break;
-            case 'BRIGHTNESS_DOWN':
-                keyCode = 0x70;
-                break;
-            default:
-                keyCode = MEDIA_REVERSE_MAP[button.action] || 0xCD;
+        // Extraire le nom de l'action réel si nécessaire
+        let actionName = button.action;
+        if (button.action === 'MUTE') {
+            actionName = 'VOLUME_MUTE';
+        }
+
+        // Utiliser directement la map pour tous les boutons média
+        keyCode = MEDIA_REVERSE_MAP[actionName];
+
+        // Vérifier si le code existe, sinon utiliser une valeur par défaut
+        if (keyCode === undefined) {
+            console.warn(`[BLE] Code non trouvé pour l'action média: ${button.action}, utilisation de la valeur par défaut (MEDIA_PLAY_PAUSE)`);
+            keyCode = 0xCD; // MEDIA_PLAY_PAUSE comme fallback
         }
 
         console.log(`[BLE] Action média configurée: ${button.action}, index=${buttonIndex}, type=${actionType}, code=0x${keyCode.toString(16).toUpperCase()}`);
@@ -195,3 +195,4 @@ export const buildButtonPayload = (button: ButtonConfig, buttonIndex: number): U
 
     return payload;
 };
+

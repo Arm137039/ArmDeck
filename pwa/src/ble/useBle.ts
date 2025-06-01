@@ -82,45 +82,63 @@ const useBle = (): UseBleReturn => {
     setError(null);
 
     try {
-      const loadedButtons: ButtonConfig[] = [];
+      // Initialiser un tableau avec des boutons "en attente" pour visualiser le chargement
       const numButtons = deviceInfo?.num_buttons || 15;
+      setButtons(Array.from({ length: numButtons }, (_, i) => ({
+        ...createEmptyButton(i),
+        isLoading: true,  // Nouvel état pour indiquer qu'un bouton est en cours de chargement
+      })));
 
       for (let i = 0; i < numButtons; i++) {
         try {
           const payload = new Uint8Array([i]);
           const response = await sendCommandStrict(device, COMMANDS.GET_BUTTON, payload);
 
+          let newButton;
           if (response) {
             const parsed = parseResponse(response);
             if (parsed && parsed.error === ERRORS.NONE && parsed.payload) {
-              const button = parseButtonData(parsed.payload, i);
-              loadedButtons.push(button);
+              newButton = parseButtonData(parsed.payload, i);
             } else {
-              loadedButtons.push(createEmptyButton(i));
+              newButton = createEmptyButton(i);
             }
           } else {
-            loadedButtons.push(createEmptyButton(i));
+            newButton = createEmptyButton(i);
           }
 
-          await delay(50); // ⚡ Réduit de 100ms → 50ms entre chaque bouton
+          // Mettre à jour le bouton individuellement dans l'état
+          setButtons(prevButtons => {
+            const updatedButtons = [...prevButtons];
+            updatedButtons[i] = { ...newButton, isLoading: false };
+            return updatedButtons;
+          });
+
+          // Courte pause entre chaque requête pour ne pas surcharger l'ESP
+          await delay(50);
         } catch (err) {
-          loadedButtons.push(createEmptyButton(i));
+          console.error(`[BLE] Erreur lors du chargement du bouton ${i}:`, err);
+
+          // Mettre à jour l'état du bouton en erreur
+          setButtons(prevButtons => {
+            const updatedButtons = [...prevButtons];
+            updatedButtons[i] = {
+              ...createEmptyButton(i),
+              isLoading: false,
+              label: `Erreur btn ${i+1}`
+            };
+            return updatedButtons;
+          });
         }
       }
 
-      while (loadedButtons.length < numButtons) {
-        loadedButtons.push(createEmptyButton(loadedButtons.length));
-      }
-
-      setButtons(loadedButtons);
       setIsDirty(false);
       setLastSaved(new Date());
     } catch (err) {
       console.error('[BLE] Failed to load config:', err);
       setError(`Failed to load config: ${err instanceof Error ? err.message : String(err)}`);
 
-      const defaultButtons = Array.from({ length: deviceInfo?.num_buttons || 15 }, (_, i) => createEmptyButton(i));
-      setButtons(defaultButtons);
+      // Réinitialiser tous les boutons en cas d'erreur globale
+      setButtons(Array.from({ length: deviceInfo?.num_buttons || 15 }, (_, i) => createEmptyButton(i)));
     } finally {
       setIsLoading(false);
       loadingConfigRef.current = false;
@@ -468,3 +486,4 @@ const useBle = (): UseBleReturn => {
 };
 
 export default useBle;
+

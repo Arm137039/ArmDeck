@@ -13,7 +13,7 @@ export const BLE_CONFIG = {
         VERSION: 1,
     },
     TIMING: {
-        ESP32_PROCESSING_DELAY: 300,
+        ESP32_PROCESSING_DELAY: 100,
         RETRY_DELAY: 100,
         BUTTON_SAVE_DELAY: 100,
         AUTO_SAVE_TIMEOUT: 1500,

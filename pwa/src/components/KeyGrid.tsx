@@ -63,6 +63,13 @@ const ProfessionalKey = ({
     drag(drop(node));
   }, [drag, drop]);
 
+  // Animation de chargement pour les boutons en cours de chargement
+  const loadingAnimation = buttonConfig.isLoading && (
+    <div className="professional-key__loading-indicator">
+      <div className="professional-key__spinner"></div>
+    </div>
+  );
+
   return (
       <div
           ref={combineRefs}
@@ -71,11 +78,13 @@ const ProfessionalKey = ({
         ${isDirty ? 'professional-key--dirty' : ''} 
         ${isDragging ? 'professional-key--dragging' : ''}
         ${!isConnectionReady ? 'professional-key--disabled' : ''}
+        ${buttonConfig.isLoading ? 'professional-key--loading' : ''}
       `}
           title={!isConnectionReady ? 'Device not fully connected - changes will not be saved' : ''}
       >
         {isDirty && <div className="professional-key__dirty-indicator" />}
         {!isConnectionReady && <div className="professional-key__warning-indicator">⚠️</div>}
+        {loadingAnimation}
 
         <div className="professional-key__number">
           {String(index + 1).padStart(2, '0')}

@@ -1,4 +1,4 @@
-import { BleDevice, DeviceInfo, ParsedResponse } from './types';
+import { BleDevice, DeviceInfo } from './types';
 import { BLE_CONFIG, COMMANDS, ERRORS } from './constants';
 import { buildCommand, parseResponse, delay } from './utils';
 
@@ -18,7 +18,6 @@ export const sendCommandStrict = async (
     try {
         // Step 1: Write command
         await device.characteristics.cmd.writeValue(packet);
-        console.log('[BLE] Command written');
 
         // Step 2: Wait for ESP32 processing
         await delay(BLE_CONFIG.TIMING.ESP32_PROCESSING_DELAY);

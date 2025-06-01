@@ -14,6 +14,7 @@ export interface ButtonConfig {
     action: string;
     color: string;
     isDirty?: boolean;
+    isLoading?: boolean;
 }
 
 export interface DeviceInfo {
@@ -62,3 +63,4 @@ export interface UseBleReturn {
     testCommunication: () => Promise<void>;
     testButtonPress: (buttonId: number) => Promise<void>;
 }
+
