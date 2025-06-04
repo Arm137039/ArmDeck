@@ -326,17 +326,6 @@ const useBle = (): UseBleReturn => {
     });
 
     setIsDirty(true);
-
-    // Auto-save
-    if (autoSaveTimeoutRef.current) {
-      clearTimeout(autoSaveTimeoutRef.current);
-    }
-
-    if (isFullyConnected) {
-      autoSaveTimeoutRef.current = setTimeout(() => {
-        saveButtonToDevice(index);
-      }, BLE_CONFIG.TIMING.AUTO_SAVE_TIMEOUT);
-    }
   }, [isFullyConnected, saveButtonToDevice]);
 
   const saveConfig = useCallback(async () => {

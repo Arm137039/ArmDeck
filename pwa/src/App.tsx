@@ -14,7 +14,7 @@ const AppContent = () => {
     isFullyConnected,
     error,
     connectionStage,
-    deviceInfo
+    deviceInfo,
   } = useBleContext();
 
   const { theme, toggleTheme } = useTheme();
@@ -91,7 +91,7 @@ const AppContent = () => {
                       <div><strong>Connect:</strong> Pair with your ArmDeck device</div>
                       <div><strong>Configure:</strong> Click buttons to assign actions</div>
                       <div><strong>Drag:</strong> Drop macros onto buttons</div>
-                      <div><strong>Auto-save:</strong> Changes sync automatically</div>
+                      <div><strong>Save:</strong> Apply changes with the save button</div>
                     </div>
                   </div>
 

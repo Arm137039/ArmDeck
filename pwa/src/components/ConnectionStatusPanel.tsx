@@ -19,6 +19,9 @@ const ConnectionStatusPanel: React.FC = () => {
 
     const configuredButtons = buttons.filter(b => b.action && b.action !== '').length;
 
+    // Déterminer si l'appareil est en train d'initialiser sa connexion
+    const isInitializing = isConnected && (!lastSaved || !deviceInfo);
+
     const getConnectionStatus = () => {
         if (isScanning) return 'Scanning...';
         if (isFullyConnected) return 'Fully Connected';
@@ -148,8 +151,8 @@ const ConnectionStatusPanel: React.FC = () => {
 
                 <div className="connection-status-panel__card">
                     <div className="label">STATUS</div>
-                    <div className={`value ${isLoading ? 'value--syncing' : isFullyConnected ? 'value--ready' : 'value--not-ready'}`}>
-                        {isLoading ? 'Busy' : isFullyConnected ? 'Ready' : 'Limited'}
+                    <div className={`value ${isLoading || isInitializing ? 'value--syncing' : isFullyConnected ? 'value--ready' : 'value--not-ready'}`}>
+                        {isLoading || isInitializing ? 'Busy' : isFullyConnected ? 'Ready' : 'Limited'}
                     </div>
                     <div className="description">
                         {lastSaved ? (
