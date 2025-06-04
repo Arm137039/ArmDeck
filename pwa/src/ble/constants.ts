@@ -26,11 +26,13 @@ export const COMMANDS = {
     GET_INFO: 0x10,
     GET_CONFIG: 0x20,
     SET_CONFIG: 0x21,
+    RESET_CONFIG: 0x22,
     GET_BUTTON: 0x30,
     SET_BUTTON: 0x31,
-    TEST_BUTTON: 0x32,
-    RESET_CONFIG: 0x52,
-    RESTART: 0xFF,
+    TEST_BUTTON: 0x40,
+    RESTART: 0x50,
+    ACK: 0xA0,
+    NACK: 0xA1,
 } as const;
 
 export const ERRORS = {
@@ -59,8 +61,9 @@ export const KEY_MAP: Record<number, string> = {
     0x2C: 'SPACE', 0x39: 'CAPS_LOCK',
     0x3A: 'F1', 0x3B: 'F2', 0x3C: 'F3', 0x3D: 'F4', 0x3E: 'F5', 0x3F: 'F6',
     0x40: 'F7', 0x41: 'F8', 0x42: 'F9', 0x43: 'F10', 0x44: 'F11', 0x45: 'F12',
-    0x68: 'F13', 0x69: 'F14', 0x6A: 'F15', 0x6B: 'F16', 0x6C: 'F17', 0x6D: 'F18',
-    0x6E: 'F19', 0x6F: 'F20', 0x70: 'F21', 0x71: 'F22', 0x72: 'F23', 0x73: 'F24',
+    0x74: 'F13', 0x75: 'F14', 0x76: 'F15', 0x77: 'F16',
+    0x78: 'F17', 0x79: 'F18', 0x7A: 'F19', 0x6F: 'F20',
+    0x70: 'F21', 0x71: 'F22', 0x72: 'F23', 0x73: 'F24',
     0x4F: 'RIGHT', 0x50: 'LEFT', 0x51: 'DOWN', 0x52: 'UP',
 };
 
@@ -83,3 +86,4 @@ export const KEY_REVERSE_MAP = Object.fromEntries(
 export const MEDIA_REVERSE_MAP = Object.fromEntries(
     Object.entries(MEDIA_MAP).map(([code, name]) => [name, parseInt(code)])
 );
+

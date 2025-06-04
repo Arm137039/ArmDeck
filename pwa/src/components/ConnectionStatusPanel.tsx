@@ -20,7 +20,6 @@ const ConnectionStatusPanel: React.FC = () => {
 
     const configuredButtons = buttons.filter(b => b.action && b.action !== '').length;
 
-    // Status helpers
     const getConnectionStatus = () => {
         if (isScanning) return 'Scanning...';
         if (isFullyConnected) return 'Fully Connected';

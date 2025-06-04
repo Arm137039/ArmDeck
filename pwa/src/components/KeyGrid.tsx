@@ -106,7 +106,6 @@ const ProfessionalKey = ({
 };
 
 const KeyGrid: React.FC = () => {
-  // 🔥 Context au lieu du hook direct
   const {
     isFullyConnected,
     buttons,
@@ -120,7 +119,6 @@ const KeyGrid: React.FC = () => {
     connectionStage
   } = useBleContext();
 
-  // 🔥 DEBUG: Log des changements d'état
   useEffect(() => {
     console.log('🔍 [KeyGrid] isFullyConnected changed to:', isFullyConnected);
   }, [isFullyConnected]);
@@ -225,7 +223,7 @@ const KeyGrid: React.FC = () => {
   }, [resetConfig, isFullyConnected]);
 
   const configuredButtons = buttons.filter(b => b.action && b.action !== '').length;
-  const connectionReady = isFullyConnected; // 🔥 Simplifié
+  const connectionReady = isFullyConnected;
 
   // 🔥 Device info mockée pour le moment (peut être ajoutée au hook plus tard)
   const deviceInfo = {
@@ -264,7 +262,6 @@ const KeyGrid: React.FC = () => {
                   <span className="warning-text"> • ⚠️ Full connection required for changes</span>
               )}
             </p>
-            {/* 🔥 Ajout du status de connexion pour debug */}
             {process.env.NODE_ENV === 'development' && (
                 <div className="debug-status">
                   <small>Connection Stage: {connectionStage} | Fully Connected: {isFullyConnected ? 'Yes' : 'No'}</small>

@@ -145,6 +145,11 @@ const useBle = (): UseBleReturn => {
     }
   }, []);
 
+  const fetchButtonConfiguration = useCallback(async () => {
+    if (!bleDevice || !deviceInfo) return;
+    await loadConfiguration(bleDevice, deviceInfo);
+  }, [bleDevice, deviceInfo, loadConfiguration]);
+
   // ========================================
   // CONNECTION MANAGEMENT
   // ========================================
@@ -391,10 +396,13 @@ const useBle = (): UseBleReturn => {
       if (response) {
         const parsed = parseResponse(response);
         if (parsed && parsed.error === ERRORS.NONE) {
-          setButtons(Array.from({ length: 15 }, (_, i) => createEmptyButton(i)));
+          console.log('[BLE] Configuration reset successfully');
+
+          // Récupérer la configuration mise à jour depuis le périphérique après le reset
+          await fetchButtonConfiguration();
+
           setIsDirty(false);
           setLastSaved(new Date());
-          console.log('[BLE] Configuration reset successfully');
         } else {
           throw new Error(`Reset failed with error code: ${parsed?.error}`);
         }
@@ -405,7 +413,7 @@ const useBle = (): UseBleReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [isFullyConnected, bleDevice]);
+  }, [isFullyConnected, bleDevice, fetchButtonConfiguration]);
 
   const getDeviceInfo = useCallback(async () => {
     if (!isFullyConnected || !workingCommandMethodRef.current) {

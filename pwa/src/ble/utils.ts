@@ -87,6 +87,8 @@ export const getKeyName = (keyCode: number): string => KEY_MAP[keyCode] || `0x${
 export const getMediaActionName = (keyCode: number): string => MEDIA_MAP[keyCode] || `MEDIA_0x${keyCode.toString(16).toUpperCase()}`;
 
 export const parseButtonData = (buttonData: Uint8Array, buttonId: number): ButtonConfig => {
+    console.log(`[BLE] Données brutes du bouton ${buttonId}:`, Array.from(buttonData).map(b => b.toString(16).padStart(2, '0')).join(' '));
+
     if (buttonData.length < 16) {
         console.warn(`[BLE] Button ${buttonId} data too short`);
         return createEmptyButton(buttonId);
@@ -109,29 +111,35 @@ export const parseButtonData = (buttonData: Uint8Array, buttonId: number): Butto
     switch (actionType) {
         case ACTION_TYPES.KEY:
             action = `KEY_${getKeyName(keyCode)}`;
+            console.log(`[BLE] Button ${buttonId} est une touche: ${action}, keyCode: ${keyCode}`);
             break;
         case ACTION_TYPES.MEDIA:
             action = getMediaActionName(keyCode);
+            console.log(`[BLE] Button ${buttonId} est une action média: ${action}, keyCode: ${keyCode}`);
             break;
         case ACTION_TYPES.MACRO:
             action = 'MACRO';
+            console.log(`[BLE] Button ${buttonId} est une macro`);
             break;
         case ACTION_TYPES.CUSTOM:
             action = 'CUSTOM';
+            console.log(`[BLE] Button ${buttonId} est une action personnalisée`);
             break;
         default:
             action = 'UNKNOWN';
+            console.log(`[BLE] Button ${buttonId} a un type d'action inconnu: ${actionType}`);
     }
 
     const color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 
-    return {
+    const buttonConfig = {
         id: buttonId,
         label: label || `Button ${buttonId + 1}`,
         action,
         color,
         isDirty: false
     };
+    return buttonConfig;
 };
 
 export const buildButtonPayload = (button: ButtonConfig, buttonIndex: number): Uint8Array => {
