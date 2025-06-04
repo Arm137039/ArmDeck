@@ -14,8 +14,7 @@ const ConnectionStatusPanel: React.FC = () => {
         isDirty,
         lastSaved,
         isLoading,
-        deviceInfo,
-        getDeviceInfo
+        deviceInfo
     } = useBleContext();
 
     const configuredButtons = buttons.filter(b => b.action && b.action !== '').length;
@@ -207,92 +206,6 @@ const ConnectionStatusPanel: React.FC = () => {
                     </>
                 )}
             </div>
-
-            {/* Status bar */}
-            <div className="connection-status-panel__status-bar">
-                <div className={`status-indicator ${isFullyConnected ? 'ready' : 'not-ready'}`}>
-                    <div className="status-icon">
-                        {isFullyConnected ? '✅' : isConnected ? '⚠️' : '❌'}
-                    </div>
-                    <div className="status-text">
-                        {isFullyConnected ?
-                            'Ready for configuration changes' :
-                            isConnected ?
-                                'Partial connection - limited functionality' :
-                                'Connect device to start configuration'
-                        }
-                    </div>
-                </div>
-            </div>
-
-            {/* Device info panel - expanded view when connected */}
-            {deviceInfo && isFullyConnected && (
-                <div className="connection-status-panel__device-details">
-                    <h3>Device Details</h3>
-                    <div className="device-details-grid">
-                        <div className="detail-item">
-                            <span className="detail-label">Name:</span>
-                            <span className="detail-value">{deviceInfo.device_name}</span>
-                        </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Firmware:</span>
-                            <span className="detail-value">
-                                v{deviceInfo.firmware_major}.{deviceInfo.firmware_minor}.{deviceInfo.firmware_patch}
-                            </span>
-                        </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Protocol:</span>
-                            <span className="detail-value">v{deviceInfo.protocol_version}</span>
-                        </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Buttons:</span>
-                            <span className="detail-value">{deviceInfo.num_buttons}</span>
-                        </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Battery:</span>
-                            <span className="detail-value">{deviceInfo.battery_level}%</span>
-                        </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Free Memory:</span>
-                            <span className="detail-value">{formatMemory(deviceInfo.free_heap)}</span>
-                        </div>
-                        <div className="detail-item">
-                            <span className="detail-label">Uptime:</span>
-                            <span className="detail-value">{formatUptime(deviceInfo.uptime_seconds)}</span>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Debug info */}
-            {process.env.NODE_ENV === 'development' && (
-                <div className="connection-status-panel__debug">
-                    <details>
-                        <summary>🔧 Debug Information</summary>
-                        <div className="debug-grid">
-                            <div><strong>Connected:</strong> {isConnected ? '✅ Yes' : '❌ No'}</div>
-                            <div><strong>Fully Connected:</strong> {isFullyConnected ? '✅ Yes' : '❌ No'}</div>
-                            <div><strong>Connection Stage:</strong> {connectionStage}</div>
-                            <div><strong>Is Scanning:</strong> {isScanning ? '🔄 Yes' : '✅ No'}</div>
-                            <div><strong>Is Loading:</strong> {isLoading ? '🔄 Yes' : '✅ No'}</div>
-                            <div><strong>Is Dirty:</strong> {isDirty ? '⚠️ Yes' : '✅ No'}</div>
-                            <div><strong>Last Saved:</strong> {lastSaved?.toISOString() || 'Never'}</div>
-                            <div><strong>Architecture:</strong> Unified Hook + Protocol v2 ✅</div>
-                            <div><strong>Buttons Configured:</strong> {configuredButtons}/15</div>
-                            {deviceInfo && (
-                                <>
-                                    <div><strong>Device Name:</strong> {deviceInfo.device_name}</div>
-                                    <div><strong>Firmware:</strong> v{deviceInfo.firmware_major}.{deviceInfo.firmware_minor}.{deviceInfo.firmware_patch}</div>
-                                    <div><strong>Protocol Version:</strong> {deviceInfo.protocol_version}</div>
-                                    <div><strong>Battery Level:</strong> {deviceInfo.battery_level}%</div>
-                                    <div><strong>Free Heap:</strong> {formatMemory(deviceInfo.free_heap)}</div>
-                                    <div><strong>Uptime:</strong> {formatUptime(deviceInfo.uptime_seconds)}</div>
-                                </>
-                            )}
-                        </div>
-                    </details>
-                </div>
-            )}
 
             {error && (
                 <div className="connection-status-panel__error">

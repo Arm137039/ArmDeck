@@ -58,8 +58,21 @@
     }
 
     &--ready {
-      background-color: var(--bg-primary);
-      color: var(--text-secondary);
+      background-color: var(--bg-secondary);
+      color: color(success);
+      border-color: color(success);
+    }
+
+    &--syncing {
+      background-color: var(--bg-secondary);
+      color: color(info);
+      border-color: color(info);
+    }
+
+    &--disabled {
+      background-color: var(--bg-secondary);
+      color: color(error);
+      border-color: color(error);
     }
   }
 
@@ -115,7 +128,9 @@
   }
 
   &__stats {
-    @include responsive-grid(220px);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: spacing(md);
     margin-bottom: spacing(xxxl);
     max-width: $grid-max-width;
     margin-left: auto;

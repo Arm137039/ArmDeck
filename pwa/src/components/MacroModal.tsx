@@ -6,9 +6,10 @@ interface MacroModalProps {
     onClose: () => void;
     onSelectMacro: (macro: Macro) => void;
     position: { x: number, y: number } | null;
+    selectedButtonIndex: number | null;
 }
 
-const MacroModal: React.FC<MacroModalProps> = ({ isOpen, onClose, onSelectMacro, position }) => {
+const MacroModal: React.FC<MacroModalProps> = ({ isOpen, onClose, onSelectMacro, position}) => {
     const [activeCategory, setActiveCategory] = useState('media');
     const modalRef = useRef<HTMLDivElement>(null);
     const macros = getMacrosByCategory(activeCategory);

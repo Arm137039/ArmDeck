@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useBleContext } from '../hooks/BleProvider';
-import { ButtonConfig } from '../ble/useBle.ts';
+import { ButtonConfig } from '@/ble';
 import { Macro } from '../data/macros';
 import MacroModal from './MacroModal';
 
@@ -116,7 +116,8 @@ const KeyGrid: React.FC = () => {
     saveConfig,
     resetConfig,
     updateButton,
-    connectionStage
+    connectionStage,
+    deviceInfo // Récupération du deviceInfo depuis le hook BLE
   } = useBleContext();
 
   useEffect(() => {
@@ -225,13 +226,6 @@ const KeyGrid: React.FC = () => {
   const configuredButtons = buttons.filter(b => b.action && b.action !== '').length;
   const connectionReady = isFullyConnected;
 
-  // 🔥 Device info mockée pour le moment (peut être ajoutée au hook plus tard)
-  const deviceInfo = {
-    name: 'ArmDeck',
-    firmware: '1.2.0',
-    heap: 190000
-  };
-
   const getStatusClass = () => {
     if (!connectionReady) return 'key-grid__status--disabled';
     if (isLoading) return 'key-grid__status--syncing';
@@ -255,7 +249,7 @@ const KeyGrid: React.FC = () => {
             <h1>ArmDeck Configuration</h1>
             <p>
               {deviceInfo ?
-                  `${deviceInfo.name} v${deviceInfo.firmware} • ${configuredButtons}/15 buttons configured` :
+                  `${deviceInfo.device_name} v${deviceInfo.firmware_major}.${deviceInfo.firmware_minor}.${deviceInfo.firmware_patch} • ${configuredButtons}/${deviceInfo.num_buttons} buttons configured` :
                   'Configure your StreamDeck layout • Drag macros or click buttons to assign actions'
               }
               {!connectionReady && (
@@ -383,17 +377,17 @@ const KeyGrid: React.FC = () => {
           </div>
 
           <div className="key-grid__stat-card">
-            <div className="label">Device Memory</div>
+            <div className="label">SYSTEM</div>
             <div className="value">
-              {deviceInfo?.heap ? `${Math.round(deviceInfo.heap / 1024)}KB` : '--'}
+              {deviceInfo?.free_heap ? `${Math.floor(deviceInfo.free_heap / 1024)}KB` : '--'}
             </div>
             <div className="description">
-              Free heap
-              {deviceInfo?.heap && (
+              Free Memory
+              {deviceInfo?.free_heap && (
                   <div className="memory-bar">
                     <div
                         className="memory-used"
-                        style={{ width: `${Math.max(0, 100 - (deviceInfo.heap / 2000))}%` }}
+                        style={{ width: `${Math.max(0, 100 - (deviceInfo.free_heap / 2000))}%` }}
                     />
                   </div>
               )}
