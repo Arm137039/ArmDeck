@@ -14,13 +14,11 @@ static bool config_initialized = false;
 static const armdeck_button_t default_buttons[15] = {
     {0,  ACTION_MEDIA, 0xCD, 0, 0x4C, 0xAF, 0x50, 0, "Play"},    // Play/Pause - Green
     {1,  ACTION_MEDIA, 0xB5, 0, 0x21, 0x96, 0xF3, 0, "Next"},    // Next - Blue
-    {2,  ACTION_MEDIA, 0xB6, 0, 0x21, 0x96, 0xF3, 0, "Prev"},    // Previous - Blue
-    {3,  ACTION_MEDIA, 0xE9, 0, 0xFF, 0x98, 0x00, 0, "Vol+"},    // Volume Up - Orange
-    {4,  ACTION_MEDIA, 0xEA, 0, 0xFF, 0x98, 0x00, 0, "Vol-"},    // Volume Down - Orange
+    {2,  ACTION_MEDIA, 0xB6, 0, 0x21, 0x96, 0xF3, 0, "Prev"},    // Previous - Blue    {3,  ACTION_MEDIA, 0x6F, 0, 0xFF, 0x98, 0x00, 0, "Brightn+"},    // Brightness Up - Orange
+    {4,  ACTION_MEDIA, 0x70, 0, 0xFF, 0x98, 0x00, 0, "Brightn-"},    // Brightness Down - Orange
     {5,  ACTION_MEDIA, 0xE2, 0, 0xF4, 0x43, 0x36, 0, "Mute"},    // Mute - Red
-    {6,  ACTION_MEDIA, 0xB7, 0, 0x9C, 0x27, 0xB0, 0, "Stop"},    // Stop - Purple
-    {7,  ACTION_KEY,   0x6F, 0, 0x60, 0x7D, 0x8B, 0, "F20"},     // F20 - Blue Grey
-    {8,  ACTION_KEY,   0x70, 0, 0x60, 0x7D, 0x8B, 0, "F21"},     // F21
+    {6,  ACTION_MEDIA, 0xB7, 0, 0x9C, 0x27, 0xB0, 0, "Stop"},    // Stop - Purple    {7,  ACTION_KEY,   0x77, 0, 0x60, 0x7D, 0x8B, 0, "F16"},     // F16 - Blue Grey
+    {8,  ACTION_KEY,   0x78, 0, 0x60, 0x7D, 0x8B, 0, "F17"},     // F17
     {9,  ACTION_KEY,   0x71, 0, 0x60, 0x7D, 0x8B, 0, "F22"},     // F22
     {10, ACTION_KEY,   0x72, 0, 0x60, 0x7D, 0x8B, 0, "F23"},     // F23
     {11, ACTION_KEY,   0x73, 0, 0x60, 0x7D, 0x8B, 0, "F24"},     // F24

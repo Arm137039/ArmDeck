@@ -6,20 +6,20 @@ idf_component_register(    SRCS
         "button_matrix.c"
         "armdeck_protocol.c"
         "armdeck_service.c"
+        "power_button.c"
+       
         # HID profile files (from ESP-IDF)
         "esp_hidd_prf_api.c"
         "hid_dev.c"
         "hid_device_le_prf.c"
-    
-    INCLUDE_DIRS 
+      INCLUDE_DIRS 
         "."
-    
-    REQUIRES 
+      REQUIRES 
         bt
         nvs_flash
-        driver
-        esp_timer
+        driver        esp_timer
         esp_hid
+        esp_hw_support
     
     PRIV_REQUIRES
         esp_system

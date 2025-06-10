@@ -171,6 +171,8 @@ typedef uint8_t mouse_cmd_t;
 #define HID_CONSUMER_BALANCE        225 // Balance
 #define HID_CONSUMER_MUTE           226 // Mute
 #define HID_CONSUMER_BASS           227 // Bass
+#define HID_CONSUMER_BRIGHTNESS_UP  0x6F // Monitor Brightness Up (111 decimal)
+#define HID_CONSUMER_BRIGHTNESS_DOWN 0x70 // Monitor Brightness Down (112 decimal)  
 #define HID_CONSUMER_VOLUME_UP      233 // Volume Increment
 #define HID_CONSUMER_VOLUME_DOWN    234 // Volume Decrement
 typedef uint8_t consumer_cmd_t;

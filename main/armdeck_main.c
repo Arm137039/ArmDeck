@@ -22,8 +22,12 @@
 #include "armdeck_service.h"
 #include "button_matrix.h"
 #include "armdeck_protocol.h"
+#include "power_button.h"
 
 static const char* TAG = "ARMDECK_MAIN";
+
+/* Function prototypes */
+static void power_button_event_handler(power_event_t event);
 
 /* Global variables */
 bool ble_connected = false;
@@ -238,12 +242,14 @@ static void status_task(void *pvParameters) {
                  ble_connected ? "YES" : "NO",
                  adv_running ? "YES" : "NO",
                  esp_get_free_heap_size() / 1024);
-        
-        /* Check if advertising should be running but isn't (fallback mechanism) */
+          /* Check if advertising should be running but isn't (fallback mechanism) */
         if (!ble_connected && !adv_running) {
             ESP_LOGW(TAG, "Advertising not running while disconnected - restarting");
             armdeck_ble_start_advertising();
         }
+        
+        /* Check power switch state */
+        power_button_check_state();
         
         vTaskDelay(pdMS_TO_TICKS(30000)); /* Every 30 seconds */
     }
@@ -292,22 +298,46 @@ void app_main(void) {
     ESP_ERROR_CHECK(armdeck_matrix_init());
     ESP_ERROR_CHECK(armdeck_hid_init());
     ESP_ERROR_CHECK(armdeck_ble_init());
+    ESP_ERROR_CHECK(power_button_init());
     
     /* Register callbacks */
     armdeck_matrix_set_callback(handle_button_event);
     armdeck_hid_register_callback(hid_event_handler);
     armdeck_ble_register_gap_callback(gap_event_handler);
     armdeck_ble_register_gatts_callback(gatts_event_handler);
-      /* Start services */
-    ESP_ERROR_CHECK(armdeck_matrix_start());
-    ESP_ERROR_CHECK(armdeck_ble_start_advertising());
-    
-    /* Enable continuous advertising to prevent timeout issues */
-    armdeck_ble_set_continuous_advertising(true);
+    power_button_set_callback(power_button_event_handler);    /* Start services selon l'état du switch power */
+    if (power_button_get_state() == POWER_STATE_ON) {
+        ESP_LOGI(TAG, "Switch ON - Démarrage des services");
+        ESP_ERROR_CHECK(armdeck_matrix_start());
+        ESP_ERROR_CHECK(armdeck_ble_start_advertising());
+        
+        /* Enable continuous advertising to prevent timeout issues */
+        armdeck_ble_set_continuous_advertising(true);
+    } else {
+        ESP_LOGI(TAG, "Switch OFF - Services en veille (non démarrés)");
+        armdeck_ble_set_continuous_advertising(false);
+    }
     
     /* Create status monitoring task */
     xTaskCreate(status_task, "status", 2048, NULL, 1, NULL);
     
     ESP_LOGI(TAG, "=== ArmDeck Ready ===");
     ESP_LOGI(TAG, "Connect via Bluetooth to start using");
+}
+
+/* Power button event handler */
+static void power_button_event_handler(power_event_t event) {
+    switch (event) {
+        case POWER_EVENT_SWITCH_ON:
+            ESP_LOGI(TAG, "Switch power: Activé - Système en marche");
+            break;
+            
+        case POWER_EVENT_SWITCH_OFF:
+            ESP_LOGI(TAG, "Switch power: Désactivé - Système en veille");
+            break;
+            
+        default:
+            ESP_LOGW(TAG, "Événement switch power inconnu: %d", event);
+            break;
+    }
 }

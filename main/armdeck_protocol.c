@@ -355,11 +355,20 @@ esp_err_t armdeck_protocol_handle_command(const uint8_t* input, uint16_t input_l
         case CMD_TEST_BUTTON:
             ESP_LOGI(TAG, "Handling CMD_TEST_BUTTON");
             return handle_test_button(payload, header.length, output, output_len);
-            
-        case CMD_RESET_CONFIG:
+              case CMD_RESET_CONFIG:
             ESP_LOGI(TAG, "Handling CMD_RESET_CONFIG");
+            // Use the proper configuration system to reset and save
+            esp_err_t reset_ret = armdeck_config_reset();
+            if (reset_ret != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to reset configuration: %s", esp_err_to_name(reset_ret));
+                *output_len = armdeck_protocol_build_response(CMD_RESET_CONFIG, ERR_MEMORY,
+                                                              NULL, 0, output, 256);
+                return reset_ret;
+            }
+            
+            // Also update local copy for backward compatibility
             memcpy(current_config.buttons, default_buttons, sizeof(default_buttons));
-            ESP_LOGI(TAG, "Configuration reset to defaults");
+            ESP_LOGI(TAG, "Configuration reset to defaults and saved");
             *output_len = armdeck_protocol_build_response(CMD_RESET_CONFIG, ERR_NONE,
                                                           NULL, 0, output, 256);
             return ESP_OK;

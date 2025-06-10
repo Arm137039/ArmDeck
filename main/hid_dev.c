@@ -115,10 +115,20 @@ void hid_consumer_build_report(uint8_t *buffer, consumer_cmd_t cmd)
 
         case HID_CONSUMER_SCAN_PREV_TRK:
             HID_CC_RPT_SET_BUTTON(buffer, HID_CC_RPT_SCAN_PREV_TRK);
+            break;        case HID_CONSUMER_STOP:
+            HID_CC_RPT_SET_BUTTON(buffer, HID_CC_RPT_STOP);
             break;
 
-        case HID_CONSUMER_STOP:
-            HID_CC_RPT_SET_BUTTON(buffer, HID_CC_RPT_STOP);
+        case HID_CONSUMER_BRIGHTNESS_UP:
+            // For brightness, we might need to send the raw value
+            buffer[0] = 0x6F;
+            buffer[1] = 0x00;
+            break;
+            
+        case HID_CONSUMER_BRIGHTNESS_DOWN:
+            // For brightness, we might need to send the raw value  
+            buffer[0] = 0x70;
+            buffer[1] = 0x00;
             break;
 
         default:
