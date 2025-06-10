@@ -59,10 +59,6 @@ GPIO 12 ←→ Switch ←→ GND
 
 ## Installation et configuration
 
-### Prérequis
-2. **VS Code**
-1. **ESP-IDF v5.4.1**
-
 ## Configuration via interface web
 
 ### Connexion BLE
@@ -75,29 +71,13 @@ Le device expose un service personnalisé pour la configuration :
 
 **Service ArmDeck** : `7a0b1000-0000-1000-8000-00805f9b34fb`
 
-**Caractéristiques :**
+**Services :**
 - **Command** : `7a0b1002-0000-1000-8000-00805f9b34fb` (Write/Notify)
 - **Keymap** : `7a0b1001-0000-1000-8000-00805f9b34fb` (Write)
 
 ## Protocole de communication : **ArmDeck Protocol**
 
-Le protocole propriétaire se nomme **"ArmDeck Protocol"** et gère la communication entre l'interface web et l'ESP32 via BLE.
-
-### Caractéristiques du protocole
-
-**Nom :** `ArmDeck Protocol v1.0`  
-**Version :** `0x01` (définie par `ARMDECK_PROTOCOL_VERSION`)  
-**Transport :** BLE via service personnalisé  
-**Magic bytes :** `0xAD 0xDC` (ArmDeck)  
-
-### Architecture de communication
-
-```
-Interface Web ←→ BLE ←→ ESP32 ←→ Ordinateur (HID)
-      ↑              ↑        ↑
-Configuration   ArmDeck    Actions
-    JSON        Protocol   HID/Clavier
-```
+Le protocole en trames, gère la communication entre l'interface web et l'ESP32 via BLE.
 
 ### Structure des paquets
 
@@ -110,84 +90,20 @@ HEADER (4 bytes):
 - Length (1 byte): Taille payload
 ```
 
-### Commandes supportées
+### Architecture de communication
 
-#### 📖 GET_INFO (0x10)
-Obtenir les informations du device
-
-**Envoi :** `[0xAD][0xDC][0x10][0x00][checksum]`
-
-**Réponse :**
-```c
-typedef struct {
-    uint8_t protocol_version;  // Version du protocole
-    uint8_t firmware_major;    // Version firmware
-    uint8_t firmware_minor;
-    uint8_t firmware_patch;
-    uint8_t num_buttons;       // Nombre de boutons (15)
-    uint8_t battery_level;     // Niveau batterie
-    uint32_t uptime_seconds;   // Temps de fonctionnement
-    uint32_t free_heap;        // Mémoire libre
-    char device_name[16];      // Nom du device
-} armdeck_device_info_t;
 ```
-
-#### ⚙️ GET_CONFIG (0x20)
-Obtenir la configuration complète
-
-**Envoi :** `[0xAD][0xDC][0x20][0x00][checksum]`
-
-**Réponse :** Configuration complète des 15 boutons
-
-#### 🔧 SET_CONFIG (0x21)
-Définir la configuration complète
-
-**Envoi :** `[HEADER][armdeck_config_t][checksum]`
-
-#### 🎯 GET_BUTTON (0x30)
-Obtenir la configuration d'un bouton spécifique
-
-**Envoi :** `[0xAD][0xDC][0x30][0x01][button_id][checksum]`
-
-#### ✏️ SET_BUTTON (0x31)
-Configurer un bouton spécifique
-
-**Envoi :** `[HEADER][armdeck_button_t][checksum]`
-
-#### 🧪 TEST_BUTTON (0x40)
-Tester un bouton (simulation de pression)
-
-**Envoi :** `[0xAD][0xDC][0x40][0x01][button_id][checksum]`
-
-#### 🔄 RESET_CONFIG (0x22)
-Réinitialiser à la configuration par défaut
-
-**Envoi :** `[0xAD][0xDC][0x22][0x00][checksum]`
-
-#### 🔃 RESTART (0x50)
-Redémarrer le device
+Interface Web ←→ BLE ←→ ESP32 ←→ Ordinateur (HID)
+      ↑              ↑        ↑
+Configuration   ArmDeck    Actions
+    JSON        Protocol   HID/Clavier
+```
 
 **Envoi :** `[0xAD][0xDC][0x50][0x00][checksum]`
 
-### Structure d'un bouton
-
-```c
-typedef struct {
-    uint8_t button_id;        // ID du bouton (0-14)
-    uint8_t action_type;      // Type d'action
-    uint8_t key_code;         // Code de la touche HID
-    uint8_t modifier;         // Modificateurs (Ctrl, Alt, etc.)
-    uint8_t color_r;          // Composante rouge (0-255)
-    uint8_t color_g;          // Composante verte (0-255)
-    uint8_t color_b;          // Composante bleue (0-255)
-    uint8_t reserved;         // Réservé
-    char label[8];            // Label (7 chars + null)
-} armdeck_button_t;
-```
-
 ### Types d'actions supportées
 
-#### 🎮 Actions Media (Consumer Control)
+#### Actions Media
 ```c
 ACTION_MEDIA = 0x02
 ```
@@ -200,21 +116,7 @@ Codes disponibles :
 - `0xE9` : Volume Up
 - `0xEA` : Volume Down
 - `0xE2` : Mute
-
-#### ⌨️ Actions Clavier (Keyboard)
-```c
-ACTION_KEY = 0x01
-```
-
-Codes HID standard (exemples) :
-- `0x6F` : F20
-- `0x70` : F21
-- `0x71` : F22
-- `0x72` : F23
-- `0x73` : F24
-- `0x74` : F13
-- `0x75` : F14
-- `0x76` : F15
+- etcqq
 
 #### 🔧 Modificateurs
 Combinaisons possibles (OR bit à bit) :
@@ -227,7 +129,7 @@ Combinaisons possibles (OR bit à bit) :
 - `0x40` : Alt Droit
 - `0x80` : GUI Droit
 
-## 🎨 Configuration par défaut
+## Configuration par défaut
 
 Au premier démarrage, cette configuration est créée :
 
@@ -255,18 +157,6 @@ Au premier démarrage, cette configuration est créée :
 
 Le bouton power utilise un **système d'interruption matérielle** pour une réactivité maximale :
 
-**Configuration ISR :**
-```c
-// Configuration GPIO avec interruption sur front montant/descendant
-io_conf.intr_type = GPIO_INTR_ANYEDGE;
-
-// Installation du gestionnaire d'interruption
-gpio_isr_handler_add(POWER_SWITCH_GPIO, power_switch_isr, NULL);
-
-// Configuration réveil deep sleep
-esp_sleep_enable_ext0_wakeup(POWER_SWITCH_GPIO, 1);
-```
-
 **Fonctionnement de l'ISR :**
 - **Détection instantanée** des changements d'état du switch
 - **Switch OFF détecté** → Demande de deep sleep immédiate
@@ -281,17 +171,6 @@ esp_sleep_enable_ext0_wakeup(POWER_SWITCH_GPIO, 1);
 - **Switch ON→OFF** : Passage en deep sleep **immédiat** (depuis l'ISR)
 - **Switch OFF→ON** : Réveil automatique depuis deep sleep
 - **Deep Sleep** : Réveil uniquement par switch power (GPIO 12)
-
-## Protocole de communication : **ArmDeck Protocol**
-
-Le protocole propriétaire se nomme **"ArmDeck Protocol"** et gère la communication entre l'interface web et l'ESP32 via BLE.
-
-### Caractéristiques du protocole
-
-**Nom :** `ArmDeck Protocol v1.0`
-**Version :** `0x01` (définie par `ARMDECK_PROTOCOL_VERSION`)
-**Transport :** BLE via service personnalisé
-**Magic bytes :** `0xAD 0xDC` (ArmDeck)
 
 ### Gestion de la connexion BLE
 
