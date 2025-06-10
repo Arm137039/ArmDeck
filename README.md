@@ -194,7 +194,6 @@ Le bouton power utilise un **système d'interruption matérielle** pour une réa
 ### Références
 - [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/)
 - [Bluetooth HID Specification](https://www.bluetooth.com/specifications/specs/human-interface-device-profile-1-1-1/)
-- [USB HID Usage Tables](https://usb.org/sites/default/files/documents/hut1_12v2.pdf)
 
 ### Architecture interne
 
