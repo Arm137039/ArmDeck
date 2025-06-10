@@ -29,6 +29,7 @@ const useBle = (): UseBleReturn => {
   const loadingConfigRef = useRef<boolean>(false);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const workingCommandMethodRef = useRef<CommandMethod | null>(null);
+  const disconnectedAtRef = useRef<number | null>(null);
 
   // ========================================
   // CONFIG MANAGEMENT
@@ -155,15 +156,33 @@ const useBle = (): UseBleReturn => {
   // ========================================
   const cleanupConnection = useCallback(() => {
     console.log('[BLE] Cleaning up connection...');
+
+    // Si on a un appareil actif, on s'assure de nettoyer correctement
+    if (bleDevice?.device) {
+      try {
+        // Supprime explicitement le listener d'événement pour éviter les déclenchements multiples
+        bleDevice.device.removeEventListener('gattserverdisconnected', () => {});
+
+        // Déconnecte le serveur s'il est connecté
+        if (bleDevice.server?.connected) {
+          bleDevice.server.disconnect();
+        }
+      } catch (e) {
+        console.warn('[BLE] Error during cleanup:', e);
+      }
+    }
+
     setIsConnected(false);
     setIsFullyConnected(false);
     setConnectionStage('Disconnected');
     setBleDevice(null);
     setDeviceInfo(null);
     workingCommandMethodRef.current = null;
+    // On garde une trace du moment de la déconnexion
+    disconnectedAtRef.current = Date.now();
     connectingRef.current = false;
     loadingConfigRef.current = false;
-  }, []);
+  }, [bleDevice]);
 
   const handleDisconnection = useCallback((device: BluetoothDevice) => {
     console.log(`[BLE] Device disconnected: ${device.name}`);
@@ -171,32 +190,114 @@ const useBle = (): UseBleReturn => {
   }, [cleanupConnection]);
 
   const connectToServices = useCallback(async (device: BluetoothDevice) => {
+    // Variable pour suivre l'étape où nous nous trouvons
+    let currentStage = 'start';
+
     try {
       setError(null);
-      setConnectionStage('Connecting to GATT...');
 
-      const server = await device.gatt!.connect();
+      // Fonction pour créer un timeout sur une opération Bluetooth
+      const withTimeout = async <T>(
+        promiseOrFn: Promise<T> | (() => Promise<T>),
+        timeoutMs: number,
+        stageName: string,
+        retryCount: number = 0
+      ): Promise<T> => {
+        currentStage = stageName;
+        setConnectionStage(stageName);
+
+        let attempts = 0;
+        let lastError: Error | null = null;
+
+        while (attempts <= retryCount) {
+          let timeoutId: NodeJS.Timeout;
+
+          // Convertir la fonction en promesse si nécessaire
+          const promise = typeof promiseOrFn === 'function'
+            ? (promiseOrFn as () => Promise<T>)()
+            : promiseOrFn;
+
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            timeoutId = setTimeout(() => {
+              reject(new Error(`Timeout at stage: ${stageName}`));
+            }, timeoutMs);
+          });
+
+          try {
+            const result = await Promise.race([promise, timeoutPromise]);
+            clearTimeout(timeoutId!);
+            return result as T;
+          } catch (error) {
+            clearTimeout(timeoutId!);
+            lastError = error as Error;
+            attempts++;
+
+            if (attempts <= retryCount) {
+              console.warn(`[BLE] Retry ${attempts}/${retryCount} for ${stageName} after error:`, error);
+              await delay(1000); // Attendre 1 seconde avant de réessayer
+              continue;
+            }
+
+            throw error;
+          }
+        }
+
+        throw lastError;
+      };
+
+      // 1. Connexion GATT avec timeout
+      const server = await withTimeout(
+        device.gatt!.connect(),
+        15000, // 15 secondes de timeout
+        'Connecting to GATT...'
+      );
       console.log('[BLE] GATT connected');
 
-      setConnectionStage('Waiting for ESP32...');
-      await delay(BLE_CONFIG.TIMING.CONNECTION_WAIT);
+      // 2. Pause beaucoup plus longue pour que l'ESP32 se stabilise complètement
+      console.log('[BLE] Waiting for ESP32 to stabilize...');
+      await withTimeout(
+        delay(3000), // 3 secondes d'attente au lieu de la valeur précédente
+        10000,
+        'Waiting for ESP32...'
+      );
+      console.log('[BLE] ESP32 stabilization period complete');
 
-      setConnectionStage('Discovering services...');
-      const armdeckService = await server.getPrimaryService(BLE_CONFIG.SERVICES.ARMDECK);
+      // 3. Découverte du service avec timeout et retry
+      console.log('[BLE] Starting service discovery...');
+      const armdeckService = await withTimeout(
+        server.getPrimaryService(BLE_CONFIG.SERVICES.ARMDECK),
+        20000, // 20 secondes de timeout
+        'Discovering services...',
+        2 // Jusqu'à 2 tentatives en cas d'échec
+      );
       console.log('[BLE] ArmDeck service found');
 
-      setConnectionStage('Getting characteristics...');
+      // 4. Récupération des caractéristiques
       const characteristics: BleDevice['characteristics'] = {};
+      let cmdCharacteristicFound = false;
 
-      try {
-        characteristics.keymap = await armdeckService.getCharacteristic(BLE_CONFIG.CHARACTERISTICS.KEYMAP);
-        console.log('[BLE] Keymap characteristic found');
-      } catch (e) {
-        console.warn('[BLE] Keymap characteristic not found');
+      await withTimeout(async () => {
+        try {
+          characteristics.keymap = await armdeckService.getCharacteristic(BLE_CONFIG.CHARACTERISTICS.KEYMAP);
+          console.log('[BLE] Keymap characteristic found');
+        } catch (e) {
+          console.warn('[BLE] Keymap characteristic not found - continuing without it');
+          // On continue même si cette caractéristique n'est pas trouvée
+        }
+
+        try {
+          characteristics.cmd = await armdeckService.getCharacteristic(BLE_CONFIG.CHARACTERISTICS.COMMAND);
+          cmdCharacteristicFound = true;
+          console.log('[BLE] Command characteristic found');
+        } catch (e) {
+          console.error('[BLE] Command characteristic not found - this is required');
+          throw new Error('Required command characteristic not found');
+        }
+      }, 10000, 'Getting characteristics...');
+
+      if (!cmdCharacteristicFound) {
+        throw new Error('Command characteristic required but not found');
       }
-
-      characteristics.cmd = await armdeckService.getCharacteristic(BLE_CONFIG.CHARACTERISTICS.COMMAND);
-      console.log('[BLE] Command characteristic found');
 
       const newBleDevice: BleDevice = {
         device,
@@ -208,38 +309,42 @@ const useBle = (): UseBleReturn => {
       workingCommandMethodRef.current = sendCommandStrict;
       setBleDevice(newBleDevice);
 
-      if (characteristics.cmd) {
-        setIsConnected(true);
-        setIsFullyConnected(true);
-        setConnectionStage('Fully Connected');
+      setIsConnected(true);
+      setIsFullyConnected(true);
+      setConnectionStage('Connected');
 
-        setTimeout(async () => {
-          try {
-            await delay(BLE_CONFIG.TIMING.SETUP_DELAY);
-            const result = await testCommunication(newBleDevice);
+      setTimeout(async () => {
+        try {
+          await delay(BLE_CONFIG.TIMING.SETUP_DELAY);
+          const result = await testCommunication(newBleDevice);
 
-            if (result.success) {
-              console.log('[BLE] Communication established, loading configuration...');
-              setDeviceInfo(result.deviceInfo || null);
-              await loadConfiguration(newBleDevice, result.deviceInfo || null);
-            } else {
-              setError('Cannot communicate with ESP32');
-            }
-          } catch (err) {
-            console.error('[BLE] Setup failed:', err);
-            setError(`Setup failed: ${err instanceof Error ? err.message : String(err)}`);
+          if (result.success) {
+            console.log('[BLE] Communication established, loading configuration...');
+            setDeviceInfo(result.deviceInfo || null);
+            await loadConfiguration(newBleDevice, result.deviceInfo || null);
+          } else {
+            setError('Cannot communicate with ESP32');
           }
-        }, 1000);
-      } else {
-        throw new Error('Required characteristics not found');
-      }
-
+        } catch (err) {
+          console.error('[BLE] Setup failed:', err);
+          setError(`Setup failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      }, 1000);
     } catch (err) {
-      console.error('[BLE] Connection failed:', err);
+      console.error(`[BLE] Connection failed at stage ${currentStage}:`, err);
       setIsConnected(false);
       setIsFullyConnected(false);
       setConnectionStage('Connection Failed');
-      setError(`Connection error: ${err instanceof Error ? err.message : String(err)}`);
+      setError(`Connection error at ${currentStage}: ${err instanceof Error ? err.message : String(err)}`);
+
+      // En cas d'erreur, on s'assure de nettoyer les connexions
+      if (device.gatt?.connected) {
+        try {
+          device.gatt.disconnect();
+        } catch (e) {
+          console.warn('[BLE] Error disconnecting after failure:', e);
+        }
+      }
     } finally {
       connectingRef.current = false;
     }
@@ -257,6 +362,19 @@ const useBle = (): UseBleReturn => {
     if (connectingRef.current) {
       console.log('[BLE] Connection already in progress');
       return;
+    }
+
+    // Vérification du délai depuis la dernière déconnexion
+    // Un délai de 3 secondes est nécessaire pour permettre à l'ESP de se réinitialiser
+    const RECONNECTION_DELAY_MS = 3000; // 3 secondes
+    if (disconnectedAtRef.current) {
+      const timeSinceDisconnect = Date.now() - disconnectedAtRef.current;
+      if (timeSinceDisconnect < RECONNECTION_DELAY_MS) {
+        const waitTime = RECONNECTION_DELAY_MS - timeSinceDisconnect;
+        console.log(`[BLE] Attente de ${waitTime}ms avant reconnexion...`);
+        setConnectionStage('Préparation de la connexion...');
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
     }
 
     connectingRef.current = true;

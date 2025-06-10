@@ -24,8 +24,7 @@ const ConnectionStatusPanel: React.FC = () => {
 
     const getConnectionStatus = () => {
         if (isScanning) return 'Scanning...';
-        if (isFullyConnected) return 'Fully Connected';
-        if (isConnected) return 'Connected';
+        if (isFullyConnected) return 'Connected';
         return 'Disconnected';
     };
 
